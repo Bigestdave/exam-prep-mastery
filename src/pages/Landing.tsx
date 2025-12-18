@@ -137,7 +137,7 @@ export default function Landing() {
               </div>
               <span className="font-semibold text-foreground">LCU Prep</span>
             </div>
-            <p>© 2025 LCU Prep. All rights reserved.</p>
+            <p>© 2024 LCU Prep. All rights reserved.</p>
           </div>
         </div>
       </footer>

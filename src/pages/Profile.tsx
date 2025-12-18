@@ -43,9 +43,9 @@ export default function Profile() {
     });
   };
 
-  const handleLogout = async () => {
-    navigate("/login");
-    await logout();
+  const handleLogout = () => {
+    logout();
+    navigate("/");
   };
 
   return (

@@ -58,7 +58,7 @@ export default function Login() {
         </div>
         
         <p className="text-sm text-primary-foreground/50">
-          © 2025 LCU Prep
+          © 2024 LCU Prep
         </p>
       </div>
 
