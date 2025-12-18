@@ -1,23 +1,26 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { CourseCard } from "@/components/CourseCard";
+import { CourseCardSkeleton } from "@/components/CourseCardSkeleton";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { getCoursesByFacultyAndLevel, courses } from "@/data/courses";
+import { useCourses } from "@/hooks/useCourses";
 import { BookOpen, CheckCircle } from "lucide-react";
 
 export default function Dashboard() {
-  const { user, profile, isLoading, purchases } = useAuth();
+  const { user, profile, isLoading: authLoading, purchases } = useAuth();
+  const { courses, isLoading: coursesLoading, getCoursesByFacultyAndLevel } = useCourses();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (!authLoading && !user && !isLoggingOut) {
       navigate("/login");
     }
-  }, [user, isLoading, navigate]);
+  }, [user, authLoading, navigate, isLoggingOut]);
 
   // Show welcome toast when profile loads after successful login
   useEffect(() => {
@@ -37,7 +40,7 @@ export default function Dashboard() {
     }
   }, [profile, toast]);
 
-  if (isLoading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse text-muted-foreground">Loading...</div>
@@ -67,7 +70,19 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {displayCourses.length > 0 ? (
+        {coursesLoading ? (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <div 
+                key={i} 
+                className="opacity-0 animate-fade-in"
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <CourseCardSkeleton />
+              </div>
+            ))}
+          </div>
+        ) : displayCourses.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {displayCourses.map((course, i) => (
               <div 

@@ -57,7 +57,7 @@ export default function ForgotPassword() {
         </div>
         
         <p className="text-sm text-primary-foreground/50">
-          © 2024 LCU Prep
+          © 2025 LCU Prep
         </p>
       </div>
 
