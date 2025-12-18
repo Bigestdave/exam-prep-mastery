@@ -28,16 +28,11 @@ export function MobileBottomNav() {
   const location = useLocation();
   const currentPath = location.pathname;
 
-  // Determine active state
-  const isHomeActive = currentPath === "/dashboard" || currentPath.startsWith("/course/");
-  const isLibraryActive = currentPath === "/library" || currentPath === "/profile";
-  const isAccountActive = currentPath === "/profile";
-
-  // Adjust logic: Profile page shows Account as active, Library is for purchases section
   const getActiveState = () => {
     if (currentPath === "/profile") return "account";
+    if (currentPath === "/library") return "library";
     if (currentPath === "/dashboard" || currentPath.startsWith("/course/")) return "home";
-    return "home"; // default
+    return "home";
   };
 
   const activeState = getActiveState();
@@ -52,10 +47,10 @@ export function MobileBottomNav() {
           isActive={activeState === "home"}
         />
         <NavItem
-          to="/profile"
+          to="/library"
           icon={<BookOpen className="w-5 h-5" />}
           label="Library"
-          isActive={false}
+          isActive={activeState === "library"}
         />
         <NavItem
           to="/profile"
