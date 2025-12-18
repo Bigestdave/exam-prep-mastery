@@ -2,19 +2,40 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { CourseCard } from "@/components/CourseCard";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import { getCoursesByFacultyAndLevel, courses } from "@/data/courses";
-import { BookOpen } from "lucide-react";
+import { BookOpen, CheckCircle } from "lucide-react";
 
 export default function Dashboard() {
   const { user, profile, isLoading, purchases } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!isLoading && !user) {
       navigate("/login");
     }
   }, [user, isLoading, navigate]);
+
+  // Show welcome toast when profile loads after successful login
+  useEffect(() => {
+    const justLoggedIn = sessionStorage.getItem('showWelcomeToast');
+    if (justLoggedIn && profile?.full_name) {
+      sessionStorage.removeItem('showWelcomeToast');
+      toast({
+        title: `Welcome back, ${profile.full_name.split(' ')[0]}!`,
+        className: "bg-navy text-primary-foreground border-navy",
+        description: (
+          <div className="flex items-center gap-2 text-primary-foreground/80">
+            <CheckCircle className="w-4 h-4 text-success" />
+            <span>You're all set to continue learning.</span>
+          </div>
+        ) as unknown as string,
+      });
+    }
+  }, [profile, toast]);
 
   if (isLoading) {
     return (
@@ -30,7 +51,7 @@ export default function Dashboard() {
   const displayCourses = filteredCourses.length > 0 ? filteredCourses : courses;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Header isLoggedIn userName={profile?.full_name || ''} />
       
       <main className="container py-8">
@@ -76,6 +97,8 @@ export default function Dashboard() {
           </div>
         )}
       </main>
+
+      <MobileBottomNav />
     </div>
   );
 }

@@ -68,7 +68,7 @@ export default {
         "3xl": "1.5rem",
       },
       boxShadow: {
-        'card': '0 8px 30px rgb(0 0 0 / 0.04)',
+        'card': '0px 4px 24px rgba(0, 0, 0, 0.06)',
         'elevated': '0 20px 40px rgb(0 0 0 / 0.08)',
         'glow': '0 0 40px hsl(217 91% 60% / 0.2)',
       },

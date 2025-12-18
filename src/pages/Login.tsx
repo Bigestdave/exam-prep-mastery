@@ -31,10 +31,7 @@ export default function Login() {
       return;
     }
     
-    toast({
-      title: "Welcome back!",
-      description: "You've successfully logged in.",
-    });
+    // Navigate first, then toast will show after profile loads
     navigate("/dashboard");
     setIsLoading(false);
   };

@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { Wallet, Share2, BookOpen, LogOut, ArrowLeft, Copy } from "lucide-react";
+import { Wallet, BookOpen, LogOut, ArrowLeft, Copy } from "lucide-react";
 
 export default function Profile() {
   const { user, profile, isLoading, logout, purchases } = useAuth();
@@ -48,7 +49,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
       <Header isLoggedIn userName={profile?.full_name || ''} />
       
       <main className="container py-8 max-w-xl">
@@ -69,7 +70,7 @@ export default function Profile() {
         </div>
 
         {/* Wallet Card */}
-        <div className="bg-navy rounded-2xl p-6 mb-6 text-primary-foreground">
+        <div className="bg-navy rounded-2xl p-6 mb-6 text-primary-foreground shadow-elevated">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
               <Wallet className="w-5 h-5 text-primary" />
@@ -100,8 +101,8 @@ export default function Profile() {
         </div>
 
         {/* Library */}
-        <div className="bg-card rounded-2xl border border-border/50 card-shadow overflow-hidden mb-6">
-          <div className="p-4 border-b border-border/50">
+        <div className="bg-card rounded-2xl border border-border/50 shadow-card overflow-hidden mb-6">
+          <div className="p-5 border-b border-border/50">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-primary" />
@@ -126,7 +127,7 @@ export default function Profile() {
                 <Link 
                   key={courseId}
                   to={`/course/${courseId}`}
-                  className="block p-4 hover:bg-secondary/50 transition-colors"
+                  className="block p-5 hover:bg-secondary/50 transition-colors"
                 >
                   <span className="text-sm font-medium text-foreground uppercase">{courseId}</span>
                 </Link>
@@ -145,6 +146,8 @@ export default function Profile() {
           Sign out
         </Button>
       </main>
+
+      <MobileBottomNav />
     </div>
   );
 }
