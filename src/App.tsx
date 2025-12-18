@@ -10,6 +10,7 @@ import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import CourseDetail from "./pages/CourseDetail";
 import AnswerView from "./pages/AnswerView";
 import Profile from "./pages/Profile";
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/course/:id" element={<CourseDetail />} />
             <Route path="/course/:id/answer/:questionId" element={<AnswerView />} />
