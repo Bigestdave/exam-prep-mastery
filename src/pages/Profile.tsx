@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Wallet, Share2, BookOpen, LogOut, ArrowLeft, Copy } from "lucide-react";
 
 export default function Profile() {
-  const { user, isLoading, logout, purchases } = useAuth();
+  const { user, profile, isLoading, logout, purchases } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -49,7 +49,7 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header isLoggedIn userName={user.fullName} />
+      <Header isLoggedIn userName={profile?.full_name || ''} />
       
       <main className="container py-8 max-w-xl">
         <Link 
@@ -61,10 +61,10 @@ export default function Profile() {
         </Link>
 
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-foreground mb-1">{user.fullName}</h1>
-          <p className="text-muted-foreground">{user.email}</p>
+          <h1 className="text-2xl font-bold text-foreground mb-1">{profile?.full_name}</h1>
+          <p className="text-muted-foreground">{user?.email}</p>
           <p className="text-sm text-muted-foreground mt-1">
-            {user.faculty} • {user.level}
+            {profile?.faculty} • {profile?.level}
           </p>
         </div>
 

@@ -36,22 +36,24 @@ export default function Signup() {
 
     setIsLoading(true);
     
-    try {
-      await signup(formData);
-      toast({
-        title: "Account created!",
-        description: "Welcome to LCU Prep.",
-      });
-      navigate("/dashboard");
-    } catch (error) {
+    const { error } = await signup(formData);
+    
+    if (error) {
       toast({
         title: "Signup failed",
-        description: "Please try again.",
+        description: error.message || "Please try again.",
         variant: "destructive",
       });
-    } finally {
       setIsLoading(false);
+      return;
     }
+    
+    toast({
+      title: "Account created!",
+      description: "Welcome to LCU Prep. Please check your email to confirm.",
+    });
+    navigate("/dashboard");
+    setIsLoading(false);
   };
 
   return (

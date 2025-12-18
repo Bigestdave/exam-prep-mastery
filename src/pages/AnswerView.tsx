@@ -9,7 +9,7 @@ import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function AnswerView() {
   const { id, questionId } = useParams<{ id: string; questionId: string }>();
-  const { user, isLoading, purchases } = useAuth();
+  const { user, profile, isLoading, purchases } = useAuth();
   const navigate = useNavigate();
 
   const course = id ? getCourseById(id) : undefined;
@@ -71,9 +71,9 @@ export default function AnswerView() {
 
   return (
     <div className="min-h-screen bg-background relative">
-      {user && <Watermark name={user.fullName} email={user.email} />}
+      {user && <Watermark name={profile?.full_name || ''} email={user.email || ''} />}
       
-      <Header isLoggedIn userName={user.fullName} />
+      <Header isLoggedIn userName={profile?.full_name || ''} />
       
       <main className="container py-8 max-w-3xl relative z-10">
         <Link 

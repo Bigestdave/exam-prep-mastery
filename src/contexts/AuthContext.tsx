@@ -1,21 +1,24 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 
-interface User {
+interface Profile {
   id: string;
-  email: string;
-  fullName: string;
-  faculty: string;
-  level: string;
+  full_name: string | null;
+  faculty: string | null;
+  level: string | null;
 }
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
+  profile: Profile | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (data: SignupData) => Promise<void>;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signup: (data: SignupData) => Promise<{ error: Error | null }>;
+  logout: () => Promise<void>;
   purchases: string[];
-  addPurchase: (courseId: string) => void;
+  addPurchase: (courseId: string) => Promise<void>;
 }
 
 interface SignupData {
@@ -30,61 +33,136 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [purchases, setPurchases] = useState<string[]>([]);
 
-  useEffect(() => {
-    // Check for existing session
-    const storedUser = localStorage.getItem('lcu_user');
-    const storedPurchases = localStorage.getItem('lcu_purchases');
+  const fetchProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
     
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    if (!error && data) {
+      setProfile(data);
     }
-    if (storedPurchases) {
-      setPurchases(JSON.parse(storedPurchases));
+  };
+
+  const fetchPurchases = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('purchases')
+      .select('course_id')
+      .eq('user_id', userId);
+    
+    if (!error && data) {
+      setPurchases(data.map(p => p.course_id));
     }
-    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          setTimeout(() => {
+            fetchProfile(session.user.id);
+            fetchPurchases(session.user.id);
+          }, 0);
+        } else {
+          setProfile(null);
+          setPurchases([]);
+        }
+      }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        fetchProfile(session.user.id);
+        fetchPurchases(session.user.id);
+      }
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const login = async (email: string, password: string) => {
-    // Demo login - in production, this would call Supabase
-    const demoUser: User = {
-      id: 'demo-user-1',
-      email,
-      fullName: 'Demo Student',
-      faculty: 'IRM',
-      level: '100L',
-    };
-    setUser(demoUser);
-    localStorage.setItem('lcu_user', JSON.stringify(demoUser));
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    return { error: error as Error | null };
   };
 
   const signup = async (data: SignupData) => {
-    const newUser: User = {
-      id: `user-${Date.now()}`,
+    const redirectUrl = `${window.location.origin}/`;
+    
+    const { data: authData, error } = await supabase.auth.signUp({
       email: data.email,
-      fullName: data.fullName,
-      faculty: data.faculty,
-      level: data.level,
-    };
-    setUser(newUser);
-    localStorage.setItem('lcu_user', JSON.stringify(newUser));
+      password: data.password,
+      options: {
+        emailRedirectTo: redirectUrl,
+      },
+    });
+
+    if (error) return { error: error as Error };
+
+    // Create profile immediately after signup
+    if (authData.user) {
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: authData.user.id,
+          full_name: data.fullName,
+          faculty: data.faculty,
+          level: data.level,
+        });
+
+      if (profileError) return { error: profileError as Error };
+    }
+
+    return { error: null };
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('lcu_user');
+  const logout = async () => {
+    await supabase.auth.signOut();
+    setProfile(null);
+    setPurchases([]);
   };
 
-  const addPurchase = (courseId: string) => {
-    const newPurchases = [...purchases, courseId];
-    setPurchases(newPurchases);
-    localStorage.setItem('lcu_purchases', JSON.stringify(newPurchases));
+  const addPurchase = async (courseId: string) => {
+    if (!user) return;
+    
+    const { error } = await supabase
+      .from('purchases')
+      .insert({
+        user_id: user.id,
+        course_id: courseId,
+      });
+
+    if (!error) {
+      setPurchases(prev => [...prev, courseId]);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, purchases, addPurchase }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session,
+      profile, 
+      isLoading, 
+      login, 
+      signup, 
+      logout, 
+      purchases, 
+      addPurchase 
+    }}>
       {children}
     </AuthContext.Provider>
   );

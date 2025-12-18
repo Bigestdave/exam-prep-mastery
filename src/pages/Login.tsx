@@ -19,22 +19,24 @@ export default function Login() {
     e.preventDefault();
     setIsLoading(true);
     
-    try {
-      await login(email, password);
-      toast({
-        title: "Welcome back!",
-        description: "You've successfully logged in.",
-      });
-      navigate("/dashboard");
-    } catch (error) {
+    const { error } = await login(email, password);
+    
+    if (error) {
       toast({
         title: "Login failed",
-        description: "Please check your credentials and try again.",
+        description: error.message || "Please check your credentials and try again.",
         variant: "destructive",
       });
-    } finally {
       setIsLoading(false);
+      return;
     }
+    
+    toast({
+      title: "Welcome back!",
+      description: "You've successfully logged in.",
+    });
+    navigate("/dashboard");
+    setIsLoading(false);
   };
 
   return (
