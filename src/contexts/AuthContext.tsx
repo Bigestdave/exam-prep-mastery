@@ -43,10 +43,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .from('profiles')
       .select('*')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
     
     if (!error && data) {
       setProfile(data);
+    } else {
+      // Profile might not exist yet for new signups, retry after a short delay
+      setTimeout(async () => {
+        const { data: retryData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .maybeSingle();
+        if (retryData) {
+          setProfile(retryData);
+        }
+      }, 1000);
     }
   };
 
