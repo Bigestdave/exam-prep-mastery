@@ -103,30 +103,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signup = async (data: SignupData) => {
     const redirectUrl = `${window.location.origin}/`;
     
-    const { data: authData, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
       options: {
         emailRedirectTo: redirectUrl,
+        data: {
+          full_name: data.fullName,
+          faculty: data.faculty,
+          level: data.level,
+        },
       },
     });
 
     if (error) return { error: error as Error };
-
-    // Create profile immediately after signup
-    if (authData.user) {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: authData.user.id,
-          full_name: data.fullName,
-          faculty: data.faculty,
-          level: data.level,
-        });
-
-      if (profileError) return { error: profileError as Error };
-    }
-
     return { error: null };
   };
 
