@@ -1,13 +1,24 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { ValueCard } from "@/components/ValueCard";
 import { CheckCircle, Target, Award, ArrowRight, GraduationCap } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Landing() {
+  const { user, profile, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      navigate("/dashboard");
+    }
+  }, [user, isLoading, navigate]);
+
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header isLoggedIn={!!user} userName={profile?.full_name || ''} />
       
       {/* Hero Section */}
       <section className="relative overflow-hidden">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { usePaystackPayment } from "react-paystack";
 import { Header } from "@/components/Header";
 import { QuestionItem } from "@/components/QuestionItem";
 import { Button } from "@/components/ui/button";
@@ -15,16 +16,37 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+const PAYSTACK_PUBLIC_KEY = "pk_live_2320cc6bb508955bd07391f75a4c73d757a0d6f6";
+
 export default function CourseDetail() {
   const { id } = useParams<{ id: string }>();
   const { user, profile, isLoading, purchases, addPurchase } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
 
   const course = id ? getCourseById(id) : undefined;
   const isOwned = id ? purchases.includes(id) : false;
+
+  const config = {
+    reference: `${course?.id}_${Date.now()}`,
+    email: user?.email || "",
+    amount: (course?.price || 0) * 100, // Paystack uses kobo (100 kobo = 1 Naira)
+    publicKey: PAYSTACK_PUBLIC_KEY,
+    metadata: {
+      course_id: course?.id || "",
+      course_code: course?.code || "",
+      custom_fields: [
+        {
+          display_name: "Course",
+          variable_name: "course",
+          value: course?.title || "",
+        },
+      ],
+    },
+  };
+
+  const initializePayment = usePaystackPayment(config);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -56,18 +78,26 @@ export default function CourseDetail() {
     );
   }
 
+  const onSuccess = () => {
+    addPurchase(course.id);
+    setShowPaymentModal(false);
+    toast({
+      title: "Payment successful! 🎉",
+      description: `You now have full access to ${course.code}.`,
+    });
+  };
+
+  const onClose = () => {
+    toast({
+      title: "Payment cancelled",
+      description: "You can try again when you're ready.",
+      variant: "destructive",
+    });
+  };
+
   const handlePayment = () => {
-    setIsProcessing(true);
-    // Simulate payment - in production, this would use Paystack
-    setTimeout(() => {
-      addPurchase(course.id);
-      setIsProcessing(false);
-      setShowPaymentModal(false);
-      toast({
-        title: "Payment successful!",
-        description: `You now have full access to ${course.code}.`,
-      });
-    }, 2000);
+    setShowPaymentModal(false);
+    initializePayment({ onSuccess, onClose });
   };
 
   return (
@@ -156,13 +186,8 @@ export default function CourseDetail() {
             <Button 
               className="w-full h-12" 
               onClick={handlePayment}
-              disabled={isProcessing}
             >
-              {isProcessing ? (
-                'Processing...'
-              ) : (
-                `Pay ₦${course.price.toLocaleString()}`
-              )}
+              Pay ₦{course.price.toLocaleString()}
             </Button>
             
             <p className="text-xs text-center text-muted-foreground mt-3">
