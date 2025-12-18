@@ -7,7 +7,7 @@ import { getCoursesByFacultyAndLevel, courses } from "@/data/courses";
 import { BookOpen } from "lucide-react";
 
 export default function Dashboard() {
-  const { user, isLoading, purchases } = useAuth();
+  const { user, profile, isLoading, purchases } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,21 +26,21 @@ export default function Dashboard() {
 
   if (!user) return null;
 
-  const filteredCourses = getCoursesByFacultyAndLevel(user.faculty, user.level);
+  const filteredCourses = getCoursesByFacultyAndLevel(profile?.faculty || '', profile?.level || '');
   const displayCourses = filteredCourses.length > 0 ? filteredCourses : courses;
 
   return (
     <div className="min-h-screen bg-background">
-      <Header isLoggedIn userName={user.fullName} />
+      <Header isLoggedIn userName={profile?.full_name || ''} />
       
       <main className="container py-8">
         <div className="mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-            Hi, {user.fullName.split(' ')[0]} 👋
+            Hi, {profile?.full_name?.split(' ')[0] || 'Student'} 👋
           </h1>
           <p className="text-muted-foreground">
             {filteredCourses.length > 0 
-              ? `Showing courses for ${user.faculty} - ${user.level}`
+              ? `Showing courses for ${profile?.faculty} - ${profile?.level}`
               : 'Browse all available courses'
             }
           </p>

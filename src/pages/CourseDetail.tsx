@@ -17,7 +17,7 @@ import {
 
 export default function CourseDetail() {
   const { id } = useParams<{ id: string }>();
-  const { user, isLoading, purchases, addPurchase } = useAuth();
+  const { user, profile, isLoading, purchases, addPurchase } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -45,7 +45,7 @@ export default function CourseDetail() {
   if (!course) {
     return (
       <div className="min-h-screen bg-background">
-        <Header isLoggedIn userName={user.fullName} />
+        <Header isLoggedIn userName={profile?.full_name || ''} />
         <main className="container py-8 text-center">
           <h1 className="text-xl font-semibold text-foreground">Course not found</h1>
           <Link to="/dashboard" className="text-primary hover:underline mt-4 inline-block">
@@ -72,7 +72,7 @@ export default function CourseDetail() {
 
   return (
     <div className="min-h-screen bg-background pb-24 md:pb-8">
-      <Header isLoggedIn userName={user.fullName} />
+      <Header isLoggedIn userName={profile?.full_name || ''} />
       
       <main className="container py-8">
         <Link 
