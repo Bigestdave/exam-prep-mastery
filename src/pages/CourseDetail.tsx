@@ -150,9 +150,9 @@ export default function CourseDetail() {
 
       {/* Mobile Sticky Footer */}
       {!isOwned && (
-        <div className="fixed bottom-0 left-0 right-0 bg-card border-t border-border p-4 md:hidden">
+        <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border/50 p-4 shadow-elevated z-50">
           <Button 
-            className="w-full h-12" 
+            className="w-full h-12 shadow-glow" 
             onClick={() => setShowPaymentModal(true)}
           >
             <Lock className="w-4 h-4" />
