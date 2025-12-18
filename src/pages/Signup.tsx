@@ -50,7 +50,7 @@ export default function Signup() {
     
     toast({
       title: "Account created!",
-      description: "Welcome to LCU Prep. Please check your email to confirm.",
+      description: "Welcome to LCU Prep!",
     });
     navigate("/dashboard");
     setIsLoading(false);
