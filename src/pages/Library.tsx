@@ -81,7 +81,7 @@ export default function Library() {
             </div>
             <h3 className="font-semibold text-foreground text-lg mb-2">Your library is empty</h3>
             <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
-              Get your first course to start practicing past questions and ace your exams!
+              Get your first tutorial questions answers and it will appear here.
             </p>
             <Button asChild>
               <Link to="/dashboard">Browse Courses</Link>
