@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { GraduationCap, User } from "lucide-react";
+import { GraduationCap, User, Settings } from "lucide-react";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback } from "./ui/avatar";
+import { useAdmin } from "@/hooks/useAdmin";
 
 interface HeaderProps {
   isLoggedIn?: boolean;
@@ -9,6 +10,8 @@ interface HeaderProps {
 }
 
 export function Header({ isLoggedIn = false, userName }: HeaderProps) {
+  const { isAdmin } = useAdmin();
+  
   const initials = userName
     ? userName
         .split(" ")
@@ -29,16 +32,26 @@ export function Header({ isLoggedIn = false, userName }: HeaderProps) {
         </Link>
 
         {isLoggedIn ? (
-          <Link to="/profile">
-            <Button variant="ghost" size="sm" className="gap-2">
-              <Avatar className="w-7 h-7">
-                <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <span className="hidden sm:inline">{userName?.split(" ")[0] || "Profile"}</span>
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            {isAdmin && (
+              <Link to="/admin">
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <Settings className="w-4 h-4" />
+                  <span className="hidden sm:inline">Admin</span>
+                </Button>
+              </Link>
+            )}
+            <Link to="/profile">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <Avatar className="w-7 h-7">
+                  <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="hidden sm:inline">{userName?.split(" ")[0] || "Profile"}</span>
+              </Button>
+            </Link>
+          </div>
         ) : (
           <Link to="/login">
             <Button variant="ghost" size="sm">
