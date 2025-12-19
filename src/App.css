@@ -1,42 +1,46 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
+/* 1. Import the Premium Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+@layer base {
+  /* 2. Set the Global Vibe */
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #F8FAFC; /* The expensive Off-White */
+    color: #334155; /* Slate 700 (Not harsh black) */
+    -webkit-font-smoothing: antialiased;
   }
-  to {
-    transform: rotate(360deg);
+
+  /* 3. Style all Headings automatically */
+  h1, h2, h3, h4, h5, h6 {
+    color: #0F172A; /* Deep Navy */
+    letter-spacing: -0.02em; /* Tight tracking = Modern */
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* 4. Utilities for specific UI elements */
+.font-serif {
+  font-family: 'Merriweather', serif;
 }
 
-.card {
-  padding: 2em;
+.shadow-premium {
+  box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.06);
 }
 
-.read-the-docs {
-  color: #888;
+.glass-nav {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid #F1F5F9;
+}
+
+/* Hide scrollbar but keep functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
