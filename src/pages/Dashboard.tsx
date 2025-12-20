@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { BookOpen, CheckCircle, Loader2 } from "lucide-react";
+import { BookOpen, CheckCircle } from "lucide-react";
 
 interface CourseWithCount {
   id: string;
@@ -32,7 +32,6 @@ export default function Dashboard() {
     }
   }, [user, isLoading, navigate]);
 
-  // Fetch question counts
   useEffect(() => {
     const fetchQuestionCounts = async () => {
       if (courses.length === 0) return;
@@ -56,7 +55,6 @@ export default function Dashboard() {
     fetchQuestionCounts();
   }, [courses]);
 
-  // Welcome Toast Logic
   useEffect(() => {
     const justLoggedIn = sessionStorage.getItem('showWelcomeToast');
     if (justLoggedIn && profile?.full_name) {
@@ -74,30 +72,50 @@ export default function Dashboard() {
     }
   }, [profile, toast]);
 
-  if (isLoading || coursesLoading) {
+  // --- THE FIX: LOADING SKELETONS ---
+  // If main loading is true, OR courses exist but counts aren't ready yet -> Show Skeletons
+  const isProcessing = courses.length > 0 && coursesWithCounts.length === 0;
+  
+  if (isLoading || coursesLoading || isProcessing) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      <div className="min-h-screen bg-slate-50/50 pb-20 md:pb-0">
+        <Header isLoggedIn userName="" />
+        <main className="container py-8 px-4 md:px-6">
+          <div className="mb-10 space-y-3">
+             <div className="h-8 w-48 bg-slate-200 rounded-lg animate-pulse"></div>
+             <div className="h-4 w-64 bg-slate-100 rounded-lg animate-pulse"></div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-48 bg-white rounded-2xl border border-slate-100 p-6 animate-pulse shadow-sm">
+                <div className="flex justify-between mb-4">
+                   <div className="w-10 h-10 bg-slate-100 rounded-xl"></div>
+                   <div className="w-16 h-6 bg-slate-100 rounded-full"></div>
+                </div>
+                <div className="h-6 w-3/4 bg-slate-100 rounded mb-2"></div>
+                <div className="h-4 w-1/2 bg-slate-50 rounded"></div>
+              </div>
+            ))}
+          </div>
+        </main>
+        <MobileBottomNav />
       </div>
     );
   }
 
   if (!user) return null;
 
-  // Filter Logic
   const filteredCourses = coursesWithCounts.filter(
     c => c.faculty === profile?.faculty && c.level === profile?.level
   );
   const displayCourses = filteredCourses.length > 0 ? filteredCourses : coursesWithCounts;
 
   return (
-    // pb-24 ensures content doesn't get hidden behind the bottom nav
-    <div className="min-h-screen bg-slate-50/50 pb-24 md:pb-0">
+    <div className="min-h-screen bg-slate-50/50 pb-24 md:pb-0 animate-fade-in">
       <Header isLoggedIn userName={profile?.full_name || ''} />
       
       <main className="container py-8 px-4 md:px-6">
         <div className="mb-8">
-          {/* Explicitly Dark Text for Visibility */}
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2 tracking-tight">
             Hi, {profile?.full_name?.split(' ')[0] || 'Student'} 👋
           </h1>
@@ -132,15 +150,4 @@ export default function Dashboard() {
             <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4">
               <BookOpen className="w-8 h-8 text-blue-600" />
             </div>
-            <h3 className="font-bold text-slate-900 mb-2">No courses available</h3>
-            <p className="text-slate-500 text-sm max-w-xs mx-auto">
-              We couldn't find any courses for your specific department and level just yet.
-            </p>
-          </div>
-        )}
-      </main>
-
-      <MobileBottomNav />
-    </div>
-  );
-}
+            <h3 className="font-bold text-slate-9
