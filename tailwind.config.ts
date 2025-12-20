@@ -13,75 +13,102 @@ export default {
     container: {
       center: true,
       padding: "1.5rem",
-      screens: { "2xl": "1200px" },
+      screens: {
+        "2xl": "1200px",
+      },
     },
     extend: {
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-        serif: ['Merriweather', 'serif'],
+        // Restoring your Fonts
+        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        serif: ['Merriweather', 'Georgia', 'serif'],
       },
       colors: {
-        border: "#E2E8F0",
-        input: "#F1F5F9",
-        ring: "#3B82F6",
-        background: "#F8FAFC",
-        foreground: "#1E293B", // Softer Navy (Slate-800)
-        
-        // MODERN PALETTE
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#4F46E5", // Indigo-600 (Much more premium than basic blue)
-          foreground: "#FFFFFF",
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "#1E293B", // Slate-800
-          foreground: "#FFFFFF",
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: "#F1F5F9",
-          foreground: "#64748B",
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "#EEF2FF", // Indigo-50
-          foreground: "#4F46E5",
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: "#FFFFFF",
-          foreground: "#1E293B",
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
         },
-        // CUSTOM
+        // Restoring your Custom Brand Colors
         navy: {
-          DEFAULT: "#0F172A",
-          light: "#334155",
+          DEFAULT: "hsl(var(--navy))",
+          light: "hsl(var(--navy-light))",
         },
         success: {
-          DEFAULT: "#059669", // Emerald-600
-          light: "#D1FAE5",
+          DEFAULT: "hsl(var(--success))",
+          light: "hsl(var(--success-light))",
         },
       },
       borderRadius: {
-        lg: "16px",
-        md: "12px",
-        sm: "8px",
-        "xl": "20px",
-        "2xl": "24px",
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+        "2xl": "1rem",
+        "3xl": "1.5rem",
       },
+      // Restoring your Premium Shadows
       boxShadow: {
-        'premium': '0px 2px 8px -2px rgba(0, 0, 0, 0.05), 0px 4px 16px rgba(0, 0, 0, 0.02)', // Softer shadow
-        'float': '0px 20px 40px -4px rgba(0, 0, 0, 0.08)',
+        'card': '0px 4px 24px rgba(0, 0, 0, 0.06)',
+        'elevated': '0 20px 40px rgb(0 0 0 / 0.08)',
+        'glow': '0 0 40px hsl(217 91% 60% / 0.2)',
       },
+      // Restoring the Animations you lost
       keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
         "fade-in": {
           from: { opacity: "0", transform: "translateY(10px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
-        "pulse-subtle": {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: "0.8" },
-        }
+        "slide-up": {
+          from: { opacity: "0", transform: "translateY(20px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "scale-in": {
+          from: { opacity: "0", transform: "scale(0.95)" },
+          to: { opacity: "1", transform: "scale(1)" },
+        },
       },
       animation: {
-        "fade-in": "fade-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards",
-        "pulse-subtle": "pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.5s ease-out forwards",
+        "slide-up": "slide-up 0.6s ease-out forwards",
+        "scale-in": "scale-in 0.3s ease-out forwards",
       },
     },
   },
