@@ -1,14 +1,27 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { useAuth } from "@/contexts/AuthContext";
-import { courses } from "@/data/courses";
-import { BookOpen, ShoppingBag } from "lucide-react";
+import { useCourses } from "@/hooks/useCourses";
+import { supabase } from "@/integrations/supabase/client";
+import { BookOpen, ShoppingBag, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+interface CourseWithCount {
+  id: string;
+  code: string;
+  title: string;
+  faculty: string;
+  level: string;
+  price: number;
+  questionCount: number;
+}
 
 export default function Library() {
   const { user, profile, isLoading, purchases } = useAuth();
+  const { courses, isLoading: coursesLoading } = useCourses();
+  const [purchasedCourses, setPurchasedCourses] = useState<CourseWithCount[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,17 +30,41 @@ export default function Library() {
     }
   }, [user, isLoading, navigate]);
 
-  if (isLoading) {
+  // Fetch purchased courses with question counts
+  useEffect(() => {
+    const fetchPurchasedCourses = async () => {
+      const filtered = courses.filter(course => purchases.includes(course.id));
+      
+      const countsPromises = filtered.map(async (course) => {
+        const { count } = await supabase
+          .from('course_questions')
+          .select('*', { count: 'exact', head: true })
+          .eq('course_id', course.id);
+
+        return {
+          ...course,
+          questionCount: count || 0
+        };
+      });
+
+      const results = await Promise.all(countsPromises);
+      setPurchasedCourses(results);
+    };
+
+    if (courses.length > 0) {
+      fetchPurchasedCourses();
+    }
+  }, [courses, purchases]);
+
+  if (isLoading || coursesLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (!user) return null;
-
-  const purchasedCourses = courses.filter(course => purchases.includes(course.id));
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
@@ -67,7 +104,7 @@ export default function Library() {
                       {course.title}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      {course.questions.length} questions
+                      {course.questionCount} questions
                     </p>
                   </div>
                 </div>

@@ -4,18 +4,23 @@ import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Watermark } from "@/components/Watermark";
 import { useAuth } from "@/contexts/AuthContext";
-import { getCourseById } from "@/data/courses";
-import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { useCourses } from "@/hooks/useCourses";
+import { useCourseQuestions } from "@/hooks/useCourseQuestions";
+import { ArrowLeft, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 
 export default function AnswerView() {
   const { id, questionId } = useParams<{ id: string; questionId: string }>();
   const { user, profile, isLoading, purchases } = useAuth();
+  const { getCourseById, isLoading: coursesLoading } = useCourses();
+  const { questions, isLoading: questionsLoading, getQuestionByIndex } = useCourseQuestions(id);
   const navigate = useNavigate();
 
   const course = id ? getCourseById(id) : undefined;
   const questionIndex = questionId ? parseInt(questionId) : 0;
   const isOwned = id ? purchases.includes(id) : false;
   const isFreePreview = questionIndex === 0;
+
+  const question = getQuestionByIndex(questionIndex);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -24,29 +29,30 @@ export default function AnswerView() {
   }, [user, isLoading, navigate]);
 
   useEffect(() => {
-    if (!isLoading && user && course && !isOwned && !isFreePreview) {
+    if (!isLoading && !questionsLoading && user && course && !isOwned && !isFreePreview) {
       navigate(`/course/${id}`);
     }
-  }, [isLoading, user, course, isOwned, isFreePreview, id, navigate]);
+  }, [isLoading, questionsLoading, user, course, isOwned, isFreePreview, id, navigate]);
 
-  if (isLoading) {
+  // Redirect if question not found after loading
+  useEffect(() => {
+    if (!questionsLoading && !question && course) {
+      navigate(`/course/${id}`);
+    }
+  }, [questionsLoading, question, course, id, navigate]);
+
+  if (isLoading || coursesLoading || questionsLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
-  if (!user || !course) return null;
-
-  const question = course.questions[questionIndex];
-  if (!question) {
-    navigate(`/course/${id}`);
-    return null;
-  }
+  if (!user || !course || !question) return null;
 
   const hasPrev = questionIndex > 0;
-  const hasNext = questionIndex < course.questions.length - 1;
+  const hasNext = questions.some(q => q.question_index === questionIndex + 1);
   const canNavigate = isOwned || (questionIndex === 0);
 
   // Simple markdown-like rendering
@@ -87,7 +93,7 @@ export default function AnswerView() {
         <div className="bg-card rounded-2xl p-6 md:p-10 card-shadow border border-border/50 mb-6">
           <div className="flex items-center gap-2 mb-4">
             <span className="text-xs font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-lg">
-              Question {questionIndex + 1} of {course.questions.length}
+              Question {questionIndex + 1} of {questions.length}
             </span>
             {isFreePreview && !isOwned && (
               <span className="text-xs font-medium text-success bg-success-light px-2.5 py-1 rounded-lg">
@@ -97,11 +103,11 @@ export default function AnswerView() {
           </div>
 
           <h1 className="text-xl md:text-2xl font-bold text-foreground mb-8">
-            {question.q}
+            {question.question_text}
           </h1>
 
           <div className="prose-content">
-            {renderAnswer(question.a)}
+            {renderAnswer(question.answer_text)}
           </div>
         </div>
 
