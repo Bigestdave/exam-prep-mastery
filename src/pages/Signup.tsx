@@ -7,14 +7,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { GraduationCap, ArrowLeft, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { faculties, levels } from "@/data/courses";
+import { levels } from "@/data/courses";
+
+// THE UPDATED DEPARTMENT LIST
+const departments = [
+  "IRM",
+  "LIS",
+  "Mass Communication",
+  "Computer Science",
+  "Business Administration"
+];
 
 export default function Signup() {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     password: "",
-    faculty: "",
+    faculty: "", // We keep this key 'faculty' so the database still works
     level: "",
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +37,7 @@ export default function Signup() {
     if (!formData.faculty || !formData.level) {
       toast({
         title: "Missing information",
-        description: "Please select your faculty and level.",
+        description: "Please select your department and level.",
         variant: "destructive",
       });
       return;
@@ -139,7 +148,8 @@ export default function Signup() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Faculty</Label>
+                {/* CHANGED LABEL TO DEPARTMENT */}
+                <Label>Department</Label>
                 <Select
                   value={formData.faculty}
                   onValueChange={(value) => setFormData({ ...formData, faculty: value })}
@@ -148,9 +158,10 @@ export default function Signup() {
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
-                    {faculties.map((faculty) => (
-                      <SelectItem key={faculty} value={faculty}>
-                        {faculty}
+                    {/* CHANGED TO USE OUR NEW LIST */}
+                    {departments.map((dept) => (
+                      <SelectItem key={dept} value={dept}>
+                        {dept}
                       </SelectItem>
                     ))}
                   </SelectContent>
