@@ -14,12 +14,19 @@ function NavItem({ to, icon, label, isActive }: NavItemProps) {
     <Link
       to={to}
       className={cn(
-        "flex flex-col items-center justify-center gap-1 py-2 px-4 transition-colors",
-        isActive ? "text-primary" : "text-muted-foreground"
+        "flex flex-col items-center justify-center gap-1 h-full w-full transition-all duration-200 active:scale-90",
+        isActive 
+          ? "text-[#2563EB]" // Royal Blue when active
+          : "text-slate-400 hover:text-slate-600"
       )}
     >
-      {icon}
-      <span className="text-xs font-medium">{label}</span>
+      {/* Icon size logic */}
+      <div className={cn("transition-transform", isActive && "-translate-y-0.5")}>
+        {icon}
+      </div>
+      <span className={cn("text-[10px] leading-none transition-all", isActive ? "font-bold" : "font-medium")}>
+        {label}
+      </span>
     </Link>
   );
 }
@@ -38,23 +45,28 @@ export function MobileBottomNav() {
   const activeState = getActiveState();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border/50 md:hidden">
-      <div className="flex items-center justify-around h-16 max-w-md mx-auto">
+    // FIXES APPLIED:
+    // 1. z-[9999]: Forces it to top layer
+    // 2. transform-gpu: Uses hardware acceleration to stop flickering
+    // 3. pb-5: Adds hard padding for iPhone home bar
+    // 4. border-t: Adds a clear separation line
+    <nav className="fixed bottom-0 left-0 right-0 z-[9999] bg-white border-t border-slate-100 shadow-[0_-10px_30px_rgba(0,0,0,0.08)] transform-gpu pb-5 pt-2 md:hidden block">
+      <div className="flex items-center justify-around h-14 max-w-md mx-auto">
         <NavItem
           to="/dashboard"
-          icon={<Home className="w-5 h-5" />}
+          icon={<Home className={cn("w-6 h-6", activeState === "home" && "fill-current")} />}
           label="Home"
           isActive={activeState === "home"}
         />
         <NavItem
           to="/library"
-          icon={<BookOpen className="w-5 h-5" />}
+          icon={<BookOpen className={cn("w-6 h-6", activeState === "library" && "fill-current")} />}
           label="Library"
           isActive={activeState === "library"}
         />
         <NavItem
           to="/profile"
-          icon={<User className="w-5 h-5" />}
+          icon={<User className={cn("w-6 h-6", activeState === "account" && "fill-current")} />}
           label="Account"
           isActive={activeState === "account"}
         />
