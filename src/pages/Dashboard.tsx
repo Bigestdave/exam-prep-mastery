@@ -111,7 +111,7 @@ export default function Dashboard() {
   const displayCourses = filteredCourses.length > 0 ? filteredCourses : coursesWithCounts;
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-24 md:pb-0 animate-fade-in">
+    <div className="min-h-screen bg-slate-50/50 pb-32 md:pb-0 animate-fade-in relative">
       <Header isLoggedIn userName={profile?.full_name || ''} />
       
       <main className="container py-8 px-4 md:px-6">
