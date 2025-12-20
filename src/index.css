@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,47 +6,51 @@
 
 @layer base {
   :root {
-    /* --- THE PREMIUM DESIGN SYSTEM --- */
-    
-    /* Backgrounds: Off-White for app, Pure White for cards */
-    --background: 210 40% 98%;   /* #F8FAFC */
-    --foreground: 222 47% 11%;   /* #0F172A */
-    
-    --card: 0 0% 100%;           /* #FFFFFF */
+    /* LCU Prep Design System */
+    --background: 210 40% 98%; /* Off-white #F8FAFC */
+    --foreground: 222 47% 11%; /* Deep Navy #0F172A */
+
+    --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
-    
+
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    
-    /* Brand: Royal Blue (Action) */
-    --primary: 221 83% 53%;      /* #2563EB */
+
+    --primary: 221 83% 53%; /* Royal Blue (Adjusted to be nicer) */
     --primary-foreground: 0 0% 100%;
-    
-    /* Brand: Navy (Structure) */
-    --secondary: 210 40% 96.1%;  /* Light Grey/Blue for badges */
+
+    /* THIS WAS THE ISSUE: Set Secondary to Light Grey/Blue for badges */
+    --secondary: 210 40% 96.1%; 
     --secondary-foreground: 222 47% 11%;
-    
+
     --muted: 215 20% 65%;
     --muted-foreground: 215 16% 47%;
-    
+
     --accent: 210 40% 96.1%;
     --accent-foreground: 222 47% 11%;
-    
+
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    
+
     --border: 214 32% 91%;
     --input: 214 32% 91%;
     --ring: 221 83% 53%;
-    
+
     --radius: 0.75rem;
 
-    /* Custom Design Tokens */
-    --shadow-premium: 0px 4px 24px rgba(0, 0, 0, 0.06);
-    --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
-    --font-content: 'Merriweather', Georgia, serif;
+    /* Custom tokens */
+    --navy: 222 47% 11%;
+    --navy-light: 215 28% 17%;
+    --blue-glow: 217 91% 60%;
+    --success: 160 84% 39%;
+    --success-light: 158 64% 94%;
+
+    /* Shadows - Premium EdTech */
+    --shadow-card: 0px 4px 24px rgba(0, 0, 0, 0.06);
+    --shadow-elevated: 0 20px 40px rgb(0 0 0 / 0.08);
+    --shadow-glow: 0 0 40px hsl(217 91% 60% / 0.2);
   }
- 
+
   .dark {
     --background: 222 47% 11%;
     --foreground: 210 40% 98%;
@@ -74,64 +78,42 @@
   * {
     @apply border-border;
   }
-  
+
   html {
     scroll-behavior: smooth;
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
-    font-family: var(--font-ui);
-    background-color: #F8FAFC; /* Force Off-White */
+    @apply bg-background text-foreground font-sans antialiased;
   }
 
-  /* Force Deep Navy on all Headings */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold tracking-tight text-[#0F172A];
-    font-family: var(--font-ui);
-    letter-spacing: -0.02em;
+    @apply font-sans font-bold tracking-tight text-[#0F172A];
+  }
+
+  .prose-content {
+    @apply font-serif leading-relaxed;
   }
 }
 
 @layer utilities {
-  /* THE EXPENSIVE SHADOW */
-  .card-shadow {
-    box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.06);
-  }
-
-  /* THE PAGE SLIDE UP ANIMATION */
-  .page-enter {
-    animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
   .text-balance {
     text-wrap: balance;
   }
-  
-  /* Hide Scrollbar */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  /* Reading Content Font */
-  .prose-content {
-    font-family: var(--font-content);
-    line-height: 1.8;
-    color: #334155;
-  }
-}
 
-@keyframes slideUpFade {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .card-shadow {
+    box-shadow: var(--shadow-card);
+  }
+
+  .elevated-shadow {
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .glow-shadow {
+    box-shadow: var(--shadow-glow);
   }
 }
