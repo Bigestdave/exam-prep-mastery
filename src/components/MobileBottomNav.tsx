@@ -14,16 +14,27 @@ function NavItem({ to, icon, label, isActive }: NavItemProps) {
     <Link
       to={to}
       className={cn(
-        "flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300",
-        isActive 
-          ? "bg-[#2563EB] text-white shadow-lg shadow-blue-500/30 scale-110 -translate-y-1" 
-          : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+        "flex flex-col items-center justify-center w-14 h-full transition-all duration-300 relative group",
+        isActive ? "text-[#2563EB]" : "text-slate-400 hover:text-slate-600"
       )}
     >
-      {/* Icon only - cleaner look for capsule */}
-      <div className={cn("transition-transform duration-300", isActive && "scale-105")}>
+      {/* Icon floats up slightly when active */}
+      <div className={cn("transition-transform duration-300", isActive && "-translate-y-1")}>
         {icon}
       </div>
+      
+      {/* Label appears/fades in */}
+      <span className={cn(
+        "text-[9px] font-bold absolute bottom-1.5 transition-opacity duration-300", 
+        isActive ? "opacity-100" : "opacity-0"
+      )}>
+        {label}
+      </span>
+
+      {/* Active Dot indicator */}
+      {isActive && (
+        <span className="absolute -bottom-2 w-1 h-1 bg-[#2563EB] rounded-full" />
+      )}
     </Link>
   );
 }
@@ -42,33 +53,33 @@ export function MobileBottomNav() {
   const activeState = getActiveState();
 
   return (
-    // FLOATING CAPSULE CONTAINER
+    // FLOATING CAPSULE DESIGN
     // z-50 ensures it's on top.
-    // bottom-6 lifts it up away from the iPhone home bar.
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-auto md:hidden">
-      <nav className="bg-white/90 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.12)] rounded-full px-2 py-2 flex items-center gap-1">
+    // bottom-8 lifts it up away from the iPhone home bar rubber-band area.
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-auto md:hidden">
+      <nav className="bg-white/95 backdrop-blur-2xl border border-white/20 shadow-[0_8px_40px_rgba(0,0,0,0.12)] rounded-full px-6 h-16 flex items-center gap-2">
         
         <NavItem
           to="/dashboard"
-          icon={<Home className="w-5 h-5" />}
+          icon={<Home className={cn("w-6 h-6", activeState === "home" && "fill-current")} />}
           label="Home"
           isActive={activeState === "home"}
         />
         
-        <div className="w-px h-6 bg-slate-200/50 mx-1"></div>
+        <div className="w-px h-6 bg-slate-200/50 mx-2"></div>
         
         <NavItem
           to="/library"
-          icon={<BookOpen className="w-5 h-5" />}
+          icon={<BookOpen className={cn("w-6 h-6", activeState === "library" && "fill-current")} />}
           label="Library"
           isActive={activeState === "library"}
         />
         
-        <div className="w-px h-6 bg-slate-200/50 mx-1"></div>
+        <div className="w-px h-6 bg-slate-200/50 mx-2"></div>
         
         <NavItem
           to="/profile"
-          icon={<User className="w-5 h-5" />}
+          icon={<User className={cn("w-6 h-6", activeState === "account" && "fill-current")} />}
           label="Account"
           isActive={activeState === "account"}
         />
