@@ -35,57 +35,30 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchQuestionCounts = async () => {
       if (courses.length === 0) return;
-
       const countsPromises = courses.map(async (course) => {
         const { count } = await supabase
           .from('course_questions')
           .select('*', { count: 'exact', head: true })
           .eq('course_id', course.id);
-
-        return {
-          ...course,
-          questionCount: count || 0
-        };
+        return { ...course, questionCount: count || 0 };
       });
-
       const results = await Promise.all(countsPromises);
       setCoursesWithCounts(results);
     };
-
     fetchQuestionCounts();
   }, [courses]);
 
-  useEffect(() => {
-    const justLoggedIn = sessionStorage.getItem('showWelcomeToast');
-    if (justLoggedIn && profile?.full_name) {
-      sessionStorage.removeItem('showWelcomeToast');
-      toast({
-        title: `Welcome back, ${profile.full_name.split(' ')[0]}!`,
-        className: "bg-slate-900 text-white border-none",
-        description: (
-          <div className="flex items-center gap-2 text-white/90">
-            <CheckCircle className="w-4 h-4 text-green-500" />
-            <span>You're all set to continue learning.</span>
-          </div>
-        ) as unknown as string,
-      });
-    }
-  }, [profile, toast]);
-
-  // --- THE FIX: LOADING SKELETONS ---
-  // If main loading is true, OR courses exist but counts aren't ready yet -> Show Skeletons
-  const isProcessing = courses.length > 0 && coursesWithCounts.length === 0;
-  
-  if (isLoading || coursesLoading || isProcessing) {
+  // Loading State: Render Skeletons
+  if (isLoading || coursesLoading || (courses.length > 0 && coursesWithCounts.length === 0)) {
     return (
-      <div className="min-h-screen bg-slate-50/50 pb-20 md:pb-0">
+      <div className="min-h-screen bg-background pb-20 md:pb-0">
         <Header isLoggedIn userName="" />
-        <main className="container py-8 px-4 md:px-6">
+        <main className="container py-8 px-6">
           <div className="mb-10 space-y-3">
              <div className="h-8 w-48 bg-slate-200 rounded-lg animate-pulse"></div>
              <div className="h-4 w-64 bg-slate-100 rounded-lg animate-pulse"></div>
           </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-48 bg-white rounded-2xl border border-slate-100 p-6 animate-pulse shadow-sm">
                 <div className="flex justify-between mb-4">
@@ -111,15 +84,15 @@ export default function Dashboard() {
   const displayCourses = filteredCourses.length > 0 ? filteredCourses : coursesWithCounts;
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-24 md:pb-0 animate-fade-in">
+    <div className="min-h-screen bg-background pb-24 md:pb-0 font-sans animate-fade-in">
       <Header isLoggedIn userName={profile?.full_name || ''} />
       
-      <main className="container py-8 px-4 md:px-6">
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2 tracking-tight">
+      <main className="container max-w-5xl py-8 px-6">
+        <div className="mb-10">
+          <h1 className="text-3xl md:text-4xl font-bold text-secondary mb-2 tracking-tight">
             Hi, {profile?.full_name?.split(' ')[0] || 'Student'} 👋
           </h1>
-          <p className="text-slate-500 font-medium">
+          <p className="text-muted-foreground font-medium">
             {filteredCourses.length > 0 
               ? `Showing courses for ${profile?.faculty} - ${profile?.level}`
               : 'Browse all available courses'
@@ -128,12 +101,12 @@ export default function Dashboard() {
         </div>
 
         {displayCourses.length > 0 ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {displayCourses.map((course, i) => (
               <div 
                 key={course.id} 
                 className="opacity-0 animate-fade-in"
-                style={{ animationDelay: `${i * 50}ms` }}
+                style={{ animationDelay: `${i * 100}ms` }}
               >
                 <CourseCard
                   id={course.id}
@@ -146,8 +119,19 @@ export default function Dashboard() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm">
-            <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="w-8 h-8 text-blue-600" />
+          <div className="text-center py-20 bg-white rounded-3xl border border-border shadow-premium">
+            <div className="w-20 h-20 rounded-3xl bg-blue-50 flex items-center justify-center mx-auto mb-6">
+              <BookOpen className="w-10 h-10 text-primary" />
             </div>
-            <h3 className="font-bold text-slate-9
+            <h3 className="text-xl font-bold text-secondary mb-2">No courses available</h3>
+            <p className="text-muted-foreground">
+              Courses for your faculty and level will appear here.
+            </p>
+          </div>
+        )}
+      </main>
+
+      <MobileBottomNav />
+    </div>
+  );
+}
