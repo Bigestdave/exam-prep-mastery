@@ -1,5 +1,5 @@
-import { Home, BookOpen, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { Home, BookOpen, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface NavItemProps {
@@ -14,19 +14,16 @@ function NavItem({ to, icon, label, isActive }: NavItemProps) {
     <Link
       to={to}
       className={cn(
-        "flex flex-col items-center justify-center gap-1 h-full w-full transition-all duration-200 active:scale-90",
+        "flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300",
         isActive 
-          ? "text-[#2563EB]" // Royal Blue when active
-          : "text-slate-400 hover:text-slate-600"
+          ? "bg-[#2563EB] text-white shadow-lg shadow-blue-500/30 scale-110 -translate-y-1" 
+          : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
       )}
     >
-      {/* Icon size logic */}
-      <div className={cn("transition-transform", isActive && "-translate-y-0.5")}>
+      {/* Icon only - cleaner look for capsule */}
+      <div className={cn("transition-transform duration-300", isActive && "scale-105")}>
         {icon}
       </div>
-      <span className={cn("text-[10px] leading-none transition-all", isActive ? "font-bold" : "font-medium")}>
-        {label}
-      </span>
     </Link>
   );
 }
@@ -45,32 +42,38 @@ export function MobileBottomNav() {
   const activeState = getActiveState();
 
   return (
-    // FIXES APPLIED:
-    // 1. z-[9999]: Forces it to top layer
-    // 2. transform-gpu: Uses hardware acceleration to stop flickering
-    // 3. pb-5: Adds hard padding for iPhone home bar
-    // 4. border-t: Adds a clear separation line
-    <nav className="fixed bottom-0 left-0 right-0 z-[9999] bg-white border-t border-slate-100 shadow-[0_-10px_30px_rgba(0,0,0,0.08)] transform-gpu pb-5 pt-2 md:hidden block">
-      <div className="flex items-center justify-around h-14 max-w-md mx-auto">
+    // FLOATING CAPSULE CONTAINER
+    // z-50 ensures it's on top.
+    // bottom-6 lifts it up away from the iPhone home bar.
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-auto md:hidden">
+      <nav className="bg-white/90 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.12)] rounded-full px-2 py-2 flex items-center gap-1">
+        
         <NavItem
           to="/dashboard"
-          icon={<Home className={cn("w-6 h-6", activeState === "home" && "fill-current")} />}
+          icon={<Home className="w-5 h-5" />}
           label="Home"
           isActive={activeState === "home"}
         />
+        
+        <div className="w-px h-6 bg-slate-200/50 mx-1"></div>
+        
         <NavItem
           to="/library"
-          icon={<BookOpen className={cn("w-6 h-6", activeState === "library" && "fill-current")} />}
+          icon={<BookOpen className="w-5 h-5" />}
           label="Library"
           isActive={activeState === "library"}
         />
+        
+        <div className="w-px h-6 bg-slate-200/50 mx-1"></div>
+        
         <NavItem
           to="/profile"
-          icon={<User className={cn("w-6 h-6", activeState === "account" && "fill-current")} />}
+          icon={<User className="w-5 h-5" />}
           label="Account"
           isActive={activeState === "account"}
         />
-      </div>
-    </nav>
+
+      </nav>
+    </div>
   );
 }
