@@ -5,8 +5,10 @@ import { Header } from "@/components/Header";
 import { QuestionItem } from "@/components/QuestionItem";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { getCourseById } from "@/data/courses";
-import { ArrowLeft, Lock, CheckCircle } from "lucide-react";
+import { useCourses } from "@/hooks/useCourses";
+import { useCourseQuestions } from "@/hooks/useCourseQuestions";
+import { supabase } from "@/integrations/supabase/client";
+import { ArrowLeft, Lock, CheckCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -21,17 +23,44 @@ const PAYSTACK_PUBLIC_KEY = "pk_live_2320cc6bb508955bd07391f75a4c73d757a0d6f6";
 export default function CourseDetail() {
   const { id } = useParams<{ id: string }>();
   const { user, profile, isLoading, purchases, addPurchase } = useAuth();
+  const { getCourseById, isLoading: coursesLoading } = useCourses();
+  const { questions, isLoading: questionsLoading } = useCourseQuestions(id);
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [questionCount, setQuestionCount] = useState(0);
 
   const course = id ? getCourseById(id) : undefined;
   const isOwned = id ? purchases.includes(id) : false;
 
+  // Fetch total question count for display (admin can see all)
+  useEffect(() => {
+    const fetchQuestionCount = async () => {
+      if (!id) return;
+      
+      const { count, error } = await supabase
+        .from('course_questions')
+        .select('*', { count: 'exact', head: true })
+        .eq('course_id', id);
+      
+      if (!error && count !== null) {
+        setQuestionCount(count);
+      }
+    };
+
+    // If user owns course, use questions length, otherwise fetch count as admin
+    if (isOwned) {
+      setQuestionCount(questions.length);
+    } else {
+      // For non-owners, we need to get the count differently since RLS limits what they see
+      fetchQuestionCount();
+    }
+  }, [id, isOwned, questions.length]);
+
   const config = {
     reference: `${course?.id}_${Date.now()}`,
     email: user?.email || "",
-    amount: (course?.price || 0) * 100, // Paystack uses kobo (100 kobo = 1 Naira)
+    amount: (course?.price || 0) * 100,
     publicKey: PAYSTACK_PUBLIC_KEY,
     metadata: {
       course_id: course?.id || "",
@@ -54,7 +83,7 @@ export default function CourseDetail() {
     }
   }, [user, isLoading, navigate]);
 
-  if (isLoading) {
+  if (isLoading || coursesLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-pulse text-muted-foreground">Loading...</div>
@@ -100,6 +129,9 @@ export default function CourseDetail() {
     initializePayment({ onSuccess, onClose });
   };
 
+  // Determine display count - if not owned, show at least 1 for free preview
+  const displayCount = isOwned ? questions.length : Math.max(questionCount, questions.length);
+
   return (
     <div className="min-h-screen bg-background pb-24 md:pb-8">
       <Header isLoggedIn userName={profile?.full_name || ''} />
@@ -129,23 +161,46 @@ export default function CourseDetail() {
             {course.title}
           </h1>
           <p className="text-muted-foreground">
-            {course.questions.length} Tutorial Questions • {course.faculty} • {course.level}
+            {displayCount} Tutorial Questions • {course.faculty} • {course.level}
           </p>
         </div>
 
-        <div className="space-y-3">
-          {course.questions.map((q, index) => (
-            <QuestionItem
-              key={index}
-              courseId={course.id}
-              questionIndex={index}
-              question={q.q}
-              isUnlocked={isOwned}
-              isFreePreview={index === 0}
-              onLockedClick={() => setShowPaymentModal(true)}
-            />
-          ))}
-        </div>
+        {questionsLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {/* Show available questions (RLS filtered) */}
+            {questions.map((q) => (
+              <QuestionItem
+                key={q.id}
+                courseId={course.id}
+                questionIndex={q.question_index}
+                question={q.question_text}
+                isUnlocked={isOwned}
+                isFreePreview={q.question_index === 0}
+                onLockedClick={() => setShowPaymentModal(true)}
+              />
+            ))}
+            
+            {/* Show locked placeholders for remaining questions */}
+            {!isOwned && displayCount > questions.length && (
+              Array.from({ length: displayCount - questions.length }).map((_, i) => (
+                <div 
+                  key={`locked-${i}`}
+                  className="bg-card rounded-xl p-4 border border-border/50 opacity-60 cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={() => setShowPaymentModal(true)}
+                >
+                  <div className="flex items-center gap-3">
+                    <Lock className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Question {questions.length + i + 1} - Unlock to view</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
       </main>
 
       {/* Mobile Sticky Footer */}
@@ -167,7 +222,7 @@ export default function CourseDetail() {
           <DialogHeader>
             <DialogTitle>Unlock {course.code}</DialogTitle>
             <DialogDescription>
-              Get instant access to all {course.questions.length} tutorial answers.
+              Get instant access to all {displayCount} tutorial answers.
             </DialogDescription>
           </DialogHeader>
           

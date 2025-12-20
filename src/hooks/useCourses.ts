@@ -1,11 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-export interface Question {
-  q: string;
-  a: string;
-}
-
 export interface Course {
   id: string;
   code: string;
@@ -13,7 +8,6 @@ export interface Course {
   faculty: string;
   level: string;
   price: number;
-  questions: Question[];
 }
 
 export function useCourses() {
@@ -28,14 +22,11 @@ export function useCourses() {
     setIsLoading(true);
     const { data, error } = await supabase
       .from('courses')
-      .select('*')
+      .select('id, code, title, faculty, level, price')
       .order('created_at', { ascending: true });
 
     if (!error && data) {
-      setCourses(data.map(c => ({
-        ...c,
-        questions: (c.questions as unknown as Question[]) || []
-      })));
+      setCourses(data);
     }
     setIsLoading(false);
   };

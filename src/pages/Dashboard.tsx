@@ -1,15 +1,28 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { CourseCard } from "@/components/CourseCard";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCourses } from "@/hooks/useCourses";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { getCoursesByFacultyAndLevel, courses } from "@/data/courses";
-import { BookOpen, CheckCircle } from "lucide-react";
+import { BookOpen, CheckCircle, Loader2 } from "lucide-react";
+
+interface CourseWithCount {
+  id: string;
+  code: string;
+  title: string;
+  faculty: string;
+  level: string;
+  price: number;
+  questionCount: number;
+}
 
 export default function Dashboard() {
   const { user, profile, isLoading, purchases } = useAuth();
+  const { courses, isLoading: coursesLoading } = useCourses();
+  const [coursesWithCounts, setCoursesWithCounts] = useState<CourseWithCount[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -18,6 +31,30 @@ export default function Dashboard() {
       navigate("/login");
     }
   }, [user, isLoading, navigate]);
+
+  // Fetch question counts for courses
+  useEffect(() => {
+    const fetchQuestionCounts = async () => {
+      if (courses.length === 0) return;
+
+      const countsPromises = courses.map(async (course) => {
+        const { count } = await supabase
+          .from('course_questions')
+          .select('*', { count: 'exact', head: true })
+          .eq('course_id', course.id);
+
+        return {
+          ...course,
+          questionCount: count || 0
+        };
+      });
+
+      const results = await Promise.all(countsPromises);
+      setCoursesWithCounts(results);
+    };
+
+    fetchQuestionCounts();
+  }, [courses]);
 
   // Show welcome toast when profile loads after successful login
   useEffect(() => {
@@ -37,18 +74,20 @@ export default function Dashboard() {
     }
   }, [profile, toast]);
 
-  if (isLoading) {
+  if (isLoading || coursesLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
+        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (!user) return null;
 
-  const filteredCourses = getCoursesByFacultyAndLevel(profile?.faculty || '', profile?.level || '');
-  const displayCourses = filteredCourses.length > 0 ? filteredCourses : courses;
+  const filteredCourses = coursesWithCounts.filter(
+    c => c.faculty === profile?.faculty && c.level === profile?.level
+  );
+  const displayCourses = filteredCourses.length > 0 ? filteredCourses : coursesWithCounts;
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
@@ -80,7 +119,7 @@ export default function Dashboard() {
                   code={course.code}
                   title={course.title}
                   isOwned={purchases.includes(course.id)}
-                  questionsCount={course.questions.length}
+                  questionsCount={course.questionCount}
                 />
               </div>
             ))}

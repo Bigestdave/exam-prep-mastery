@@ -12,7 +12,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import type { Json } from "@/integrations/supabase/types";
 import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen } from "lucide-react";
 
 interface Question {
@@ -27,7 +26,7 @@ interface Course {
   faculty: string;
   level: string;
   price: number;
-  questions: Question[];
+  questionCount: number;
 }
 
 const faculties = ["IRM", "Engineering", "Sciences", "Arts"];
@@ -78,18 +77,44 @@ export default function AdminDashboard() {
 
   const fetchCourses = async () => {
     setIsLoadingCourses(true);
-    const { data, error } = await supabase
+    
+    // Fetch courses
+    const { data: coursesData, error: coursesError } = await supabase
       .from('courses')
-      .select('*')
+      .select('id, code, title, faculty, level, price')
       .order('created_at', { ascending: true });
 
-    if (!error && data) {
-      setCourses(data.map(c => ({
-        ...c,
-        questions: (c.questions as unknown as Question[]) || []
-      })));
+    if (!coursesError && coursesData) {
+      // Fetch question counts for each course
+      const coursesWithCounts = await Promise.all(
+        coursesData.map(async (course) => {
+          const { count } = await supabase
+            .from('course_questions')
+            .select('*', { count: 'exact', head: true })
+            .eq('course_id', course.id);
+          
+          return {
+            ...course,
+            questionCount: count || 0
+          };
+        })
+      );
+      
+      setCourses(coursesWithCounts);
     }
     setIsLoadingCourses(false);
+  };
+
+  const fetchCourseQuestions = async (courseId: string): Promise<Question[]> => {
+    const { data, error } = await supabase
+      .from('course_questions')
+      .select('question_text, answer_text')
+      .eq('course_id', courseId)
+      .order('question_index', { ascending: true });
+
+    if (error || !data) return [];
+    
+    return data.map(q => ({ q: q.question_text, a: q.answer_text }));
   };
 
   const resetForm = () => {
@@ -102,14 +127,17 @@ export default function AdminDashboard() {
     setEditingCourse(null);
   };
 
-  const openEditDialog = (course: Course) => {
+  const openEditDialog = async (course: Course) => {
     setEditingCourse(course);
     setCode(course.code);
     setTitle(course.title);
     setFaculty(course.faculty);
     setLevel(course.level);
     setPrice(course.price.toString());
-    setQuestions(course.questions.length > 0 ? course.questions : [{ q: "", a: "" }]);
+    
+    // Fetch existing questions
+    const existingQuestions = await fetchCourseQuestions(course.id);
+    setQuestions(existingQuestions.length > 0 ? existingQuestions : [{ q: "", a: "" }]);
     setIsDialogOpen(true);
   };
 
@@ -132,51 +160,106 @@ export default function AdminDashboard() {
       faculty,
       level,
       price: parseInt(price) || 1000,
-      questions: JSON.parse(JSON.stringify(filteredQuestions)) as Json,
     };
 
     if (editingCourse) {
-      const { error } = await supabase
+      // Update course
+      const { error: updateError } = await supabase
         .from('courses')
         .update(courseData)
         .eq('id', editingCourse.id);
 
-      if (error) {
+      if (updateError) {
         toast({
           title: "Error",
-          description: error.message,
+          description: updateError.message,
           variant: "destructive",
         });
-      } else {
-        toast({ title: "Course updated successfully" });
-        setIsDialogOpen(false);
-        resetForm();
-        fetchCourses();
+        setIsSaving(false);
+        return;
       }
-    } else {
-      const { error } = await supabase
-        .from('courses')
-        .insert([courseData]);
 
-      if (error) {
+      // Delete existing questions and insert new ones
+      await supabase
+        .from('course_questions')
+        .delete()
+        .eq('course_id', editingCourse.id);
+
+      if (filteredQuestions.length > 0) {
+        const questionsToInsert = filteredQuestions.map((q, index) => ({
+          course_id: editingCourse.id,
+          question_index: index,
+          question_text: q.q,
+          answer_text: q.a,
+        }));
+
+        const { error: questionsError } = await supabase
+          .from('course_questions')
+          .insert(questionsToInsert);
+
+        if (questionsError) {
+          toast({
+            title: "Warning",
+            description: "Course updated but questions could not be saved: " + questionsError.message,
+            variant: "destructive",
+          });
+        }
+      }
+
+      toast({ title: "Course updated successfully" });
+    } else {
+      // Create new course
+      const { data: newCourse, error: insertError } = await supabase
+        .from('courses')
+        .insert([courseData])
+        .select()
+        .single();
+
+      if (insertError || !newCourse) {
         toast({
           title: "Error",
-          description: error.message,
+          description: insertError?.message || "Failed to create course",
           variant: "destructive",
         });
-      } else {
-        toast({ title: "Course created successfully" });
-        setIsDialogOpen(false);
-        resetForm();
-        fetchCourses();
+        setIsSaving(false);
+        return;
       }
+
+      // Insert questions for new course
+      if (filteredQuestions.length > 0) {
+        const questionsToInsert = filteredQuestions.map((q, index) => ({
+          course_id: newCourse.id,
+          question_index: index,
+          question_text: q.q,
+          answer_text: q.a,
+        }));
+
+        const { error: questionsError } = await supabase
+          .from('course_questions')
+          .insert(questionsToInsert);
+
+        if (questionsError) {
+          toast({
+            title: "Warning",
+            description: "Course created but questions could not be saved: " + questionsError.message,
+            variant: "destructive",
+          });
+        }
+      }
+
+      toast({ title: "Course created successfully" });
     }
+
+    setIsDialogOpen(false);
+    resetForm();
+    fetchCourses();
     setIsSaving(false);
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this course?")) return;
 
+    // Questions will be deleted automatically via CASCADE
     const { error } = await supabase
       .from('courses')
       .delete()
@@ -381,7 +464,7 @@ export default function AdminDashboard() {
                       <TableCell>{course.faculty}</TableCell>
                       <TableCell>{course.level}</TableCell>
                       <TableCell>₦{course.price.toLocaleString()}</TableCell>
-                      <TableCell>{course.questions.length}</TableCell>
+                      <TableCell>{course.questionCount}</TableCell>
                       <TableCell className="text-right">
                         <Button variant="ghost" size="icon" onClick={() => openEditDialog(course)}>
                           <Pencil className="w-4 h-4" />

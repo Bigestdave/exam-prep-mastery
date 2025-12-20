@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      course_questions: {
+        Row: {
+          answer_text: string
+          course_id: string
+          created_at: string | null
+          id: string
+          question_index: number
+          question_text: string
+          updated_at: string | null
+        }
+        Insert: {
+          answer_text: string
+          course_id: string
+          created_at?: string | null
+          id?: string
+          question_index: number
+          question_text: string
+          updated_at?: string | null
+        }
+        Update: {
+          answer_text?: string
+          course_id?: string
+          created_at?: string | null
+          id?: string
+          question_index?: number
+          question_text?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_questions_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           code: string
@@ -22,7 +60,6 @@ export type Database = {
           id: string
           level: string
           price: number
-          questions: Json
           title: string
           updated_at: string | null
         }
@@ -33,7 +70,6 @@ export type Database = {
           id?: string
           level: string
           price?: number
-          questions?: Json
           title: string
           updated_at?: string | null
         }
@@ -44,7 +80,6 @@ export type Database = {
           id?: string
           level?: string
           price?: number
-          questions?: Json
           title?: string
           updated_at?: string | null
         }
@@ -121,6 +156,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_purchased_course: { Args: { course_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
