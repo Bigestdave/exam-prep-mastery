@@ -36,7 +36,7 @@ export default function Landing() {
             </h1>
             
             <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto opacity-0 animate-slide-up" style={{ animationDelay: '200ms' }}>
-              We provide First Class level solutions to all 15 tutorial questions. 
+              We provide First Class level solutions to all 15 tutorial questions for Lead City students. 
               Verified answers. Complete coverage. Guaranteed results.
             </p>
             
