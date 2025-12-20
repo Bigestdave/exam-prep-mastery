@@ -18,7 +18,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const PAYSTACK_PUBLIC_KEY = "pk_live_2320cc6bb508955bd07391f75a4c73d757a0d6f6";
+// Use test key for testing: pk_test_xxx, live key for production: pk_live_xxx
+const PAYSTACK_PUBLIC_KEY = "pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"; // Replace with your test key
 
 export default function CourseDetail() {
   const { id } = useParams<{ id: string }>();
