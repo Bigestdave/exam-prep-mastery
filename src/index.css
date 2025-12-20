@@ -1,36 +1,128 @@
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ... (Keep your existing @layer base variables here) ... */
+@layer base {
+  :root {
+    /* --- THE PREMIUM DESIGN SYSTEM --- */
+    
+    /* Backgrounds: Off-White for app, Pure White for cards */
+    --background: 210 40% 98%;   /* #F8FAFC */
+    --foreground: 222 47% 11%;   /* #0F172A */
+    
+    --card: 0 0% 100%;           /* #FFFFFF */
+    --card-foreground: 222 47% 11%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    
+    /* Brand: Royal Blue (Action) */
+    --primary: 221 83% 53%;      /* #2563EB */
+    --primary-foreground: 0 0% 100%;
+    
+    /* Brand: Navy (Structure) */
+    --secondary: 210 40% 96.1%;  /* Light Grey/Blue for badges */
+    --secondary-foreground: 222 47% 11%;
+    
+    --muted: 215 20% 65%;
+    --muted-foreground: 215 16% 47%;
+    
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47% 11%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
+    
+    --radius: 0.75rem;
+
+    /* Custom Design Tokens */
+    --shadow-premium: 0px 4px 24px rgba(0, 0, 0, 0.06);
+    --font-ui: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-content: 'Merriweather', Georgia, serif;
+  }
+ 
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 215 28% 17%;
+    --card-foreground: 210 40% 98%;
+    --popover: 215 28% 17%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 217 91% 60%;
+  }
+}
 
 @layer base {
-  * { @apply border-border; }
-  html { scroll-behavior: smooth; }
-  body { 
-    @apply bg-background text-foreground font-sans antialiased; 
-    background-color: #F8FAFC; /* Force Off-White */
+  * {
+    @apply border-border;
   }
   
-  /* Force Deep Navy on Headings */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-ui);
+    background-color: #F8FAFC; /* Force Off-White */
+  }
+
+  /* Force Deep Navy on all Headings */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-sans font-bold tracking-tight text-[#0F172A]; 
+    @apply font-bold tracking-tight text-[#0F172A];
+    font-family: var(--font-ui);
+    letter-spacing: -0.02em;
   }
 }
 
 @layer utilities {
-  .card-shadow { box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.06); }
-  
-  /* THE PAGE TRANSITION ANIMATION */
+  /* THE EXPENSIVE SHADOW */
+  .card-shadow {
+    box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.06);
+  }
+
+  /* THE PAGE SLIDE UP ANIMATION */
   .page-enter {
-    animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .text-balance {
+    text-wrap: balance;
   }
   
   /* Hide Scrollbar */
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  /* Reading Content Font */
+  .prose-content {
+    font-family: var(--font-content);
+    line-height: 1.8;
+    color: #334155;
+  }
 }
 
 @keyframes slideUpFade {
