@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { BookOpen, CheckCircle } from "lucide-react";
+import { BookOpen, CheckCircle, Loader2 } from "lucide-react";
 
 interface CourseWithCount {
   id: string;
@@ -21,7 +21,7 @@ interface CourseWithCount {
 
 export default function Dashboard() {
   const { user, profile, isLoading, purchases } = useAuth();
-  const { courses, isLoading: coursesLoading } = useCourses();
+  const { data: courses, isLoading: coursesLoading } = useCourses();
   const [coursesWithCounts, setCoursesWithCounts] = useState<CourseWithCount[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -34,15 +34,19 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchQuestionCounts = async () => {
-      if (courses.length === 0) return;
+      if (!courses || courses.length === 0) return;
 
       const countsPromises = courses.map(async (course) => {
+        // Count questions for each course from the 'course_questions' table
         const { count } = await supabase
           .from('course_questions')
           .select('*', { count: 'exact', head: true })
           .eq('course_id', course.id);
 
-        return { ...course, questionCount: count || 0 };
+        return {
+          ...course,
+          questionCount: count || 0
+        };
       });
 
       const results = await Promise.all(countsPromises);
@@ -52,49 +56,55 @@ export default function Dashboard() {
     fetchQuestionCounts();
   }, [courses]);
 
-  // Loading State (Skeleton)
-  const isProcessing = courses.length > 0 && coursesWithCounts.length === 0;
-  
-  if (isLoading || coursesLoading || isProcessing) {
+  useEffect(() => {
+    const justLoggedIn = sessionStorage.getItem('showWelcomeToast');
+    if (justLoggedIn && profile?.full_name) {
+      sessionStorage.removeItem('showWelcomeToast');
+      toast({
+        title: `Welcome back, ${profile.full_name.split(' ')[0]}!`,
+        className: "bg-navy text-primary-foreground border-navy",
+        description: (
+          <div className="flex items-center gap-2 text-primary-foreground/80">
+            <CheckCircle className="w-4 h-4 text-success" />
+            <span>You're all set to continue learning.</span>
+          </div>
+        ) as unknown as string,
+      });
+    }
+  }, [profile, toast]);
+
+  if (isLoading || coursesLoading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] pb-20 md:pb-0">
-        <Header isLoggedIn userName="" />
-        <main className="container py-8 px-4 md:px-6">
-          <div className="mb-10 space-y-3">
-             <div className="h-8 w-48 bg-slate-200 rounded-lg animate-pulse"></div>
-             <div className="h-4 w-64 bg-slate-100 rounded-lg animate-pulse"></div>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 bg-white rounded-2xl border border-slate-100 p-6 animate-pulse shadow-sm"></div>
-            ))}
-          </div>
-        </main>
-        <MobileBottomNav />
+      <div className="min-h-screen bg-background pb-20 md:pb-0 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (!user) return null;
 
-  const filteredCourses = coursesWithCounts.filter(
-    c => c.faculty === profile?.faculty && c.level === profile?.level
-  );
-  const displayCourses = filteredCourses.length > 0 ? filteredCourses : coursesWithCounts;
+  // Filter courses based on user's faculty and level
+  // If user is Admin (you), show everything for debugging
+  const isAdmin = user.email === 'aistories72@gmail.com'; // Add your email here to see all
+  
+  const displayCourses = isAdmin 
+    ? coursesWithCounts 
+    : coursesWithCounts.filter(
+        c => c.faculty === profile?.faculty && c.level === profile?.level
+      );
 
   return (
-    // Added 'page-enter' for animation and 'pb-32' for the floating nav
-    <div className="min-h-screen bg-[#F8FAFC] pb-32 md:pb-0 page-enter relative">
+    <div className="min-h-screen bg-background pb-32 md:pb-0 font-sans">
       <Header isLoggedIn userName={profile?.full_name || ''} />
       
       <main className="container py-8 px-4 md:px-6">
         <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#0F172A] mb-2 tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2 tracking-tight">
             Hi, {profile?.full_name?.split(' ')[0] || 'Student'} 👋
           </h1>
-          <p className="text-slate-500 font-medium">
-            {filteredCourses.length > 0 
-              ? `Showing courses for ${profile?.faculty} - ${profile?.level}`
+          <p className="text-muted-foreground font-medium">
+            {displayCourses.length > 0 
+              ? `${profile?.faculty} • ${profile?.level}`
               : 'Browse all available courses'
             }
           </p>
@@ -119,13 +129,13 @@ export default function Dashboard() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm">
-            <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="w-8 h-8 text-blue-600" />
+          <div className="text-center py-16 bg-card rounded-2xl border border-border/50 shadow-card">
+            <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4">
+              <BookOpen className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="font-bold text-[#0F172A] mb-2">No courses available</h3>
-            <p className="text-slate-500 text-sm max-w-xs mx-auto">
-              We couldn't find any courses for your specific faculty and level just yet.
+            <h3 className="font-bold text-foreground mb-2">No courses available</h3>
+            <p className="text-muted-foreground text-sm max-w-xs mx-auto">
+              We couldn't find any courses for your specific department and level just yet.
             </p>
           </div>
         )}
