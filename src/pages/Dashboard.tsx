@@ -103,13 +103,14 @@ export default function Dashboard() {
 
   if (!user) return null;
 
-  // UPDATED FILTER: Matches profile department exactly
+  // --- THE FILTER CHANGE (STRICT MATCH) ---
   const displayCourses = coursesWithCounts.filter(
     c => c.faculty === profile?.faculty && c.level === profile?.level
   );
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-32 md:pb-0 animate-fade-in relative page-enter">
+    // pb-32 ensures the floating nav bar never blocks the bottom course card
+    <div className="min-h-screen bg-slate-50/50 pb-32 md:pb-0 animate-fade-in relative">
       <Header isLoggedIn userName={profile?.full_name || ''} />
       
       <main className="container py-8 px-4 md:px-6">
@@ -120,7 +121,7 @@ export default function Dashboard() {
           <p className="text-slate-500 font-medium">
             {displayCourses.length > 0 
               ? `${profile?.faculty} • ${profile?.level}`
-              : 'Browse all available courses'
+              : 'No courses available for your department yet.'
             }
           </p>
         </div>
@@ -146,11 +147,11 @@ export default function Dashboard() {
         ) : (
           <div className="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm">
             <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4 text-blue-600">
-              <BookOpen size={32} />
+              <BookOpen className="w-8 h-8 text-blue-600" />
             </div>
             <h3 className="font-bold text-slate-900 mb-2">No courses available</h3>
             <p className="text-slate-500 text-sm max-w-xs mx-auto">
-              We couldn't find any courses for your specific department and level just yet.
+              We haven't added tutorials for {profile?.faculty} {profile?.level} just yet.
             </p>
           </div>
         )}
