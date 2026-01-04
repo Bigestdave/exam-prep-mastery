@@ -29,7 +29,7 @@ interface Course {
   questionCount: number;
 }
 
-
+const faculties = ["IRM", "Engineering", "Sciences", "Arts"];
 const levels = ["100L", "200L", "300L", "400L"];
 
 export default function AdminDashboard() {
