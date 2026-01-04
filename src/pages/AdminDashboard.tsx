@@ -29,8 +29,16 @@ interface Course {
   questionCount: number;
 }
 
-const faculties = ["IRM", "Engineering", "Sciences", "Arts"];
-const levels = ["100L", "200L", "300L", "400L"];
+// FIX: MATCHING SIGNUP PAGE EXACTLY
+const faculties = [
+  "IRM",
+  "LIS",
+  "Mass Communication",
+  "Computer Science",
+  "Business Administration"
+];
+
+const levels = ["100L", "200L", "300L", "400L", "500L"];
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
