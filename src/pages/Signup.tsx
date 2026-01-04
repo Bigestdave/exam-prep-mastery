@@ -9,10 +9,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { levels } from "@/data/courses";
 
-// THE UPDATED DEPARTMENT LIST
+// THE OFFICIAL LIST (Matches Database)
 const departments = [
-  "IRM",
-  "LIS",
+  "Information Resource Management (IRM)",
+  "Library & Information Science (LIS)",
   "Mass Communication",
   "Computer Science",
   "Business Administration"
