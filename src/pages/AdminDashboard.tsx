@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen, FileText, LayoutDashboard } from "lucide-react";
 
 interface Question {
   q: string;
@@ -55,45 +55,34 @@ export default function AdminDashboard() {
   // Form state
   const [code, setCode] = useState("");
   const [title, setTitle] = useState("");
-  const [faculty, setFaculty] = useState("");
+  const [faculty, setFaculty] = useState(""); // This will now store "Department"
   const [level, setLevel] = useState("");
   const [price, setPrice] = useState("1000");
   const [questions, setQuestions] = useState<Question[]>([{ q: "", a: "" }]);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      navigate("/login");
-    }
+    if (!authLoading && !user) navigate("/login");
   }, [user, authLoading, navigate]);
 
   useEffect(() => {
     if (!adminLoading && !isAdmin && user) {
-      toast({
-        title: "Access denied",
-        description: "You don't have admin privileges.",
-        variant: "destructive",
-      });
+      toast({ title: "Access denied", variant: "destructive" });
       navigate("/dashboard");
     }
   }, [isAdmin, adminLoading, user, navigate, toast]);
 
   useEffect(() => {
-    if (isAdmin) {
-      fetchCourses();
-    }
+    if (isAdmin) fetchCourses();
   }, [isAdmin]);
 
   const fetchCourses = async () => {
     setIsLoadingCourses(true);
-    
-    // Fetch courses
     const { data: coursesData, error: coursesError } = await supabase
       .from('courses')
-      .select('id, code, title, faculty, level, price')
+      .select('*')
       .order('created_at', { ascending: true });
 
     if (!coursesError && coursesData) {
-      // Fetch question counts for each course
       const coursesWithCounts = await Promise.all(
         coursesData.map(async (course) => {
           const { count } = await supabase
@@ -101,13 +90,9 @@ export default function AdminDashboard() {
             .select('*', { count: 'exact', head: true })
             .eq('course_id', course.id);
           
-          return {
-            ...course,
-            questionCount: count || 0
-          };
+          return { ...course, questionCount: count || 0 };
         })
       );
-      
       setCourses(coursesWithCounts);
     }
     setIsLoadingCourses(false);
@@ -143,7 +128,6 @@ export default function AdminDashboard() {
     setLevel(course.level);
     setPrice(course.price.toString());
     
-    // Fetch existing questions
     const existingQuestions = await fetchCourseQuestions(course.id);
     setQuestions(existingQuestions.length > 0 ? existingQuestions : [{ q: "", a: "" }]);
     setIsDialogOpen(true);
@@ -160,135 +144,76 @@ export default function AdminDashboard() {
     }
 
     setIsSaving(true);
-
     const filteredQuestions = questions.filter(q => q.q.trim() && q.a.trim());
-    const courseData = {
-      code,
-      title,
-      faculty,
-      level,
-      price: parseInt(price) || 1000,
+    const courseData = { 
+      code, title, faculty, level, 
+      price: parseInt(price) || 1000 
     };
 
-    if (editingCourse) {
-      // Update course
-      const { error: updateError } = await supabase
-        .from('courses')
-        .update(courseData)
-        .eq('id', editingCourse.id);
+    let courseId = editingCourse?.id;
 
-      if (updateError) {
-        toast({
-          title: "Error",
-          description: updateError.message,
-          variant: "destructive",
-        });
-        setIsSaving(false);
-        return;
+    try {
+      if (editingCourse) {
+        // Update Course
+        const { error: updateError } = await supabase
+          .from('courses')
+          .update(courseData)
+          .eq('id', editingCourse.id);
+        if (updateError) throw updateError;
+      } else {
+        // Create Course
+        const { data: newCourse, error: insertError } = await supabase
+          .from('courses')
+          .insert([courseData])
+          .select()
+          .single();
+        if (insertError) throw insertError;
+        courseId = newCourse.id;
       }
 
-      // Delete existing questions and insert new ones
-      await supabase
-        .from('course_questions')
-        .delete()
-        .eq('course_id', editingCourse.id);
-
-      if (filteredQuestions.length > 0) {
-        const questionsToInsert = filteredQuestions.map((q, index) => ({
-          course_id: editingCourse.id,
-          question_index: index,
-          question_text: q.q,
-          answer_text: q.a,
-        }));
-
-        const { error: questionsError } = await supabase
+      // Handle Questions (Delete Old -> Insert New to ensure order)
+      if (courseId) {
+        await supabase
           .from('course_questions')
-          .insert(questionsToInsert);
+          .delete()
+          .eq('course_id', courseId);
 
-        if (questionsError) {
-          toast({
-            title: "Warning",
-            description: "Course updated but questions could not be saved: " + questionsError.message,
-            variant: "destructive",
-          });
+        if (filteredQuestions.length > 0) {
+          const questionsToInsert = filteredQuestions.map((q, index) => ({
+            course_id: courseId,
+            question_index: index + 1, // Start at 1
+            question_text: q.q,
+            answer_text: q.a,
+          }));
+
+          const { error: qError } = await supabase
+            .from('course_questions')
+            .insert(questionsToInsert);
+          
+          if (qError) throw qError;
         }
       }
 
-      toast({ title: "Course updated successfully" });
-    } else {
-      // Create new course
-      const { data: newCourse, error: insertError } = await supabase
-        .from('courses')
-        .insert([courseData])
-        .select()
-        .single();
-
-      if (insertError || !newCourse) {
-        toast({
-          title: "Error",
-          description: insertError?.message || "Failed to create course",
-          variant: "destructive",
-        });
-        setIsSaving(false);
-        return;
-      }
-
-      // Insert questions for new course
-      if (filteredQuestions.length > 0) {
-        const questionsToInsert = filteredQuestions.map((q, index) => ({
-          course_id: newCourse.id,
-          question_index: index,
-          question_text: q.q,
-          answer_text: q.a,
-        }));
-
-        const { error: questionsError } = await supabase
-          .from('course_questions')
-          .insert(questionsToInsert);
-
-        if (questionsError) {
-          toast({
-            title: "Warning",
-            description: "Course created but questions could not be saved: " + questionsError.message,
-            variant: "destructive",
-          });
-        }
-      }
-
-      toast({ title: "Course created successfully" });
+      toast({ title: editingCourse ? "Course Updated" : "Course Created", className: "bg-green-600 text-white" });
+      setIsDialogOpen(false);
+      resetForm();
+      fetchCourses();
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setIsSaving(false);
     }
-
-    setIsDialogOpen(false);
-    resetForm();
-    fetchCourses();
-    setIsSaving(false);
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this course?")) return;
-
-    // Questions will be deleted automatically via CASCADE
-    const { error } = await supabase
-      .from('courses')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({ title: "Course deleted" });
-      fetchCourses();
-    }
+    if (!confirm("Delete this course? All data will be lost.")) return;
+    const { error } = await supabase.from('courses').delete().eq('id', id);
+    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    else { toast({ title: "Deleted" }); fetchCourses(); }
   };
 
-  const addQuestion = () => {
-    setQuestions([...questions, { q: "", a: "" }]);
-  };
-
+  const addQuestion = () => setQuestions([...questions, { q: "", a: "" }]);
+  
   const updateQuestion = (index: number, field: 'q' | 'a', value: string) => {
     const updated = [...questions];
     updated[index][field] = value;
@@ -301,131 +226,67 @@ export default function AdminDashboard() {
     }
   };
 
-  if (authLoading || adminLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
+  if (authLoading || adminLoading) return <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]"><Loader2 className="w-10 h-10 animate-spin text-blue-600" /></div>;
   if (!isAdmin) return null;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card">
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <header className="bg-white border-b sticky top-0 z-10 shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")}>
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h1 className="text-xl font-bold">Admin Dashboard</h1>
+            <h1 className="text-xl font-bold text-[#0F172A]">Admin Dashboard</h1>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
             setIsDialogOpen(open);
             if (!open) resetForm();
           }}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Add Course
+              <Button className="bg-[#2563EB] hover:bg-blue-700 font-bold">
+                <Plus className="w-4 h-4 mr-2" /> Add Course
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl">
               <DialogHeader>
                 <DialogTitle>{editingCourse ? "Edit Course" : "Add New Course"}</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 mt-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Course Code *</Label>
-                    <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="e.g. IRM 102" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Title *</Label>
-                    <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Library Routines" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label>Faculty *</Label>
+              <div className="space-y-6 mt-4 p-1">
+                {/* Course Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                  <div className="space-y-2"><Label>Code</Label><Input value={code} onChange={e => setCode(e.target.value)} className="bg-white" placeholder="IRM 101" /></div>
+                  <div className="space-y-2"><Label>Title</Label><Input value={title} onChange={e => setTitle(e.target.value)} className="bg-white" /></div>
+                  <div className="space-y-2"><Label>Department</Label>
                     <Select value={faculty} onValueChange={setFaculty}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select faculty" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {faculties.map(f => (
-                          <SelectItem key={f} value={f}>{f}</SelectItem>
-                        ))}
+                      <SelectTrigger className="bg-white"><SelectValue placeholder="Select" /></SelectTrigger>
+                      <SelectContent className="bg-white">
+                        {departments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Level *</Label>
-                    <Select value={level} onValueChange={setLevel}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select level" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {levels.map(l => (
-                          <SelectItem key={l} value={l}>{l}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Price (₦)</Label>
-                    <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
-                  </div>
+                  <div className="space-y-2"><Label>Price</Label><Input type="number" value={price} onChange={e => setPrice(e.target.value)} className="bg-white" /></div>
                 </div>
 
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label>Questions</Label>
-                    <Button type="button" variant="outline" size="sm" onClick={addQuestion}>
-                      <Plus className="w-3 h-3 mr-1" />
-                      Add Question
-                    </Button>
+                {/* Questions Editor */}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <Label className="text-lg font-bold">Questions ({questions.length})</Label>
+                    <Button variant="outline" size="sm" onClick={addQuestion}><Plus className="w-4 h-4 mr-1"/> Add</Button>
                   </div>
-                  <div className="space-y-4 max-h-60 overflow-y-auto">
-                    {questions.map((q, i) => (
-                      <Card key={i} className="p-3">
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <Label className="text-xs">Question {i + 1}</Label>
-                            {questions.length > 1 && (
-                              <Button type="button" variant="ghost" size="sm" onClick={() => removeQuestion(i)}>
-                                <Trash2 className="w-3 h-3" />
-                              </Button>
-                            )}
-                          </div>
-                          <Input
-                            value={q.q}
-                            onChange={(e) => updateQuestion(i, 'q', e.target.value)}
-                            placeholder="Question text..."
-                          />
-                          <Textarea
-                            value={q.a}
-                            onChange={(e) => updateQuestion(i, 'a', e.target.value)}
-                            placeholder="Answer (supports markdown)..."
-                            rows={3}
-                          />
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
+                  {questions.map((q, i) => (
+                    <Card key={i} className="p-4 border-slate-200">
+                      <div className="space-y-3">
+                         <div className="flex justify-between"><Label className="text-blue-600 font-bold">Question {i+1}</Label><button onClick={() => removeQuestion(i)}><Trash2 className="w-4 h-4 text-red-400"/></button></div>
+                         <Input value={q.q} onChange={e => updateQuestion(i, 'q', e.target.value)} placeholder="Question..." className="font-bold" />
+                         <Textarea value={q.a} onChange={e => updateQuestion(i, 'a', e.target.value)} placeholder="Answer (Use ### for headers)..." className="font-serif bg-slate-50 min-h-[120px]" />
+                      </div>
+                    </Card>
+                  ))}
                 </div>
 
-                <Button onClick={handleSubmit} className="w-full" disabled={isSaving}>
-                  {isSaving ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      Saving...
-                    </>
-                  ) : (
-                    editingCourse ? "Update Course" : "Create Course"
-                  )}
+                <Button onClick={handleSubmit} className="w-full h-12 bg-[#2563EB] font-bold text-lg" disabled={isSaving}>
+                  {isSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : "Save Course Content"}
                 </Button>
               </div>
             </DialogContent>
@@ -433,53 +294,23 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      {/* Content */}
-      <main className="container mx-auto px-4 py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5" />
-              Manage Courses ({courses.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {isLoadingCourses ? (
-              <div className="flex justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin" />
-              </div>
-            ) : courses.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">
-                No courses yet. Click "Add Course" to create one.
-              </p>
-            ) : (
+      <main className="container mx-auto px-4 py-8 max-w-5xl">
+        <Card className="bg-white shadow-premium border-slate-100 rounded-3xl overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b"><CardTitle>Live Courses</CardTitle></CardHeader>
+          <CardContent className="p-0">
+            {isLoadingCourses ? <div className="p-10 flex justify-center"><Loader2 className="animate-spin text-blue-600"/></div> : (
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Code</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Faculty</TableHead>
-                    <TableHead>Level</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Questions</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
+                <TableHeader><TableRow><TableHead>Code</TableHead><TableHead>Title</TableHead><TableHead>Dept</TableHead><TableHead>Qs</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
                 <TableBody>
-                  {courses.map((course) => (
-                    <TableRow key={course.id}>
-                      <TableCell className="font-medium">{course.code}</TableCell>
-                      <TableCell>{course.title}</TableCell>
-                      <TableCell>{course.faculty}</TableCell>
-                      <TableCell>{course.level}</TableCell>
-                      <TableCell>₦{course.price.toLocaleString()}</TableCell>
-                      <TableCell>{course.questionCount}</TableCell>
+                  {courses.map(c => (
+                    <TableRow key={c.id}>
+                      <TableCell className="font-bold text-[#0F172A]">{c.code}</TableCell>
+                      <TableCell>{c.title}</TableCell>
+                      <TableCell><span className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-bold">{c.faculty}</span></TableCell>
+                      <TableCell>{c.questionCount}</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" onClick={() => openEditDialog(course)}>
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(course.id)}>
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => openEditDialog(c)}><Pencil className="w-4 h-4"/></Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(c.id)}><Trash2 className="w-4 h-4 text-red-500"/></Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -491,4 +322,5 @@ export default function AdminDashboard() {
       </main>
     </div>
   );
+}
 }
