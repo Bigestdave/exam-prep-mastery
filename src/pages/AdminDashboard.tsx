@@ -355,7 +355,7 @@ export default function AdminDashboard() {
                         <SelectValue placeholder="Select faculty" />
                       </SelectTrigger>
                       <SelectContent>
-                        {faculties.map(f => (
+                        {departments.map(f => (
                           <SelectItem key={f} value={f}>{f}</SelectItem>
                         ))}
                       </SelectContent>
