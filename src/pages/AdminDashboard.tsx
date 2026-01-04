@@ -29,14 +29,7 @@ interface Course {
   questionCount: number;
 }
 
-// THE OFFICIAL LIST (Matches Database)
-const departments = [
-  "Information Resource Management (IRM)",
-  "Library & Information Science (LIS)",
-  "Mass Communication",
-  "Computer Science",
-  "Business Administration"
-];
+
 const levels = ["100L", "200L", "300L", "400L"];
 
 export default function AdminDashboard() {
