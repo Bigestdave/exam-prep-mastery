@@ -189,16 +189,21 @@ export default function CourseDetail() {
         ) : (
           <div className="space-y-3">
             {/* Show available questions (RLS filtered) */}
-            {questions.map((q) => (
-              <QuestionItem
+            {questions.map((q, i) => (
+              <div 
                 key={q.id}
-                courseId={course.id}
-                questionIndex={q.question_index}
-                question={q.question_text}
-                isUnlocked={isOwned}
-                isFreePreview={q.question_index === 0}
-                onLockedClick={() => setShowPaymentModal(true)}
-              />
+                className="opacity-0 animate-fade-in"
+                style={{ animationDelay: `${i * 50}ms`, animationFillMode: 'forwards' }}
+              >
+                <QuestionItem
+                  courseId={course.id}
+                  questionIndex={q.question_index}
+                  question={q.question_text}
+                  isUnlocked={isOwned}
+                  isFreePreview={q.question_index === 0}
+                  onLockedClick={() => setShowPaymentModal(true)}
+                />
+              </div>
             ))}
             
             {/* Show locked placeholders for remaining questions */}
@@ -206,7 +211,8 @@ export default function CourseDetail() {
               Array.from({ length: displayCount - questions.length }).map((_, i) => (
                 <div 
                   key={`locked-${i}`}
-                  className="bg-card rounded-xl p-4 border border-border/50 opacity-60 cursor-pointer hover:opacity-80 transition-opacity"
+                  className="opacity-0 animate-fade-in bg-card rounded-xl p-4 border border-border/50 cursor-pointer hover:opacity-80 transition-opacity"
+                  style={{ animationDelay: `${(questions.length + i) * 50}ms`, animationFillMode: 'forwards' }}
                   onClick={() => setShowPaymentModal(true)}
                 >
                   <div className="flex items-center gap-3">
