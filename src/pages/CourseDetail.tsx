@@ -8,8 +8,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Lock, CheckCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, Lock, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
   DialogContent,
@@ -85,8 +86,23 @@ export default function CourseDetail() {
 
   if (isLoading || coursesLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      <div className="min-h-screen bg-background pb-24 md:pb-8">
+        <Header isLoggedIn userName="" />
+        <main className="container py-8 px-4">
+          <Skeleton className="h-4 w-28 mb-6" />
+          <div className="mb-8 space-y-3">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-8 w-20 rounded-lg" />
+            </div>
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-4 w-48" />
+          </div>
+          <div className="space-y-3">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Skeleton key={i} className="h-16 w-full rounded-xl" />
+            ))}
+          </div>
+        </main>
       </div>
     );
   }
@@ -166,8 +182,10 @@ export default function CourseDetail() {
         </div>
 
         {questionsLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+          <div className="space-y-3">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Skeleton key={i} className="h-16 w-full rounded-xl" />
+            ))}
           </div>
         ) : (
           <div className="space-y-3">
