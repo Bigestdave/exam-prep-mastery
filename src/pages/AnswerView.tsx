@@ -6,7 +6,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AnswerView() {
   const { id, questionId } = useParams<{ id: string; questionId: string }>();
@@ -36,24 +35,24 @@ export default function AnswerView() {
       <div className="min-h-screen bg-[#F8FAFC]">
         <Header isLoggedIn userName="" />
         <main className="container py-8 px-4 max-w-3xl">
-          <Skeleton className="h-4 w-28 mb-6" />
+          <div className="h-4 w-28 bg-slate-100 rounded-lg animate-pulse mb-6"></div>
           <div className="bg-white rounded-3xl p-6 md:p-10 shadow-lg shadow-slate-200/50 border border-slate-100 mb-8">
             <div className="flex items-center gap-3 mb-6">
-              <Skeleton className="h-4 w-20" />
+              <div className="h-4 w-20 bg-slate-100 rounded animate-pulse"></div>
             </div>
-            <Skeleton className="h-8 w-full mb-3" />
-            <Skeleton className="h-6 w-3/4 mb-8" />
+            <div className="h-8 w-full bg-slate-200 rounded-lg animate-pulse mb-3"></div>
+            <div className="h-6 w-3/4 bg-slate-100 rounded-lg animate-pulse mb-8"></div>
             <div className="space-y-4">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-5/6" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-4/5" />
+              <div className="h-4 w-full bg-slate-100 rounded animate-pulse"></div>
+              <div className="h-4 w-full bg-slate-100 rounded animate-pulse"></div>
+              <div className="h-4 w-5/6 bg-slate-100 rounded animate-pulse"></div>
+              <div className="h-4 w-full bg-slate-100 rounded animate-pulse"></div>
+              <div className="h-4 w-4/5 bg-slate-100 rounded animate-pulse"></div>
             </div>
           </div>
           <div className="flex items-center justify-between pb-20">
-            <Skeleton className="h-10 w-28 rounded-xl" />
-            <Skeleton className="h-10 w-32 rounded-xl" />
+            <div className="h-10 w-28 bg-slate-100 rounded-xl animate-pulse"></div>
+            <div className="h-10 w-32 bg-slate-200 rounded-xl animate-pulse"></div>
           </div>
         </main>
       </div>

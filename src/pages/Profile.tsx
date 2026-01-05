@@ -7,7 +7,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useToast } from "@/hooks/use-toast";
 import { Wallet, BookOpen, LogOut, ArrowLeft, Copy } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Profile() {
   const { user, profile, isLoading, logout, purchases } = useAuth();
@@ -23,46 +22,46 @@ export default function Profile() {
 
   if (isLoading || coursesLoading) {
     return (
-      <div className="min-h-screen bg-background pb-20 md:pb-0">
+      <div className="min-h-screen bg-[#F8FAFC] pb-20 md:pb-0">
         <Header isLoggedIn userName="" />
         <main className="container py-8 max-w-xl px-4">
-          <Skeleton className="h-4 w-32 mb-6" />
+          <div className="h-4 w-32 bg-slate-100 rounded-lg animate-pulse mb-6"></div>
           <div className="mb-8 space-y-2">
-            <Skeleton className="h-7 w-40" />
-            <Skeleton className="h-4 w-48" />
-            <Skeleton className="h-4 w-32" />
+            <div className="h-7 w-40 bg-slate-200 rounded-lg animate-pulse"></div>
+            <div className="h-4 w-48 bg-slate-100 rounded-lg animate-pulse"></div>
+            <div className="h-4 w-32 bg-slate-100 rounded-lg animate-pulse"></div>
           </div>
           {/* Wallet Card Skeleton */}
-          <div className="bg-muted rounded-2xl p-6 mb-6">
+          <div className="bg-slate-200 rounded-2xl p-6 mb-6">
             <div className="flex items-center gap-3 mb-4">
-              <Skeleton className="w-10 h-10 rounded-xl" />
+              <div className="w-10 h-10 bg-slate-300 rounded-xl animate-pulse"></div>
               <div className="space-y-2">
-                <Skeleton className="h-3 w-24" />
-                <Skeleton className="h-6 w-16" />
+                <div className="h-3 w-24 bg-slate-300 rounded animate-pulse"></div>
+                <div className="h-6 w-16 bg-slate-300 rounded animate-pulse"></div>
               </div>
             </div>
             <div className="flex gap-3">
-              <Skeleton className="h-10 flex-1 rounded-lg" />
-              <Skeleton className="h-10 flex-1 rounded-lg" />
+              <div className="h-10 flex-1 bg-slate-300 rounded-lg animate-pulse"></div>
+              <div className="h-10 flex-1 bg-slate-300 rounded-lg animate-pulse"></div>
             </div>
           </div>
           {/* Library Skeleton */}
-          <div className="bg-card rounded-2xl border border-border/50 overflow-hidden mb-6">
-            <div className="p-5 border-b border-border/50">
+          <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden mb-6 shadow-sm">
+            <div className="p-5 border-b border-slate-100">
               <div className="flex items-center gap-3">
-                <Skeleton className="w-10 h-10 rounded-xl" />
+                <div className="w-10 h-10 bg-slate-100 rounded-xl animate-pulse"></div>
                 <div className="space-y-2">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-3 w-32" />
+                  <div className="h-4 w-24 bg-slate-200 rounded animate-pulse"></div>
+                  <div className="h-3 w-32 bg-slate-100 rounded animate-pulse"></div>
                 </div>
               </div>
             </div>
             <div className="p-5 space-y-3">
-              <Skeleton className="h-5 w-20" />
-              <Skeleton className="h-5 w-24" />
+              <div className="h-5 w-20 bg-slate-100 rounded animate-pulse"></div>
+              <div className="h-5 w-24 bg-slate-100 rounded animate-pulse"></div>
             </div>
           </div>
-          <Skeleton className="h-10 w-full" />
+          <div className="h-10 w-full bg-slate-100 rounded-lg animate-pulse"></div>
         </main>
         <MobileBottomNav />
       </div>
