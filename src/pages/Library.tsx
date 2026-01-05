@@ -7,7 +7,6 @@ import { useCourses } from "@/hooks/useCourses";
 import { supabase } from "@/integrations/supabase/client";
 import { BookOpen, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface CourseWithCount {
   id: string;
@@ -66,22 +65,22 @@ export default function Library() {
 
   if (isProcessing) {
     return (
-      <div className="min-h-screen bg-background pb-20 md:pb-0">
+      <div className="min-h-screen bg-[#F8FAFC] pb-20 md:pb-0">
         <Header isLoggedIn userName="" />
         <main className="container py-8 px-4 md:px-6">
           <div className="mb-8 space-y-3">
-            <Skeleton className="h-8 w-32" />
-            <Skeleton className="h-4 w-48" />
+            <div className="h-8 w-32 bg-slate-200 rounded-lg animate-pulse"></div>
+            <div className="h-4 w-48 bg-slate-100 rounded-lg animate-pulse"></div>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-card rounded-2xl border border-border/50 p-5">
+              <div key={i} className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
                 <div className="flex items-start gap-4">
-                  <Skeleton className="w-12 h-12 rounded-xl" />
+                  <div className="w-12 h-12 bg-slate-100 rounded-xl animate-pulse"></div>
                   <div className="flex-1 space-y-2">
-                    <Skeleton className="h-3 w-16" />
-                    <Skeleton className="h-5 w-full" />
-                    <Skeleton className="h-4 w-24" />
+                    <div className="h-3 w-16 bg-slate-100 rounded animate-pulse"></div>
+                    <div className="h-5 w-full bg-slate-200 rounded animate-pulse"></div>
+                    <div className="h-4 w-24 bg-slate-100 rounded animate-pulse"></div>
                   </div>
                 </div>
               </div>
