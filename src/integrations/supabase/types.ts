@@ -91,6 +91,7 @@ export type Database = {
           faculty: string | null
           full_name: string | null
           id: string
+          is_admin: boolean | null
           level: string | null
         }
         Insert: {
@@ -98,6 +99,7 @@ export type Database = {
           faculty?: string | null
           full_name?: string | null
           id: string
+          is_admin?: boolean | null
           level?: string | null
         }
         Update: {
@@ -105,6 +107,7 @@ export type Database = {
           faculty?: string | null
           full_name?: string | null
           id?: string
+          is_admin?: boolean | null
           level?: string | null
         }
         Relationships: []
