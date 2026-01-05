@@ -5,8 +5,9 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, ShoppingBag, Loader2 } from "lucide-react";
+import { BookOpen, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CourseWithCount {
   id: string;
@@ -22,6 +23,7 @@ export default function Library() {
   const { user, profile, isLoading, purchases } = useAuth();
   const { courses, isLoading: coursesLoading } = useCourses();
   const [purchasedCourses, setPurchasedCourses] = useState<CourseWithCount[]>([]);
+  const [isFetchingCounts, setIsFetchingCounts] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,6 +35,7 @@ export default function Library() {
   // Fetch purchased courses with question counts
   useEffect(() => {
     const fetchPurchasedCourses = async () => {
+      setIsFetchingCounts(true);
       const filtered = courses.filter(course => purchases.includes(course.id));
       
       const countsPromises = filtered.map(async (course) => {
@@ -49,17 +52,43 @@ export default function Library() {
 
       const results = await Promise.all(countsPromises);
       setPurchasedCourses(results);
+      setIsFetchingCounts(false);
     };
 
-    if (courses.length > 0) {
+    if (courses.length > 0 && purchases.length > 0) {
       fetchPurchasedCourses();
+    } else if (courses.length > 0) {
+      setIsFetchingCounts(false);
     }
   }, [courses, purchases]);
 
-  if (isLoading || coursesLoading) {
+  const isProcessing = isLoading || coursesLoading || (purchases.length > 0 && isFetchingCounts);
+
+  if (isProcessing) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+      <div className="min-h-screen bg-background pb-20 md:pb-0">
+        <Header isLoggedIn userName="" />
+        <main className="container py-8 px-4 md:px-6">
+          <div className="mb-8 space-y-3">
+            <Skeleton className="h-8 w-32" />
+            <Skeleton className="h-4 w-48" />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-card rounded-2xl border border-border/50 p-5">
+                <div className="flex items-start gap-4">
+                  <Skeleton className="w-12 h-12 rounded-xl" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="h-5 w-full" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </main>
+        <MobileBottomNav />
       </div>
     );
   }

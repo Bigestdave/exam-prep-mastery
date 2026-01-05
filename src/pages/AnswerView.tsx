@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
-import { ArrowLeft, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AnswerView() {
   const { id, questionId } = useParams<{ id: string; questionId: string }>();
@@ -31,7 +32,32 @@ export default function AnswerView() {
   }, [isLoading, questionsLoading, user, course, isOwned, isFreePreview, id, navigate]);
 
   if (isLoading || coursesLoading || questionsLoading) {
-    return <div className="min-h-screen bg-background flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+    return (
+      <div className="min-h-screen bg-[#F8FAFC]">
+        <Header isLoggedIn userName="" />
+        <main className="container py-8 px-4 max-w-3xl">
+          <Skeleton className="h-4 w-28 mb-6" />
+          <div className="bg-white rounded-3xl p-6 md:p-10 shadow-lg shadow-slate-200/50 border border-slate-100 mb-8">
+            <div className="flex items-center gap-3 mb-6">
+              <Skeleton className="h-4 w-20" />
+            </div>
+            <Skeleton className="h-8 w-full mb-3" />
+            <Skeleton className="h-6 w-3/4 mb-8" />
+            <div className="space-y-4">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-5/6" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-4/5" />
+            </div>
+          </div>
+          <div className="flex items-center justify-between pb-20">
+            <Skeleton className="h-10 w-28 rounded-xl" />
+            <Skeleton className="h-10 w-32 rounded-xl" />
+          </div>
+        </main>
+      </div>
+    );
   }
 
   if (!user || !course || !question) return null;
