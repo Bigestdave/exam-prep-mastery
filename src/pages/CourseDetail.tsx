@@ -122,13 +122,46 @@ export default function CourseDetail() {
     );
   }
 
-  const onSuccess = () => {
-    addPurchase(course.id);
-    setShowPaymentModal(false);
-    toast({
-      title: "Payment successful! 🎉",
-      description: `You now have full access to ${course.code}.`,
-    });
+  const onSuccess = async (response: { reference: string }) => {
+    try {
+      // Verify payment server-side and record purchase
+      const { data, error } = await supabase.functions.invoke('verify-payment', {
+        body: { reference: response.reference }
+      });
+      
+      if (error) {
+        console.error('Payment verification failed:', error);
+        toast({
+          title: "Payment verification failed",
+          description: "Please contact support with your payment reference: " + response.reference,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (data?.success) {
+        // Refresh purchases in auth context
+        addPurchase(course.id);
+        setShowPaymentModal(false);
+        toast({
+          title: "Payment successful! 🎉",
+          description: `You now have full access to ${course.code}.`,
+        });
+      } else {
+        toast({
+          title: "Payment verification issue",
+          description: data?.error || "Please contact support.",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      console.error('Payment verification error:', err);
+      toast({
+        title: "Verification error",
+        description: "Please contact support with your payment reference: " + response.reference,
+        variant: "destructive",
+      });
+    }
   };
 
   const onClose = () => {
