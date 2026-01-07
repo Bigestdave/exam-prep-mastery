@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { ValueCard } from "@/components/ValueCard";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { CheckCircle, Target, Award, ArrowRight, GraduationCap } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -134,7 +135,7 @@ export default function Landing() {
         <div className="container">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-3xl font-bold text-foreground mb-8 text-center">Frequently Asked Questions</h2>
-            <div className="space-y-6">
+            <Accordion type="single" collapsible className="w-full">
               {[
                 { q: 'Is payment for all courses or one course?', a: 'Payment is per course. You unlock only the course you choose.' },
                 { q: 'Can I see the answers before paying?', a: 'Yes. You can preview one solved tutorial question before unlocking the full course.' },
@@ -143,12 +144,16 @@ export default function Landing() {
                 { q: 'How long do I have access after paying?', a: 'Access lasts for the current semester.' },
                 { q: 'What if I have an issue after payment?', a: 'Access is automatic. If there\'s any issue, support is available.' },
               ].map((faq, i) => (
-                <div key={i} className="opacity-0 animate-fade-in" style={{ animationDelay: `${i * 50 + 100}ms` }}>
-                  <h3 className="font-semibold text-foreground mb-2">{faq.q}</h3>
-                  <p className="text-muted-foreground">{faq.a}</p>
-                </div>
+                <AccordionItem key={i} value={`faq-${i}`} className="border-border">
+                  <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline">
+                    {faq.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground">
+                    {faq.a}
+                  </AccordionContent>
+                </AccordionItem>
               ))}
-            </div>
+            </Accordion>
           </div>
         </div>
       </section>
