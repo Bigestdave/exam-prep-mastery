@@ -94,7 +94,7 @@ export default function Landing() {
           
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
-              { step: '01', title: 'Create Account', desc: 'Sign up with your faculty and level details' },
+              { step: '01', title: 'Create Account', desc: 'Sign up with your department and level details' },
               { step: '02', title: 'Find Your Course', desc: 'We automatically show courses for your level' },
               { step: '03', title: 'Unlock & Study', desc: 'Access all 15 answers instantly' },
             ].map((item, i) => (
