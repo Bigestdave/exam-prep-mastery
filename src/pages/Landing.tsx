@@ -107,6 +107,52 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* How Pricing Works */}
+      <section className="py-16 md:py-24">
+        <div className="container">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-3xl font-bold text-foreground mb-8 text-center">How Pricing Works</h2>
+            <div className="space-y-4">
+              {[
+                'Each course is unlocked separately',
+                'You only pay for the courses you are taking',
+                'One-time payment per course, per semester',
+                'Access is instant after payment',
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-3 opacity-0 animate-fade-in" style={{ animationDelay: `${i * 50 + 100}ms` }}>
+                  <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                  <p className="text-muted-foreground">{item}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-16 md:py-24 bg-secondary/30">
+        <div className="container">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-3xl font-bold text-foreground mb-8 text-center">Frequently Asked Questions</h2>
+            <div className="space-y-6">
+              {[
+                { q: 'Is payment for all courses or one course?', a: 'Payment is per course. You unlock only the course you choose.' },
+                { q: 'Can I see the answers before paying?', a: 'Yes. You can preview one solved tutorial question before unlocking the full course.' },
+                { q: 'Will this actually help for exams?', a: 'Exams are set from tutorial questions. We prepare all the tutorials properly, so no question is unfamiliar.' },
+                { q: 'When is the best time to get it?', a: 'Most students unlock courses during holidays or early semester to avoid rushing later.' },
+                { q: 'How long do I have access after paying?', a: 'Access lasts for the current semester.' },
+                { q: 'What if I have an issue after payment?', a: 'Access is automatic. If there\'s any issue, support is available.' },
+              ].map((faq, i) => (
+                <div key={i} className="opacity-0 animate-fade-in" style={{ animationDelay: `${i * 50 + 100}ms` }}>
+                  <h3 className="font-semibold text-foreground mb-2">{faq.q}</h3>
+                  <p className="text-muted-foreground">{faq.a}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-20 md:py-28">
         <div className="container">
