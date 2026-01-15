@@ -85,14 +85,35 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Find user by email
-    const { data: users, error: userError } = await supabase.auth.admin.listUsers();
-    if (userError) {
-      console.error('Failed to list users:', userError);
-      return new Response('Failed to find user', { status: 500, headers: corsHeaders });
+    // Find user by email using paginated search
+    let user = null;
+    let page = 1;
+    const perPage = 100;
+    
+    while (!user) {
+      const { data: usersPage, error: userError } = await supabase.auth.admin.listUsers({
+        page,
+        perPage,
+      });
+      
+      if (userError) {
+        console.error('Failed to list users:', userError);
+        return new Response('Failed to find user', { status: 500, headers: corsHeaders });
+      }
+      
+      if (!usersPage.users || usersPage.users.length === 0) {
+        break; // No more users to check
+      }
+      
+      user = usersPage.users.find(u => u.email?.toLowerCase() === customerEmail.toLowerCase());
+      
+      if (usersPage.users.length < perPage) {
+        break; // Last page reached
+      }
+      
+      page++;
     }
-
-    const user = users.users.find(u => u.email?.toLowerCase() === customerEmail.toLowerCase());
+    
     if (!user) {
       console.error('User not found for email:', customerEmail);
       return new Response('User not found', { status: 404, headers: corsHeaders });
