@@ -18,7 +18,9 @@ const departments = [
   "Library & Information Science (LIS)",
   "Mass Communication",
   "Computer Science",
-  "Business Administration"
+  "Business Administration",
+  "Psychology",
+  "Public Administration"
 ];
 
 export default function Signup() {
