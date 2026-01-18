@@ -34,7 +34,9 @@ const faculties = [
   "Library & Information Science (LIS)",
   "Mass Communication",
   "Computer Science",
-  "Business Administration"
+  "Business Administration",
+  "Psychology",
+  "Public Administration"
 ];
 
 const levels = ["100L", "200L", "300L", "400L", "500L"];
