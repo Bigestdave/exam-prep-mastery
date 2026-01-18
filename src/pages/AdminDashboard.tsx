@@ -29,10 +29,9 @@ interface Course {
   questionCount: number;
 }
 
-// FIX: MATCHING SIGNUP PAGE EXACTLY
 const faculties = [
-  "IRM",
-  "LIS",
+  "Information Resource Management (IRM)",
+  "Library & Information Science (LIS)",
   "Mass Communication",
   "Computer Science",
   "Business Administration"
