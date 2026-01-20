@@ -13,6 +13,22 @@ export default function ForgotPassword() {
   const [emailSent, setEmailSent] = useState(false);
   const { toast } = useToast();
 
+  const getErrorMessage = (errorMessage: string): string => {
+    const lowerMessage = errorMessage.toLowerCase();
+    
+    if (lowerMessage.includes('rate limit') || lowerMessage.includes('too many requests')) {
+      return 'Too many reset attempts. Please wait a few minutes before trying again.';
+    }
+    if (lowerMessage.includes('network') || lowerMessage.includes('fetch')) {
+      return 'Unable to connect. Please check your internet connection.';
+    }
+    if (lowerMessage.includes('invalid email')) {
+      return 'Please enter a valid email address.';
+    }
+    
+    return errorMessage || 'Something went wrong. Please try again.';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -23,8 +39,8 @@ export default function ForgotPassword() {
     
     if (error) {
       toast({
-        title: "Error",
-        description: error.message,
+        title: "Unable to send reset link",
+        description: getErrorMessage(error.message),
         variant: "destructive",
       });
       setIsLoading(false);

@@ -16,6 +16,28 @@ export default function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const getErrorMessage = (errorMessage: string): string => {
+    const lowerMessage = errorMessage.toLowerCase();
+    
+    if (lowerMessage.includes('invalid login credentials')) {
+      return 'The email or password you entered is incorrect. Please try again.';
+    }
+    if (lowerMessage.includes('email not confirmed')) {
+      return 'Please check your email and click the confirmation link before signing in.';
+    }
+    if (lowerMessage.includes('user not found') || lowerMessage.includes('no user')) {
+      return 'No account found with this email. Please sign up first.';
+    }
+    if (lowerMessage.includes('too many requests') || lowerMessage.includes('rate limit')) {
+      return 'Too many login attempts. Please wait a few minutes before trying again.';
+    }
+    if (lowerMessage.includes('network') || lowerMessage.includes('fetch')) {
+      return 'Unable to connect. Please check your internet connection.';
+    }
+    
+    return errorMessage || 'Something went wrong. Please try again.';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -25,7 +47,7 @@ export default function Login() {
     if (error) {
       toast({
         title: "Login failed",
-        description: error.message || "Please check your credentials and try again.",
+        description: getErrorMessage(error.message),
         variant: "destructive",
       });
       setIsLoading(false);
