@@ -12,22 +12,53 @@ export default function ResetPassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isValidLink, setIsValidLink] = useState<boolean | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const getErrorMessage = (errorMessage: string): string => {
+    const lowerMessage = errorMessage.toLowerCase();
+    
+    if (lowerMessage.includes('same password') || lowerMessage.includes('different password')) {
+      return 'New password must be different from your current password.';
+    }
+    if (lowerMessage.includes('weak password') || lowerMessage.includes('password strength')) {
+      return 'Please choose a stronger password with letters, numbers, and symbols.';
+    }
+    if (lowerMessage.includes('session') || lowerMessage.includes('expired') || lowerMessage.includes('invalid')) {
+      return 'This reset link has expired. Please request a new one.';
+    }
+    if (lowerMessage.includes('network') || lowerMessage.includes('fetch')) {
+      return 'Unable to connect. Please check your internet connection.';
+    }
+    
+    return errorMessage || 'Something went wrong. Please try again.';
+  };
 
   useEffect(() => {
     // Check if we have access token in URL (from email link)
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const accessToken = hashParams.get('access_token');
+    const type = hashParams.get('type');
     
-    if (!accessToken) {
-      // No token, redirect to forgot password
-      toast({
-        title: "Invalid link",
-        description: "Please request a new password reset link.",
-        variant: "destructive",
+    // Valid if we have access_token OR if type is recovery
+    if (accessToken || type === 'recovery') {
+      setIsValidLink(true);
+    } else {
+      // Also check if user already has a session from the recovery link
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          setIsValidLink(true);
+        } else {
+          setIsValidLink(false);
+          toast({
+            title: "Invalid link",
+            description: "Please request a new password reset link.",
+            variant: "destructive",
+          });
+          navigate("/forgot-password");
+        }
       });
-      navigate("/forgot-password");
     }
   }, [navigate, toast]);
 
@@ -58,8 +89,8 @@ export default function ResetPassword() {
     
     if (error) {
       toast({
-        title: "Error",
-        description: error.message,
+        title: "Unable to update password",
+        description: getErrorMessage(error.message),
         variant: "destructive",
       });
       setIsLoading(false);
@@ -69,6 +100,15 @@ export default function ResetPassword() {
     setIsSuccess(true);
     setIsLoading(false);
   };
+
+  // Show loading while checking link validity
+  if (isValidLink === null) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex">
