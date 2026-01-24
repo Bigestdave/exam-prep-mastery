@@ -8,7 +8,7 @@ import { useCourses } from "@/hooks/useCourses";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { BookOpen } from "lucide-react";
-import { departmentHasCourses } from "@/data/departments";
+
 interface CourseWithCount {
   id: string;
   code: string;
@@ -82,12 +82,11 @@ export default function Dashboard() {
     c => c.faculty === profile?.faculty && c.level === profile?.level
   );
 
-  // Only show all courses if user's department has courses but none found for their level
-  // If department has NO courses at all, show empty state
-  const userDepartmentHasCourses = profile?.faculty ? departmentHasCourses(profile.faculty) : false;
-  const displayCourses = userDepartmentHasCourses 
-    ? filteredCourses // Only show their department's courses (or empty if none)
-    : []; // Non-science departments get empty state
+  // Check if this department has ANY courses in the database (not just based on static mapping)
+  const departmentHasCoursesInDb = coursesWithCounts.some(c => c.faculty === profile?.faculty);
+  
+  // Show filtered courses if any exist for their department, otherwise show empty state
+  const displayCourses = filteredCourses;
 
   return (
     // Added 'page-enter' for animation and 'pb-32' for the floating nav
@@ -102,7 +101,7 @@ export default function Dashboard() {
           <p className="text-slate-500 font-medium">
             {displayCourses.length > 0 
               ? `Showing courses for ${profile?.faculty} - ${profile?.level}`
-              : userDepartmentHasCourses 
+              : departmentHasCoursesInDb 
                 ? `No courses found for ${profile?.level} yet`
                 : `Tutorial courses for your department are coming soon`
             }
@@ -133,10 +132,10 @@ export default function Dashboard() {
               <BookOpen className="w-8 h-8 text-blue-600" />
             </div>
             <h3 className="font-bold text-[#0F172A] mb-2">
-              {userDepartmentHasCourses ? "No courses for this level" : "Coming Soon"}
+              {departmentHasCoursesInDb ? "No courses for this level" : "Coming Soon"}
             </h3>
             <p className="text-slate-500 text-sm max-w-xs mx-auto">
-              {userDepartmentHasCourses 
+              {departmentHasCoursesInDb 
                 ? `We couldn't find any courses for ${profile?.level} in your department just yet.`
                 : `Tutorial courses for ${profile?.faculty || "your department"} are being prepared and will be available soon.`
               }
