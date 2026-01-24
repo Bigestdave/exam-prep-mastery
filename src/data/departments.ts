@@ -136,34 +136,32 @@ export const baseCourses: CourseMapping[] = [
   { code: "PHY 101", title: "General Physics I" },
   { code: "MTH 101", title: "General Mathematics I" },
   { code: "COS 101", title: "Introduction to Computer Science" },
-  { code: "GST 106", title: "Use of English I" },
-  { code: "GST 107", title: "Use of English II" },
 ];
 
 // Mapping of which courses each category takes
 export const categoryCourseMappings: Record<string, string[]> = {
-  "Medical & Clinical Sciences": ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101", "GST 106", "GST 107"],
-  "Health Sciences": ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101", "GST 106", "GST 107"],
-  "Biological & Natural Sciences": ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101", "GST 106", "GST 107"],
-  "Physical & Mathematical Sciences": ["CHM 101", "PHY 101", "MTH 101", "COS 101", "GST 106", "GST 107"],
-  "Engineering & Technology": ["CHM 101", "PHY 101", "MTH 101", "COS 101", "GST 106", "GST 107"],
-  "Information & Communication Technology": ["CHM 101", "PHY 101", "MTH 101", "COS 101", "GST 106", "GST 107"],
-  "Environmental Design": ["PHY 101", "MTH 101", "COS 101", "GST 106", "GST 107"],
-  "Agriculture": ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101", "GST 106", "GST 107"],
-  "Science Education": ["COS 101", "GST 106", "GST 107"], // Base courses, specific subjects added per department
-  "Social Sciences & Humanities": ["COS 101", "GST 106", "GST 107"],
+  "Medical & Clinical Sciences": ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101"],
+  "Health Sciences": ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101"],
+  "Biological & Natural Sciences": ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101"],
+  "Physical & Mathematical Sciences": ["CHM 101", "PHY 101", "MTH 101", "COS 101"],
+  "Engineering & Technology": ["CHM 101", "PHY 101", "MTH 101", "COS 101"],
+  "Information & Communication Technology": ["CHM 101", "PHY 101", "MTH 101", "COS 101"],
+  "Environmental Design": ["PHY 101", "MTH 101", "COS 101"],
+  "Agriculture": ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101"],
+  "Science Education": ["COS 101"], // Base courses, specific subjects added per department
+  "Social Sciences & Humanities": ["COS 101"],
 };
 
 // Special cases for Science Education departments
 export const scienceEducationCourseMappings: Record<string, string[]> = {
-  "Biology Education": ["BIO 101", "CHM 101", "COS 101", "GST 106", "GST 107"],
-  "Chemistry Education": ["CHM 101", "PHY 101", "COS 101", "GST 106", "GST 107"],
-  "Physics Education": ["PHY 101", "MTH 101", "COS 101", "GST 106", "GST 107"],
-  "Mathematics Education": ["MTH 101", "PHY 101", "COS 101", "GST 106", "GST 107"],
+  "Biology Education": ["BIO 101", "CHM 101", "COS 101"],
+  "Chemistry Education": ["CHM 101", "PHY 101", "COS 101"],
+  "Physics Education": ["PHY 101", "MTH 101", "COS 101"],
+  "Mathematics Education": ["MTH 101", "PHY 101", "COS 101"],
 };
 
 // Special case: Biomedical Engineering takes BIO 101
-export const biomedicalEngineeringCourses = ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101", "GST 106", "GST 107"];
+export const biomedicalEngineeringCourses = ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101"];
 
 // Helper function to get courses for a specific department
 export function getCoursesForDepartment(department: string): string[] {
