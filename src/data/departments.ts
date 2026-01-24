@@ -1,64 +1,68 @@
 // Centralized department taxonomy for the entire application
-// Each department is grouped by category for organization
+// Each faculty is grouped with its departments
 
-export interface DepartmentCategory {
+export interface FacultyCategory {
   name: string;
   departments: string[];
+  courseType: "science" | "partial-science" | "non-science";
 }
 
-export const departmentCategories: DepartmentCategory[] = [
+export const facultyCategories: FacultyCategory[] = [
   {
-    name: "Medical & Clinical Sciences",
+    name: "Faculty of Basic Medical & Health Sciences",
+    courseType: "science",
     departments: [
-      "Medicine (MBBS)",
-      "Nursing",
-      "Pharmacy",
-      "Dentistry",
-      "Dental Surgery",
-      "Dental Technology",
-      "Dental Therapy",
-    ],
-  },
-  {
-    name: "Health Sciences",
-    departments: [
-      "Radiography",
+      "Nursing Science",
       "Medical Laboratory Science (MLS)",
+      "Radiography & Radiation Science",
       "Physiotherapy",
       "Human Anatomy",
       "Human Physiology",
       "Public Health",
       "Community Health",
       "Human Nutrition & Dietetics",
-      "Environmental Health Science (EHS)",
-      "Health Information Management (HIM)",
+      "Environmental Health Science",
+      "Health Information Management",
       "Health Information Science",
+      "Medical Social Work",
     ],
   },
   {
-    name: "Biological & Natural Sciences",
+    name: "College of Medicine & Dental Sciences",
+    courseType: "science",
+    departments: [
+      "Medicine & Surgery (MBBS)",
+      "Dentistry (BDS)",
+      "Dental Technology",
+      "Dental Therapy",
+    ],
+  },
+  {
+    name: "Faculty of Pharmacy",
+    courseType: "science",
+    departments: ["Pharmacy (Pharm.D)"],
+  },
+  {
+    name: "Faculty of Natural & Applied Sciences",
+    courseType: "science",
     departments: [
       "Microbiology",
       "Biochemistry",
-      "Biology",
-      "Biotechnology",
       "Science Laboratory Technology (SLT)",
       "Forensic Science",
-      "Environmental Management & Toxicology (EMT)",
-    ],
-  },
-  {
-    name: "Physical & Mathematical Sciences",
-    departments: [
+      "Biotechnology",
+      "Biology",
       "Chemistry",
-      "Physics",
+      "Physics with Electronics",
       "Geology",
+      "Environmental Management & Toxicology",
       "Mathematics",
       "Statistics",
     ],
   },
   {
-    name: "Engineering & Technology",
+    name: "Faculty of Engineering & Technology",
+    courseType: "science",
     departments: [
       "Civil Engineering",
       "Mechanical Engineering",
@@ -66,40 +70,89 @@ export const departmentCategories: DepartmentCategory[] = [
       "Computer Engineering",
       "Telecommunications Engineering",
       "Mechatronics Engineering",
+      "Biomedical Engineering",
       "Information & Communication Engineering",
       "Wood Products Engineering",
-      "Biomedical Engineering",
     ],
   },
   {
-    name: "Information & Communication Technology",
+    name: "Faculty of Information & Communication Technology",
+    courseType: "partial-science",
     departments: [
       "Computer Science",
       "Software Engineering",
       "Cyber Security",
-      "Information Technology",
       "Data Science",
+      "Information Technology",
     ],
   },
   {
-    name: "Environmental Design",
+    name: "Faculty of Communication & Information Sciences",
+    courseType: "non-science",
+    departments: [
+      "Mass Communication & Media Studies",
+      "Information Resources Management (IRM)",
+      "Library & Information Science",
+    ],
+  },
+  {
+    name: "Faculty of Social & Management Sciences",
+    courseType: "non-science",
+    departments: [
+      "Accounting",
+      "Business Administration",
+      "Economics",
+      "International Relations",
+      "Political Science",
+      "Public Administration",
+      "Sociology",
+      "Psychology",
+      "Criminology & Security Studies",
+      "Banking & Finance",
+      "Marketing",
+      "Entrepreneurship",
+      "Human Resource Management",
+      "Social Work",
+    ],
+  },
+  {
+    name: "Faculty of Environmental Design & Management",
+    courseType: "partial-science",
     departments: [
       "Architecture",
+      "Estate Management",
       "Surveying & Geoinformatics",
       "Building Technology",
+      "Urban & Regional Planning",
       "Quantity Surveying",
     ],
   },
   {
-    name: "Agriculture",
+    name: "Faculty of Law",
+    courseType: "non-science",
+    departments: ["LL.B Law"],
+  },
+  {
+    name: "Faculty of Arts & Humanities",
+    courseType: "non-science",
     departments: [
-      "Agricultural Science",
-      "Fisheries & Aquaculture",
+      "English & Literary Studies",
+      "History & International Studies",
+      "Creative Arts",
+      "Philosophy",
+      "Religious Studies",
     ],
   },
   {
-    name: "Science Education",
+    name: "Faculty of Education",
+    courseType: "non-science",
     departments: [
+      "Educational Management",
+      "Guidance & Counselling",
+      "Business Education",
+      "Social Studies Education",
+      "Computer Science Education",
+      "Physical & Health Education",
       "Biology Education",
       "Chemistry Education",
       "Physics Education",
@@ -107,24 +160,18 @@ export const departmentCategories: DepartmentCategory[] = [
     ],
   },
   {
-    name: "Social Sciences & Humanities",
-    departments: [
-      "Information Resource Management (IRM)",
-      "Library & Information Science (LIS)",
-      "Mass Communication",
-      "Business Administration",
-      "Psychology",
-      "Public Administration",
-    ],
+    name: "Faculty of Agriculture",
+    courseType: "science",
+    departments: ["Agricultural Science", "Fisheries & Aquaculture"],
   },
 ];
 
 // Flat list of all departments for dropdowns
-export const allDepartments: string[] = departmentCategories.flatMap(
-  (category) => category.departments
+export const allDepartments: string[] = facultyCategories.flatMap(
+  (faculty) => faculty.departments
 );
 
-// Course mapping by department category (which courses each category takes)
+// Course mapping by course type
 export interface CourseMapping {
   code: string;
   title: string;
@@ -138,21 +185,23 @@ export const baseCourses: CourseMapping[] = [
   { code: "COS 101", title: "Introduction to Computer Science" },
 ];
 
-// Mapping of which courses each category takes
-export const categoryCourseMappings: Record<string, string[]> = {
-  "Medical & Clinical Sciences": ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101"],
-  "Health Sciences": ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101"],
-  "Biological & Natural Sciences": ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101"],
-  "Physical & Mathematical Sciences": ["CHM 101", "PHY 101", "MTH 101", "COS 101"],
-  "Engineering & Technology": ["CHM 101", "PHY 101", "MTH 101", "COS 101"],
-  "Information & Communication Technology": ["CHM 101", "PHY 101", "MTH 101", "COS 101"],
-  "Environmental Design": ["PHY 101", "MTH 101", "COS 101"],
-  "Agriculture": ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101"],
-  "Science Education": ["COS 101"], // Base courses, specific subjects added per department
-  "Social Sciences & Humanities": ["COS 101"],
+// Science folder: BIO, CHM, PHY, MTH, COS
+const scienceCourses = ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101"];
+
+// Partial science: PHY, MTH, COS (no BIO, CHM)
+const partialScienceCourses = ["PHY 101", "MTH 101", "COS 101"];
+
+// Non-science: No courses available (empty array)
+const nonScienceCourses: string[] = [];
+
+// Course type mappings
+export const courseTypeMappings: Record<string, string[]> = {
+  science: scienceCourses,
+  "partial-science": partialScienceCourses,
+  "non-science": nonScienceCourses,
 };
 
-// Special cases for Science Education departments
+// Special cases for Science Education departments (they use science folder)
 export const scienceEducationCourseMappings: Record<string, string[]> = {
   "Biology Education": ["BIO 101", "CHM 101", "COS 101"],
   "Chemistry Education": ["CHM 101", "PHY 101", "COS 101"],
@@ -163,26 +212,36 @@ export const scienceEducationCourseMappings: Record<string, string[]> = {
 // Special case: Biomedical Engineering takes BIO 101
 export const biomedicalEngineeringCourses = ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101"];
 
+// Helper function to get the faculty for a department
+export function getFacultyForDepartment(department: string): FacultyCategory | undefined {
+  return facultyCategories.find((faculty) =>
+    faculty.departments.includes(department)
+  );
+}
+
 // Helper function to get courses for a specific department
 export function getCoursesForDepartment(department: string): string[] {
-  // Check Science Education special cases
+  // Check Science Education special cases first
   if (scienceEducationCourseMappings[department]) {
     return scienceEducationCourseMappings[department];
   }
-  
+
   // Special case for Biomedical Engineering
   if (department === "Biomedical Engineering") {
     return biomedicalEngineeringCourses;
   }
-  
-  // Find the category for this department
-  const category = departmentCategories.find((cat) =>
-    cat.departments.includes(department)
-  );
-  
-  if (category) {
-    return categoryCourseMappings[category.name] || [];
+
+  // Find the faculty for this department
+  const faculty = getFacultyForDepartment(department);
+
+  if (faculty) {
+    return courseTypeMappings[faculty.courseType] || [];
   }
-  
+
   return [];
+}
+
+// Check if a department has any courses available
+export function departmentHasCourses(department: string): boolean {
+  return getCoursesForDepartment(department).length > 0;
 }

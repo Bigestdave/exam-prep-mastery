@@ -11,7 +11,7 @@ import { levels } from "@/data/courses";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-import { departmentCategories, allDepartments } from "@/data/departments";
+import { facultyCategories, allDepartments } from "@/data/departments";
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -222,7 +222,7 @@ export default function Signup() {
                       <CommandInput placeholder="Search department..." />
                       <CommandList className="max-h-[300px]">
                         <CommandEmpty>No department found.</CommandEmpty>
-                        {departmentCategories.map((category) => (
+                        {facultyCategories.map((category) => (
                           <CommandGroup key={category.name} heading={category.name}>
                             {category.departments.map((dept) => (
                               <CommandItem
