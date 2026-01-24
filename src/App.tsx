@@ -14,6 +14,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import CourseDetail from "./pages/CourseDetail";
 import AnswerView from "./pages/AnswerView";
 import Profile from "./pages/Profile";
+import RequestCourse from "./pages/RequestCourse";
 import Library from "./pages/Library";
 import NotFound from "./pages/NotFound";
 
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/course/:id" element={<CourseDetail />} />
             <Route path="/course/:id/answer/:questionId" element={<AnswerView />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/request-course" element={<RequestCourse />} />
             <Route path="/library" element={<Library />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
