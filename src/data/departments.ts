@@ -185,32 +185,75 @@ export const baseCourses: CourseMapping[] = [
   { code: "COS 101", title: "Introduction to Computer Science" },
 ];
 
-// Science folder: BIO, CHM, PHY, MTH, COS
-const scienceCourses = ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101"];
+// Departments that have COS 101 (52 departments across 3 groups)
+export const cos101Departments: string[] = [
+  // Group A
+  "Human Anatomy",
+  "Human Physiology",
+  "Environmental Health Science",
+  "Environmental Management & Toxicology",
+  "Health Information Management",
+  "Architecture",
+  "Surveying & Geoinformatics",
+  "Estate Management",
+  "Building Technology",
+  "Urban & Regional Planning",
+  "Quantity Surveying",
+  "Accounting",
+  "Business Administration",
+  "Economics",
+  "International Relations",
+  "Political Science",
+  "Public Administration",
+  "Sociology",
+  "Psychology",
+  "Criminology & Security Studies",
+  "Banking & Finance",
+  "Marketing",
+  "Entrepreneurship",
+  "Human Resource Management",
+  // Group B
+  "Nursing Science",
+  "Physiotherapy",
+  "Biochemistry",
+  "Biology",
+  "Biotechnology",
+  "Chemistry",
+  "Computer Science",
+  "Cyber Security",
+  "Forensic Science",
+  "Geology",
+  "Information Technology",
+  "Microbiology",
+  "Physics with Electronics",
+  "Science Laboratory Technology (SLT)",
+  "Software Engineering",
+  // Group C
+  "Medicine & Surgery (MBBS)",
+  "Dentistry (BDS)",
+  "Dental Technology",
+  "Dental Therapy",
+  "Pharmacy (Pharm.D)",
+  "Medical Laboratory Science (MLS)",
+  "Public Health",
+  "Radiography & Radiation Science",
+  "Human Nutrition & Dietetics",
+];
 
-// Partial science: PHY, MTH, COS (no BIO, CHM)
-const partialScienceCourses = ["PHY 101", "MTH 101", "COS 101"];
+// Base courses by type (without COS 101 - added separately)
+const scienceBaseCourses = ["BIO 101", "CHM 101", "PHY 101", "MTH 101"];
+const partialScienceBaseCourses = ["PHY 101", "MTH 101"];
 
-// Non-science: No courses available (empty array)
-const nonScienceCourses: string[] = [];
-
-// Course type mappings
-export const courseTypeMappings: Record<string, string[]> = {
-  science: scienceCourses,
-  "partial-science": partialScienceCourses,
-  "non-science": nonScienceCourses,
-};
-
-// Special cases for Science Education departments (they use science folder)
+// Special cases for Science Education departments
 export const scienceEducationCourseMappings: Record<string, string[]> = {
-  "Biology Education": ["BIO 101", "CHM 101", "COS 101"],
-  "Chemistry Education": ["CHM 101", "PHY 101", "COS 101"],
-  "Physics Education": ["PHY 101", "MTH 101", "COS 101"],
-  "Mathematics Education": ["MTH 101", "PHY 101", "COS 101"],
+  "Biology Education": ["BIO 101", "CHM 101"],
+  "Chemistry Education": ["CHM 101", "PHY 101"],
+  "Physics Education": ["PHY 101", "MTH 101"],
+  "Mathematics Education": ["MTH 101", "PHY 101"],
 };
 
-// Special case: Biomedical Engineering takes BIO 101
-export const biomedicalEngineeringCourses = ["BIO 101", "CHM 101", "PHY 101", "MTH 101", "COS 101"];
+// Special case: Biomedical Engineering takes BIO 101 (but no COS 101 since Engineering is excluded)
+export const biomedicalEngineeringCourses = ["BIO 101", "CHM 101", "PHY 101", "MTH 101"];
 
 // Helper function to get the faculty for a department
 export function getFacultyForDepartment(department: string): FacultyCategory | undefined {
@@ -223,22 +266,36 @@ export function getFacultyForDepartment(department: string): FacultyCategory | u
 export function getCoursesForDepartment(department: string): string[] {
   // Check Science Education special cases first
   if (scienceEducationCourseMappings[department]) {
-    return scienceEducationCourseMappings[department];
+    const baseCourses = scienceEducationCourseMappings[department];
+    // Science Education departments don't have COS 101
+    return baseCourses;
   }
 
-  // Special case for Biomedical Engineering
+  // Special case for Biomedical Engineering (no COS 101)
   if (department === "Biomedical Engineering") {
     return biomedicalEngineeringCourses;
   }
 
   // Find the faculty for this department
   const faculty = getFacultyForDepartment(department);
+  if (!faculty) return [];
 
-  if (faculty) {
-    return courseTypeMappings[faculty.courseType] || [];
+  let courses: string[] = [];
+
+  // Assign base courses based on course type
+  if (faculty.courseType === "science") {
+    courses = [...scienceBaseCourses];
+  } else if (faculty.courseType === "partial-science") {
+    courses = [...partialScienceBaseCourses];
+  }
+  // non-science departments get no base science courses
+
+  // Add COS 101 only if department is in the COS 101 list
+  if (cos101Departments.includes(department)) {
+    courses.push("COS 101");
   }
 
-  return [];
+  return courses;
 }
 
 // Check if a department has any courses available
