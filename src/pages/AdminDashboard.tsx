@@ -13,7 +13,7 @@ import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen } from "lucide-react";
-import { departmentCategories, allDepartments } from "@/data/departments";
+import { facultyCategories, allDepartments } from "@/data/departments";
 
 interface Question {
   q: string;
@@ -349,7 +349,7 @@ export default function AdminDashboard() {
                         <SelectValue placeholder="Select department" />
                       </SelectTrigger>
                       <SelectContent className="max-h-[300px]">
-                        {departmentCategories.map(category => (
+                        {facultyCategories.map(category => (
                           <div key={category.name}>
                             <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50">
                               {category.name}

@@ -7,8 +7,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { BookOpen, CheckCircle } from "lucide-react";
-
+import { BookOpen } from "lucide-react";
+import { departmentHasCourses } from "@/data/departments";
 interface CourseWithCount {
   id: string;
   code: string;
@@ -77,10 +77,17 @@ export default function Dashboard() {
 
   if (!user) return null;
 
+  // Filter courses by user's department
   const filteredCourses = coursesWithCounts.filter(
     c => c.faculty === profile?.faculty && c.level === profile?.level
   );
-  const displayCourses = filteredCourses.length > 0 ? filteredCourses : coursesWithCounts;
+
+  // Only show all courses if user's department has courses but none found for their level
+  // If department has NO courses at all, show empty state
+  const userDepartmentHasCourses = profile?.faculty ? departmentHasCourses(profile.faculty) : false;
+  const displayCourses = userDepartmentHasCourses 
+    ? filteredCourses // Only show their department's courses (or empty if none)
+    : []; // Non-science departments get empty state
 
   return (
     // Added 'page-enter' for animation and 'pb-32' for the floating nav
@@ -93,9 +100,11 @@ export default function Dashboard() {
             Hi, {profile?.full_name?.split(' ')[0] || 'Student'} 👋
           </h1>
           <p className="text-slate-500 font-medium">
-            {filteredCourses.length > 0 
+            {displayCourses.length > 0 
               ? `Showing courses for ${profile?.faculty} - ${profile?.level}`
-              : 'Browse all available courses'
+              : userDepartmentHasCourses 
+                ? `No courses found for ${profile?.level} yet`
+                : `Tutorial courses for your department are coming soon`
             }
           </p>
         </div>
@@ -123,9 +132,14 @@ export default function Dashboard() {
             <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mx-auto mb-4">
               <BookOpen className="w-8 h-8 text-blue-600" />
             </div>
-            <h3 className="font-bold text-[#0F172A] mb-2">No courses available</h3>
+            <h3 className="font-bold text-[#0F172A] mb-2">
+              {userDepartmentHasCourses ? "No courses for this level" : "Coming Soon"}
+            </h3>
             <p className="text-slate-500 text-sm max-w-xs mx-auto">
-              We couldn't find any courses for your specific faculty and level just yet.
+              {userDepartmentHasCourses 
+                ? `We couldn't find any courses for ${profile?.level} in your department just yet.`
+                : `Tutorial courses for ${profile?.faculty || "your department"} are being prepared and will be available soon.`
+              }
             </p>
           </div>
         )}
