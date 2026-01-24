@@ -69,7 +69,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .eq('user_id', userId);
     
     if (!error && data) {
-      setPurchases(data.map(p => p.course_id));
+      // Deduplicate course IDs (safety net)
+      const uniqueCourseIds = [...new Set(data.map(p => p.course_id))];
+      setPurchases(uniqueCourseIds);
     }
   };
 

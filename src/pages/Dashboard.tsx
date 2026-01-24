@@ -36,16 +36,25 @@ export default function Dashboard() {
     const fetchQuestionCounts = async () => {
       if (courses.length === 0) return;
 
-      const countsPromises = courses.map(async (course) => {
-        const { count } = await supabase
-          .from('course_questions')
-          .select('*', { count: 'exact', head: true })
-          .eq('course_id', course.id);
+      // Batch query: Get all question counts in ONE query instead of N queries
+      const courseIds = courses.map(c => c.id);
+      const { data: countData } = await supabase
+        .from('course_questions')
+        .select('course_id')
+        .in('course_id', courseIds);
 
-        return { ...course, questionCount: count || 0 };
+      // Count questions per course
+      const countMap = new Map<string, number>();
+      countData?.forEach(q => {
+        countMap.set(q.course_id, (countMap.get(q.course_id) || 0) + 1);
       });
 
-      const results = await Promise.all(countsPromises);
+      // Map courses with their counts
+      const results = courses.map(course => ({
+        ...course,
+        questionCount: countMap.get(course.id) || 0
+      }));
+
       setCoursesWithCounts(results);
     };
 
