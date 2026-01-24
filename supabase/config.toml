@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.paystack-webhook]
 verify_jwt = false
+
+[functions.notify-course-request]
+verify_jwt = false

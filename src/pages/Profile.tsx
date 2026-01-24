@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
@@ -6,13 +6,15 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useToast } from "@/hooks/use-toast";
-import { Wallet, BookOpen, LogOut, ArrowLeft, Copy } from "lucide-react";
+import { RequestCourseDialog } from "@/components/RequestCourseDialog";
+import { BookPlus, BookOpen, LogOut, ArrowLeft } from "lucide-react";
 
 export default function Profile() {
   const { user, profile, isLoading, logout, purchases } = useAuth();
   const { courses, isLoading: coursesLoading } = useCourses();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -31,18 +33,14 @@ export default function Profile() {
             <div className="h-4 w-48 bg-slate-100 rounded-lg animate-pulse"></div>
             <div className="h-4 w-32 bg-slate-100 rounded-lg animate-pulse"></div>
           </div>
-          {/* Wallet Card Skeleton */}
-          <div className="bg-slate-200 rounded-2xl p-6 mb-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-slate-300 rounded-xl animate-pulse"></div>
+          {/* Request Course Skeleton */}
+          <div className="bg-white rounded-2xl border border-slate-100 p-5 mb-6 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-slate-100 rounded-xl animate-pulse"></div>
               <div className="space-y-2">
-                <div className="h-3 w-24 bg-slate-300 rounded animate-pulse"></div>
-                <div className="h-6 w-16 bg-slate-300 rounded animate-pulse"></div>
+                <div className="h-4 w-32 bg-slate-200 rounded animate-pulse"></div>
+                <div className="h-3 w-48 bg-slate-100 rounded animate-pulse"></div>
               </div>
-            </div>
-            <div className="flex gap-3">
-              <div className="h-10 flex-1 bg-slate-300 rounded-lg animate-pulse"></div>
-              <div className="h-10 flex-1 bg-slate-300 rounded-lg animate-pulse"></div>
             </div>
           </div>
           {/* Library Skeleton */}
@@ -77,21 +75,6 @@ export default function Profile() {
   };
   // --- LOGIC FIX END ---
 
-  const handleCopyReferral = () => {
-    navigator.clipboard.writeText(`${window.location.origin}?ref=${user.id}`);
-    toast({
-      title: "Link copied!",
-      description: "Share it with your friends to earn rewards.",
-    });
-  };
-
-  const handleWithdraw = () => {
-    toast({
-      title: "Coming Soon",
-      description: "Withdrawals will be available soon.",
-    });
-  };
-
   const handleLogout = async () => {
     navigate("/login");
     await logout();
@@ -118,36 +101,21 @@ export default function Profile() {
           </p>
         </div>
 
-        {/* Wallet Card */}
-        <div className="bg-navy rounded-2xl p-6 mb-6 text-primary-foreground shadow-elevated">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-              <Wallet className="w-5 h-5 text-primary" />
+        {/* Request a Course Card */}
+        <button
+          onClick={() => setIsRequestDialogOpen(true)}
+          className="w-full bg-card rounded-2xl border border-border/50 shadow-card p-5 mb-6 text-left hover:bg-secondary/30 transition-colors group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <BookPlus className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-sm text-primary-foreground/70">Referral Earnings</p>
-              <p className="text-2xl font-bold">₦0</p>
+              <h3 className="font-semibold text-foreground">Request a Course</h3>
+              <p className="text-sm text-muted-foreground">Don't see your course? Let us know</p>
             </div>
           </div>
-          
-          <div className="flex gap-3">
-            <Button 
-              variant="secondary" 
-              className="flex-1 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20"
-              onClick={handleWithdraw}
-            >
-              Withdraw
-            </Button>
-            <Button 
-              variant="secondary"
-              className="flex-1 bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground/20"
-              onClick={handleCopyReferral}
-            >
-              <Copy className="w-4 h-4" />
-              Invite Friend
-            </Button>
-          </div>
-        </div>
+        </button>
 
         {/* Library */}
         <div className="bg-card rounded-2xl border border-border/50 shadow-card overflow-hidden mb-6">
@@ -198,6 +166,12 @@ export default function Profile() {
           Sign out
         </Button>
       </main>
+
+      <RequestCourseDialog 
+        open={isRequestDialogOpen} 
+        onOpenChange={setIsRequestDialogOpen}
+        userDepartment={profile?.faculty}
+      />
 
       <MobileBottomNav />
     </div>

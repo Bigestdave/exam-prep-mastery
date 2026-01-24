@@ -52,6 +52,48 @@ export type Database = {
           },
         ]
       }
+      course_requests: {
+        Row: {
+          course_code: string
+          course_name: string
+          course_rep_name: string
+          course_rep_phone: string
+          created_at: string
+          department: string
+          extra_notes: string | null
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          course_code: string
+          course_name: string
+          course_rep_name: string
+          course_rep_phone: string
+          created_at?: string
+          department: string
+          extra_notes?: string | null
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          course_code?: string
+          course_name?: string
+          course_rep_name?: string
+          course_rep_phone?: string
+          created_at?: string
+          department?: string
+          extra_notes?: string | null
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       courses: {
         Row: {
           code: string
