@@ -18,7 +18,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -51,11 +50,6 @@ const courseRequestSchema = z.object({
     .min(1, "Course rep phone is required")
     .max(20, "Phone number must be less than 20 characters")
     .regex(/^[0-9+\-\s()]+$/, "Please enter a valid phone number"),
-  extraNotes: z
-    .string()
-    .trim()
-    .max(500, "Notes must be less than 500 characters")
-    .optional(),
 });
 
 type CourseRequestForm = z.infer<typeof courseRequestSchema>;
@@ -83,7 +77,6 @@ export function RequestCourseDialog({
       department: userDepartment || "",
       courseRepName: "",
       courseRepPhone: "",
-      extraNotes: "",
     },
   });
 
@@ -129,7 +122,6 @@ export function RequestCourseDialog({
         department: userDepartment || "",
         courseRepName: "",
         courseRepPhone: "",
-        extraNotes: "",
       });
       onOpenChange(false);
     }
@@ -241,31 +233,6 @@ export function RequestCourseDialog({
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="extraNotes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Extra Notes{" "}
-                        <span className="text-muted-foreground font-normal">
-                          (optional)
-                        </span>
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="e.g. tutorials were given last week"
-                          className="resize-none"
-                          rows={3}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <div className="flex gap-3 pt-2">
                   <Button
                     type="button"
