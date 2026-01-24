@@ -13,6 +13,7 @@ import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen } from "lucide-react";
+import { departmentCategories, allDepartments } from "@/data/departments";
 
 interface Question {
   q: string;
@@ -29,15 +30,7 @@ interface Course {
   questionCount: number;
 }
 
-const faculties = [
-  "Information Resource Management (IRM)",
-  "Library & Information Science (LIS)",
-  "Mass Communication",
-  "Computer Science",
-  "Business Administration",
-  "Psychology",
-  "Public Administration"
-];
+// Use centralized departments from data file
 
 const levels = ["100L", "200L", "300L", "400L", "500L"];
 
@@ -353,11 +346,18 @@ export default function AdminDashboard() {
                     <Label>Faculty *</Label>
                     <Select value={faculty} onValueChange={setFaculty}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select faculty" />
+                        <SelectValue placeholder="Select department" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {faculties.map(f => (
-                          <SelectItem key={f} value={f}>{f}</SelectItem>
+                      <SelectContent className="max-h-[300px]">
+                        {departmentCategories.map(category => (
+                          <div key={category.name}>
+                            <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50">
+                              {category.name}
+                            </div>
+                            {category.departments.map(dept => (
+                              <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                            ))}
+                          </div>
                         ))}
                       </SelectContent>
                     </Select>

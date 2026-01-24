@@ -11,17 +11,7 @@ import { levels } from "@/data/courses";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-
-// THE OFFICIAL LIST (Matches Database)
-const departments = [
-  "Information Resource Management (IRM)",
-  "Library & Information Science (LIS)",
-  "Mass Communication",
-  "Computer Science",
-  "Business Administration",
-  "Psychology",
-  "Public Administration"
-];
+import { departmentCategories, allDepartments } from "@/data/departments";
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -230,28 +220,30 @@ export default function Signup() {
                   <PopoverContent className="w-[300px] p-0" align="start">
                     <Command>
                       <CommandInput placeholder="Search department..." />
-                      <CommandList>
+                      <CommandList className="max-h-[300px]">
                         <CommandEmpty>No department found.</CommandEmpty>
-                        <CommandGroup>
-                          {departments.map((dept) => (
-                            <CommandItem
-                              key={dept}
-                              value={dept}
-                              onSelect={() => {
-                                setFormData({ ...formData, faculty: dept });
-                                setDepartmentOpen(false);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  formData.faculty === dept ? "opacity-100" : "opacity-0"
-                                )}
-                              />
-                              {dept}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
+                        {departmentCategories.map((category) => (
+                          <CommandGroup key={category.name} heading={category.name}>
+                            {category.departments.map((dept) => (
+                              <CommandItem
+                                key={dept}
+                                value={dept}
+                                onSelect={() => {
+                                  setFormData({ ...formData, faculty: dept });
+                                  setDepartmentOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    formData.faculty === dept ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {dept}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        ))}
                       </CommandList>
                     </Command>
                   </PopoverContent>
