@@ -1,20 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
-import { useToast } from "@/hooks/use-toast";
-import { RequestCourseDialog } from "@/components/RequestCourseDialog";
-import { BookPlus, BookOpen, LogOut, ArrowLeft } from "lucide-react";
+import { BookPlus, BookOpen, LogOut, ArrowLeft, ChevronRight } from "lucide-react";
 
 export default function Profile() {
   const { user, profile, isLoading, logout, purchases } = useAuth();
   const { courses, isLoading: coursesLoading } = useCourses();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -102,9 +98,9 @@ export default function Profile() {
         </div>
 
         {/* Request a Course Card */}
-        <button
-          onClick={() => setIsRequestDialogOpen(true)}
-          className="w-full bg-card rounded-2xl border border-border/50 shadow-card p-5 mb-6 text-left hover:bg-secondary/30 transition-colors group"
+        <Link
+          to="/request-course"
+          className="w-full bg-card rounded-2xl border border-border/50 shadow-card p-5 mb-6 flex items-center justify-between hover:bg-secondary/30 transition-colors group"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
@@ -115,7 +111,8 @@ export default function Profile() {
               <p className="text-sm text-muted-foreground">Don't see your course? Let us know</p>
             </div>
           </div>
-        </button>
+          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+        </Link>
 
         {/* Library */}
         <div className="bg-card rounded-2xl border border-border/50 shadow-card overflow-hidden mb-6">
@@ -166,12 +163,6 @@ export default function Profile() {
           Sign out
         </Button>
       </main>
-
-      <RequestCourseDialog 
-        open={isRequestDialogOpen} 
-        onOpenChange={setIsRequestDialogOpen}
-        userDepartment={profile?.faculty}
-      />
 
       <MobileBottomNav />
     </div>
