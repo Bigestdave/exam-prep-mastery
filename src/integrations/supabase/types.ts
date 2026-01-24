@@ -159,6 +159,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_course_question_counts: {
+        Args: { p_course_ids: string[] }
+        Returns: {
+          course_id: string
+          question_count: number
+        }[]
+      }
       has_purchased_course: { Args: { course_id: string }; Returns: boolean }
       has_role: {
         Args: {

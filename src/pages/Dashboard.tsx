@@ -36,17 +36,22 @@ export default function Dashboard() {
     const fetchQuestionCounts = async () => {
       if (courses.length === 0) return;
 
-      // Batch query: Get all question counts in ONE query instead of N queries
+      // Use database function to get counts efficiently (avoids 1000 row limit)
       const courseIds = courses.map(c => c.id);
-      const { data: countData } = await supabase
-        .from('course_questions')
-        .select('course_id')
-        .in('course_id', courseIds);
+      const { data: countData, error } = await supabase
+        .rpc('get_course_question_counts', { p_course_ids: courseIds });
 
-      // Count questions per course
+      if (error) {
+        console.error('Error fetching question counts:', error);
+        // Fallback: set all counts to 0
+        setCoursesWithCounts(courses.map(c => ({ ...c, questionCount: 0 })));
+        return;
+      }
+
+      // Build count map from results
       const countMap = new Map<string, number>();
-      countData?.forEach(q => {
-        countMap.set(q.course_id, (countMap.get(q.course_id) || 0) + 1);
+      countData?.forEach((row: { course_id: string; question_count: number }) => {
+        countMap.set(row.course_id, row.question_count);
       });
 
       // Map courses with their counts
