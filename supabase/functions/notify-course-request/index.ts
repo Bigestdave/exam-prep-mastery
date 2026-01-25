@@ -146,7 +146,7 @@ serve(async (req) => {
     `;
 
     const { error: emailError } = await resend.emails.send({
-      from: "LCU Prep <noreply@lcuprep.lovable.app>",
+      from: "LCU Prep <onboarding@resend.dev>",
       to: [adminEmail],
       subject: `📘 Course Request: ${payload.courseCode} - ${payload.courseName}`,
       html: emailHtml,
