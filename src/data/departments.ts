@@ -183,6 +183,7 @@ export const baseCourses: CourseMapping[] = [
   { code: "PHY 101", title: "General Physics I" },
   { code: "MTH 101", title: "General Mathematics I" },
   { code: "COS 101", title: "Introduction to Computer Science" },
+  { code: "ACC 101", title: "Principles of Accounting" },
 ];
 
 // Departments that have COS 101 (52 departments across 3 groups)
@@ -240,9 +241,21 @@ export const cos101Departments: string[] = [
   "Human Nutrition & Dietetics",
 ];
 
-// Base courses by type (without COS 101 - added separately)
+// Base courses by type (without COS 101 and ACC 101 - added separately)
 const scienceBaseCourses = ["BIO 101", "CHM 101", "PHY 101", "MTH 101"];
 const partialScienceBaseCourses = ["PHY 101", "MTH 101"];
+
+// Departments that have ACC 101 (business/management focused)
+export const acc101Departments: string[] = [
+  "Accounting",
+  "Business Administration",
+  "Banking & Finance",
+  "Marketing",
+  "Entrepreneurship",
+  "Human Resource Management",
+  "Economics",
+  "Public Administration",
+];
 
 // Special cases for Science Education departments
 export const scienceEducationCourseMappings: Record<string, string[]> = {
@@ -293,6 +306,11 @@ export function getCoursesForDepartment(department: string): string[] {
   // Add COS 101 only if department is in the COS 101 list
   if (cos101Departments.includes(department)) {
     courses.push("COS 101");
+  }
+
+  // Add ACC 101 only if department is in the ACC 101 list
+  if (acc101Departments.includes(department)) {
+    courses.push("ACC 101");
   }
 
   return courses;
