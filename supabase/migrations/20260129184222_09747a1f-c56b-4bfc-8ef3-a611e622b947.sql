@@ -1,0 +1,1 @@
+INSERT INTO purchases (user_id, course_id) VALUES ('55957d98-cbfe-436e-8aae-dc6a8d70c603', 'c11efb08-beb4-4ec2-af87-156da3d893d4')
