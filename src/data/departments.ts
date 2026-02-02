@@ -93,6 +93,7 @@ export const facultyCategories: FacultyCategory[] = [
       "Mass Communication & Media Studies",
       "Information Resources Management (IRM)",
       "Library & Information Science",
+      "Office and Information Management",
     ],
   },
   {
