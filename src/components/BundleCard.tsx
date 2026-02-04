@@ -23,9 +23,10 @@ export function BundleCard({ courses, userEmail, userId }: BundleCardProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  // Calculate Bundle Price (no discount - full value)
+  // Calculate Bundle Price (20% off total)
   const totalValue = courses.reduce((sum, c) => sum + c.price, 0);
-  const bundlePrice = totalValue;
+  const bundlePrice = Math.floor(totalValue * 0.8);
+  const savings = totalValue - bundlePrice;
 
   // Prepare purchase records
   const courseIdsToUnlock = courses.map(c => ({
@@ -108,7 +109,11 @@ export function BundleCard({ courses, userEmail, userId }: BundleCardProps) {
         </div>
 
         <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 min-w-[180px] md:min-w-[200px] border border-white/10 flex flex-col items-center text-center w-full md:w-auto">
-          <span className="text-2xl md:text-3xl font-black text-white mb-4">₦{bundlePrice.toLocaleString()}</span>
+          <span className="text-slate-300 line-through text-sm font-medium">₦{totalValue.toLocaleString()}</span>
+          <span className="text-2xl md:text-3xl font-black text-white mb-1">₦{bundlePrice.toLocaleString()}</span>
+          <span className="text-xs font-bold text-green-300 bg-green-500/20 px-2 py-0.5 rounded mb-4">
+            Save ₦{savings.toLocaleString()}
+          </span>
           
           <Button 
             onClick={handleBundlePayment}
