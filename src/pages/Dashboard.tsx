@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { CourseCard } from "@/components/CourseCard";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
-import { BundleCard } from "@/components/BundleCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { supabase } from "@/integrations/supabase/client";
@@ -103,10 +102,6 @@ export default function Dashboard() {
   // Show filtered courses if any exist for their department, otherwise show empty state
   const displayCourses = filteredCourses;
 
-  // Bundle logic: filter out already purchased courses
-  const unpurchasedCourses = displayCourses.filter(c => !purchases.includes(c.id));
-  const showBundle = unpurchasedCourses.length >= 2;
-
   return (
     // Added 'page-enter' for animation and 'pb-32' for the floating nav
     <div className="min-h-screen bg-[#F8FAFC] pb-32 md:pb-0 page-enter relative">
@@ -126,15 +121,6 @@ export default function Dashboard() {
             }
           </p>
         </div>
-
-        {/* Bundle Offer Card - shown when user has 2+ unpurchased courses */}
-        {showBundle && user && (
-          <BundleCard 
-            courses={unpurchasedCourses}
-            userEmail={user.email || ''} 
-            userId={user.id} 
-          />
-        )}
 
         {displayCourses.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
