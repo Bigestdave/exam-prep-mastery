@@ -1,0 +1,1 @@
+UPDATE public.courses SET price = 1500 WHERE code = 'GST 107'
