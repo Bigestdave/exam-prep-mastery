@@ -8,7 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Lock, CheckCircle } from "lucide-react";
+import { ArrowLeft, Lock, CheckCircle, Sparkles, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -22,16 +22,29 @@ const PAYSTACK_PUBLIC_KEY = "pk_live_2320cc6bb508955bd07391f75a4c73d757a0d6f6";
 
 export default function CourseDetail() {
   const { id } = useParams<{ id: string }>();
-  const { user, profile, isLoading, purchases, addPurchase } = useAuth();
-  const { getCourseById, isLoading: coursesLoading } = useCourses();
+  const { user, profile, isLoading, purchases, addPurchase, addPurchases } = useAuth();
+  const { getCourseById, courses, isLoading: coursesLoading } = useCourses();
   const { questions, isLoading: questionsLoading } = useCourseQuestions(id);
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentOption, setPaymentOption] = useState<'single' | 'bundle'>('single');
   const [questionCount, setQuestionCount] = useState(0);
 
   const course = id ? getCourseById(id) : undefined;
   const isOwned = id ? purchases.includes(id) : false;
+
+  // Bundle logic - find unowned courses in same faculty & level
+  const unownedCourses = courses.filter(c => 
+    c.faculty === course?.faculty && 
+    c.level === course?.level && 
+    !purchases.includes(c.id)
+  );
+  const singlePrice = course?.price || 1000;
+  const bundleTotal = unownedCourses.reduce((sum, c) => sum + c.price, 0);
+  const bundleDiscounted = Math.floor(bundleTotal * 0.8);
+  const bundleSavings = bundleTotal - bundleDiscounted;
+  const activeAmount = paymentOption === 'single' ? singlePrice : bundleDiscounted;
 
   // Fetch total question count for display (admin can see all)
   useEffect(() => {
@@ -60,16 +73,20 @@ export default function CourseDetail() {
   const config = {
     reference: `${course?.id}_${Date.now()}`,
     email: user?.email || "",
-    amount: (course?.price || 0) * 100,
+    amount: activeAmount * 100,
     publicKey: PAYSTACK_PUBLIC_KEY,
     metadata: {
       course_id: course?.id || "",
       course_code: course?.code || "",
+      payment_type: paymentOption,
+      bundle_course_ids: paymentOption === 'bundle' ? unownedCourses.map(c => c.id) : undefined,
       custom_fields: [
         {
           display_name: "Course",
           variable_name: "course",
-          value: course?.title || "",
+          value: paymentOption === 'bundle' 
+            ? `Semester Bundle (${unownedCourses.length} courses)` 
+            : (course?.title || ""),
         },
       ],
     },
@@ -122,15 +139,24 @@ export default function CourseDetail() {
     );
   }
 
-  const onSuccess = (response: { reference: string }) => {
-    // Payment handled by Paystack webhook - just show success message
+  const onSuccess = async (response: { reference: string }) => {
     console.log('Payment completed, reference:', response.reference);
-    addPurchase(course.id);
+    
+    if (paymentOption === 'bundle') {
+      const courseIds = unownedCourses.map(c => c.id);
+      await addPurchases(courseIds);
+      toast({
+        title: "Semester Bundle unlocked! 🎉",
+        description: `You now have access to all ${courseIds.length} courses.`,
+      });
+    } else {
+      addPurchase(course.id);
+      toast({
+        title: "Payment successful! 🎉",
+        description: `Your purchase is being processed. Refresh the page if the course doesn't appear in your library.`,
+      });
+    }
     setShowPaymentModal(false);
-    toast({
-      title: "Payment successful! 🎉",
-      description: `Your purchase is being processed. Refresh the page if the course doesn't appear in your library.`,
-    });
   };
 
   const onClose = () => {
@@ -144,6 +170,11 @@ export default function CourseDetail() {
   const handlePayment = () => {
     setShowPaymentModal(false);
     initializePayment({ onSuccess, onClose });
+  };
+
+  const openPaymentModal = () => {
+    setPaymentOption('single');
+    setShowPaymentModal(true);
   };
 
   // Determine display count - if not owned, show at least 1 for free preview
@@ -203,7 +234,7 @@ export default function CourseDetail() {
                   question={q.question_text}
                   isUnlocked={isOwned}
                   isFreePreview={q.question_index === 0}
-                  onLockedClick={() => setShowPaymentModal(true)}
+                  onLockedClick={openPaymentModal}
                 />
               </div>
             ))}
@@ -215,7 +246,7 @@ export default function CourseDetail() {
                   key={`locked-${i}`}
                   className="opacity-0 animate-fade-in bg-card rounded-xl p-4 border border-border/50 cursor-pointer hover:opacity-80 transition-opacity"
                   style={{ animationDelay: `${(questions.length + i) * 50}ms`, animationFillMode: 'forwards' }}
-                  onClick={() => setShowPaymentModal(true)}
+                  onClick={openPaymentModal}
                 >
                   <div className="flex items-center gap-3">
                     <Lock className="w-4 h-4 text-muted-foreground" />
@@ -233,7 +264,7 @@ export default function CourseDetail() {
         <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border/50 p-4 shadow-elevated z-50">
           <Button 
             className="w-full h-12 shadow-glow" 
-            onClick={() => setShowPaymentModal(true)}
+            onClick={openPaymentModal}
           >
             <Lock className="w-4 h-4" />
             Unlock Full Access • ₦{course.price.toLocaleString()}
@@ -241,37 +272,77 @@ export default function CourseDetail() {
         </div>
       )}
 
-      {/* Payment Modal */}
+      {/* Payment Modal with Upsell */}
       <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Unlock {course.code}</DialogTitle>
-            <DialogDescription>
-              Get instant access to all {displayCount} tutorial answers.
+        <DialogContent className="sm:max-w-md p-0 overflow-hidden">
+          <DialogHeader className="p-6 pb-3">
+            <DialogTitle className="text-center">Choose your plan</DialogTitle>
+            <DialogDescription className="sr-only">
+              Select single course or semester bundle purchase option
             </DialogDescription>
           </DialogHeader>
           
-          <div className="py-4">
-            <div className="bg-secondary rounded-xl p-4 mb-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-muted-foreground">Course</span>
-                <span className="font-medium text-foreground">{course.title}</span>
+          <div className="px-6 pb-6 space-y-4">
+            {/* Single Course Option */}
+            <div 
+              onClick={() => setPaymentOption('single')}
+              className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                paymentOption === 'single' 
+                  ? 'border-primary bg-primary/5' 
+                  : 'border-border bg-card'
+              }`}
+            >
+              <div className="flex justify-between items-center mb-1">
+                <span className="font-semibold text-foreground">Single Course</span>
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                  paymentOption === 'single' ? 'border-primary' : 'border-muted-foreground/30'
+                }`}>
+                  {paymentOption === 'single' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                </div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Price</span>
-                <span className="font-bold text-lg text-foreground">₦{course.price.toLocaleString()}</span>
-              </div>
+              <p className="text-sm text-muted-foreground">{course.code}: {course.title}</p>
+              <p className="font-bold text-lg text-foreground mt-2">₦{singlePrice.toLocaleString()}</p>
             </div>
+
+            {/* Bundle Option - only show if >1 unowned course */}
+            {unownedCourses.length > 1 && (
+              <div 
+                onClick={() => setPaymentOption('bundle')}
+                className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all overflow-hidden ${
+                  paymentOption === 'bundle' 
+                    ? 'border-primary bg-primary/5' 
+                    : 'border-border bg-card'
+                }`}
+              >
+                <div className="absolute top-0 right-0 bg-amber-400 text-amber-900 text-[10px] font-bold px-3 py-1 rounded-bl-xl z-10 flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" /> BEST VALUE
+                </div>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-semibold text-foreground">Semester Bundle</span>
+                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                    paymentOption === 'bundle' ? 'border-primary' : 'border-muted-foreground/30'
+                  }`}>
+                    {paymentOption === 'bundle' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground">Unlock remaining {unownedCourses.length} courses</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <p className="font-bold text-lg text-foreground">₦{bundleDiscounted.toLocaleString()}</p>
+                  <span className="text-xs text-muted-foreground line-through">₦{bundleTotal.toLocaleString()}</span>
+                  <span className="text-[10px] font-bold text-success bg-success-light px-2 py-0.5 rounded-full">SAVE ₦{bundleSavings.toLocaleString()}</span>
+                </div>
+              </div>
+            )}
 
             <Button 
               className="w-full h-12" 
               onClick={handlePayment}
             >
-              Pay ₦{course.price.toLocaleString()}
+              Pay ₦{activeAmount.toLocaleString()}
             </Button>
             
-            <p className="text-xs text-center text-muted-foreground mt-3">
-              Secured by Paystack
+            <p className="text-xs text-center text-muted-foreground flex items-center justify-center gap-1">
+              <Check className="w-3 h-3 text-success" /> One-time payment • Secured by Paystack
             </p>
           </div>
         </DialogContent>

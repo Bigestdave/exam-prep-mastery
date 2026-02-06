@@ -19,6 +19,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   purchases: string[];
   addPurchase: (courseId: string) => Promise<void>;
+  addPurchases: (courseIds: string[]) => Promise<void>;
 }
 
 interface SignupData {
@@ -158,6 +159,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const addPurchases = async (courseIds: string[]) => {
+    if (!user || courseIds.length === 0) return;
+    const records = courseIds.map(courseId => ({
+      user_id: user.id,
+      course_id: courseId,
+    }));
+    const { error } = await supabase.from('purchases').insert(records);
+    if (!error) {
+      setPurchases(prev => [...new Set([...prev, ...courseIds])]);
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -168,7 +181,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signup, 
       logout, 
       purchases, 
-      addPurchase 
+      addPurchase,
+      addPurchases 
     }}>
       {children}
     </AuthContext.Provider>
