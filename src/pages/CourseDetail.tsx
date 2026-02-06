@@ -279,61 +279,74 @@ export default function CourseDetail() {
       <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
         <DialogContent className="sm:max-w-md p-0 overflow-hidden">
           <DialogHeader className="p-6 pb-3">
-            <DialogTitle className="text-center">Choose your plan</DialogTitle>
+            <DialogTitle className="text-center">
+              {ENABLE_BUNDLE_UPSELL && unownedCourses.length > 1 ? 'Choose your plan' : 'Confirm Purchase'}
+            </DialogTitle>
             <DialogDescription className="sr-only">
-              Select single course or semester bundle purchase option
+              {ENABLE_BUNDLE_UPSELL && unownedCourses.length > 1 
+                ? 'Select single course or semester bundle purchase option'
+                : 'Confirm your course purchase'}
             </DialogDescription>
           </DialogHeader>
           
           <div className="px-6 pb-6 space-y-4">
-            {/* Single Course Option */}
-            <div 
-              onClick={() => setPaymentOption('single')}
-              className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                paymentOption === 'single' 
-                  ? 'border-primary bg-primary/5' 
-                  : 'border-border bg-card'
-              }`}
-            >
-              <div className="flex justify-between items-center mb-1">
-                <span className="font-semibold text-foreground">Single Course</span>
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                  paymentOption === 'single' ? 'border-primary' : 'border-muted-foreground/30'
-                }`}>
-                  {paymentOption === 'single' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+            {ENABLE_BUNDLE_UPSELL && unownedCourses.length > 1 ? (
+              <>
+                {/* Single Course Option */}
+                <div 
+                  onClick={() => setPaymentOption('single')}
+                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    paymentOption === 'single' 
+                      ? 'border-primary bg-primary/5' 
+                      : 'border-border bg-card'
+                  }`}
+                >
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-semibold text-foreground">Single Course</span>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      paymentOption === 'single' ? 'border-primary' : 'border-muted-foreground/30'
+                    }`}>
+                      {paymentOption === 'single' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{course.code}: {course.title}</p>
+                  <p className="font-bold text-lg text-foreground mt-2">₦{singlePrice.toLocaleString()}</p>
                 </div>
-              </div>
-              <p className="text-sm text-muted-foreground">{course.code}: {course.title}</p>
-              <p className="font-bold text-lg text-foreground mt-2">₦{singlePrice.toLocaleString()}</p>
-            </div>
 
-            {/* Bundle Option - only show if >1 unowned course */}
-            {unownedCourses.length > 1 && (
-              <div 
-                onClick={() => setPaymentOption('bundle')}
-                className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all overflow-hidden ${
-                  paymentOption === 'bundle' 
-                    ? 'border-primary bg-primary/5' 
-                    : 'border-border bg-card'
-                }`}
-              >
-                <div className="absolute top-0 right-0 bg-amber-400 text-amber-900 text-[10px] font-bold px-3 py-1 rounded-bl-xl z-10 flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" /> BEST VALUE
-                </div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="font-semibold text-foreground">Semester Bundle</span>
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                    paymentOption === 'bundle' ? 'border-primary' : 'border-muted-foreground/30'
-                  }`}>
-                    {paymentOption === 'bundle' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                {/* Bundle Option */}
+                <div 
+                  onClick={() => setPaymentOption('bundle')}
+                  className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all overflow-hidden ${
+                    paymentOption === 'bundle' 
+                      ? 'border-primary bg-primary/5' 
+                      : 'border-border bg-card'
+                  }`}
+                >
+                  <div className="absolute top-0 right-0 bg-amber-400 text-amber-900 text-[10px] font-bold px-3 py-1 rounded-bl-xl z-10 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" /> BEST VALUE
+                  </div>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-semibold text-foreground">Semester Bundle</span>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      paymentOption === 'bundle' ? 'border-primary' : 'border-muted-foreground/30'
+                    }`}>
+                      {paymentOption === 'bundle' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Unlock remaining {unownedCourses.length} courses</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <p className="font-bold text-lg text-foreground">₦{bundleDiscounted.toLocaleString()}</p>
+                    <span className="text-xs text-muted-foreground line-through">₦{bundleTotal.toLocaleString()}</span>
+                    <span className="text-[10px] font-bold text-success bg-success-light px-2 py-0.5 rounded-full">SAVE ₦{bundleSavings.toLocaleString()}</span>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground">Unlock remaining {unownedCourses.length} courses</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <p className="font-bold text-lg text-foreground">₦{bundleDiscounted.toLocaleString()}</p>
-                  <span className="text-xs text-muted-foreground line-through">₦{bundleTotal.toLocaleString()}</span>
-                  <span className="text-[10px] font-bold text-success bg-success-light px-2 py-0.5 rounded-full">SAVE ₦{bundleSavings.toLocaleString()}</span>
-                </div>
+              </>
+            ) : (
+              /* Simple single-course confirmation */
+              <div className="p-4 rounded-xl border-2 border-primary bg-primary/5">
+                <p className="font-semibold text-foreground">{course.code}: {course.title}</p>
+                <p className="text-sm text-muted-foreground mt-1">{course.faculty} • {course.level}</p>
+                <p className="font-bold text-lg text-foreground mt-2">₦{singlePrice.toLocaleString()}</p>
               </div>
             )}
 
