@@ -1,0 +1,1 @@
+INSERT INTO courses (code, title, faculty, level, price) VALUES ('CSS 101', 'Introduction to Criminology', 'Criminology & Security Studies', '100L', 1000);
