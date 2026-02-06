@@ -64,11 +64,13 @@ serve(async (req) => {
 
     const data = payload.data;
     const courseId = data.metadata?.course_id;
+    const paymentType = data.metadata?.payment_type || 'single';
+    const bundleCourseIds = data.metadata?.bundle_course_ids;
     const customerEmail = data.customer?.email;
     const reference = data.reference;
     const amount = data.amount;
 
-    console.log('Processing payment:', { reference, customerEmail, courseId, amount });
+    console.log('Processing payment:', { reference, customerEmail, courseId, paymentType, amount });
 
     if (!courseId) {
       console.error('Missing course_id in metadata');
@@ -102,13 +104,13 @@ serve(async (req) => {
       }
       
       if (!usersPage.users || usersPage.users.length === 0) {
-        break; // No more users to check
+        break;
       }
       
       user = usersPage.users.find(u => u.email?.toLowerCase() === customerEmail.toLowerCase());
       
       if (usersPage.users.length < perPage) {
-        break; // Last page reached
+        break;
       }
       
       page++;
@@ -121,35 +123,48 @@ serve(async (req) => {
 
     console.log('Found user:', user.id);
 
-    // Check if purchase already exists
-    const { data: existingPurchase } = await supabase
-      .from('purchases')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('course_id', courseId)
-      .maybeSingle();
+    // Determine which course IDs to record
+    const courseIdsToRecord: string[] = paymentType === 'bundle' && Array.isArray(bundleCourseIds) && bundleCourseIds.length > 0
+      ? bundleCourseIds
+      : [courseId];
 
-    if (existingPurchase) {
-      console.log('Purchase already exists:', existingPurchase.id);
-      return new Response('Purchase already recorded', { status: 200, headers: corsHeaders });
+    console.log('Recording purchases for courses:', courseIdsToRecord);
+
+    let recordedCount = 0;
+
+    for (const cId of courseIdsToRecord) {
+      // Check if purchase already exists
+      const { data: existingPurchase } = await supabase
+        .from('purchases')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('course_id', cId)
+        .maybeSingle();
+
+      if (existingPurchase) {
+        console.log('Purchase already exists for course:', cId);
+        continue;
+      }
+
+      // Insert the purchase
+      const { data: purchase, error: insertError } = await supabase
+        .from('purchases')
+        .insert({
+          user_id: user.id,
+          course_id: cId,
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Failed to insert purchase for course:', cId, insertError);
+      } else {
+        console.log('Purchase recorded:', purchase.id, 'for course:', cId);
+        recordedCount++;
+      }
     }
 
-    // Insert the purchase
-    const { data: purchase, error: insertError } = await supabase
-      .from('purchases')
-      .insert({
-        user_id: user.id,
-        course_id: courseId,
-      })
-      .select()
-      .single();
-
-    if (insertError) {
-      console.error('Failed to insert purchase:', insertError);
-      return new Response('Failed to record purchase', { status: 500, headers: corsHeaders });
-    }
-
-    console.log('Purchase recorded via webhook:', purchase.id, 'for reference:', reference);
+    console.log(`Webhook complete: ${recordedCount} new purchases recorded for reference:`, reference);
 
     return new Response(
       JSON.stringify({ success: true, purchase_id: purchase.id }),
