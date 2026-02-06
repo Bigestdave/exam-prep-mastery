@@ -20,6 +20,9 @@ import {
 
 const PAYSTACK_PUBLIC_KEY = "pk_live_2320cc6bb508955bd07391f75a4c73d757a0d6f6";
 
+// ⚡ BUNDLE FEATURE FLAG — set to true to re-enable semester bundle upsell
+const ENABLE_BUNDLE_UPSELL = false;
+
 export default function CourseDetail() {
   const { id } = useParams<{ id: string }>();
   const { user, profile, isLoading, purchases, addPurchase, addPurchases } = useAuth();
@@ -35,11 +38,11 @@ export default function CourseDetail() {
   const isOwned = id ? purchases.includes(id) : false;
 
   // Bundle logic - find unowned courses in same faculty & level
-  const unownedCourses = courses.filter(c => 
+  const unownedCourses = ENABLE_BUNDLE_UPSELL ? courses.filter(c => 
     c.faculty === course?.faculty && 
     c.level === course?.level && 
     !purchases.includes(c.id)
-  );
+  ) : [];
   const singlePrice = course?.price || 1000;
   const bundleTotal = unownedCourses.reduce((sum, c) => sum + c.price, 0);
   const bundleDiscounted = Math.floor(bundleTotal * 0.8);
@@ -174,7 +177,12 @@ export default function CourseDetail() {
 
   const openPaymentModal = () => {
     setPaymentOption('single');
-    setShowPaymentModal(true);
+    if (ENABLE_BUNDLE_UPSELL && unownedCourses.length > 1) {
+      setShowPaymentModal(true);
+    } else {
+      // Direct payment without modal when bundle is disabled
+      initializePayment({ onSuccess, onClose });
+    }
   };
 
   // Determine display count - if not owned, show at least 1 for free preview
