@@ -140,6 +140,7 @@ export const facultyCategories: FacultyCategory[] = [
       "English & Literary Studies",
       "History & International Studies",
       "Creative Arts",
+      "Performing Art and Film Studies",
       "Philosophy",
       "Religious Studies",
     ],
