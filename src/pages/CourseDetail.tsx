@@ -21,7 +21,7 @@ import {
 const PAYSTACK_PUBLIC_KEY = "pk_live_2320cc6bb508955bd07391f75a4c73d757a0d6f6";
 
 // ⚡ BUNDLE FEATURE FLAG — set to true to re-enable semester bundle upsell
-const ENABLE_BUNDLE_UPSELL = true;
+const ENABLE_BUNDLE_UPSELL = false;
 
 export default function CourseDetail() {
   const { id } = useParams<{ id: string }>();
