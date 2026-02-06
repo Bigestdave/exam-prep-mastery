@@ -177,12 +177,7 @@ export default function CourseDetail() {
 
   const openPaymentModal = () => {
     setPaymentOption('single');
-    if (ENABLE_BUNDLE_UPSELL && unownedCourses.length > 1) {
-      setShowPaymentModal(true);
-    } else {
-      // Direct payment without modal when bundle is disabled
-      initializePayment({ onSuccess, onClose });
-    }
+    setShowPaymentModal(true);
   };
 
   // Determine display count - if not owned, show at least 1 for free preview
