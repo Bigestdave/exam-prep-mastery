@@ -280,12 +280,12 @@ export default function CourseDetail() {
         <DialogContent className="sm:max-w-md p-0 overflow-hidden">
           <DialogHeader className="p-6 pb-3">
             <DialogTitle className="text-center">
-              {ENABLE_BUNDLE_UPSELL && unownedCourses.length > 1 ? 'Choose your plan' : 'Confirm Purchase'}
+              {ENABLE_BUNDLE_UPSELL && unownedCourses.length > 1 ? 'Choose your plan' : `Unlock ${course.code}`}
             </DialogTitle>
-            <DialogDescription className="sr-only">
+            <DialogDescription className="text-center">
               {ENABLE_BUNDLE_UPSELL && unownedCourses.length > 1 
                 ? 'Select single course or semester bundle purchase option'
-                : 'Confirm your course purchase'}
+                : `Get instant access to all ${displayCount} tutorial answers.`}
             </DialogDescription>
           </DialogHeader>
           
