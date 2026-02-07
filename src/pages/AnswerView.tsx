@@ -6,12 +6,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 export default function AnswerView() {
   const { id, questionId } = useParams<{ id: string; questionId: string }>();
@@ -80,18 +74,14 @@ export default function AnswerView() {
       if (trimmedSeg.startsWith('%%%') && trimmedSeg.endsWith('%%%')) {
         const explanationText = trimmedSeg.slice(3, -3).trim();
         return (
-          <Accordion key={`exp-${segIdx}`} type="single" collapsible className="mb-6">
-            <AccordionItem value="explanation" className="border border-primary/15 rounded-2xl bg-primary/[0.03] overflow-hidden">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline gap-3">
-                <span className="text-xs font-bold text-primary uppercase tracking-widest">Why This Is Correct</span>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-0">
-                <div className="text-muted-foreground leading-relaxed font-serif text-base whitespace-pre-wrap pl-[2.375rem]">
-                  {explanationText}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          <div key={`exp-${segIdx}`} className="mb-6 pl-4 border-l-2 border-primary/30 bg-primary/[0.03] rounded-r-xl py-3 pr-4">
+            <span className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5 inline-block">
+              Professor's Explanation
+            </span>
+            <p className="text-muted-foreground leading-relaxed font-serif text-base whitespace-pre-wrap">
+              {explanationText}
+            </p>
+          </div>
         );
       }
 
