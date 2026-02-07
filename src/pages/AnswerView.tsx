@@ -76,7 +76,7 @@ export default function AnswerView() {
         return (
           <div key={`exp-${segIdx}`} className="mb-6 pl-4 border-l-2 border-primary/30 bg-primary/[0.03] rounded-r-xl py-3 pr-4">
             <span className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5 inline-block">
-              Professor's Explanation
+              Why This Is Correct
             </span>
             <p className="text-muted-foreground leading-relaxed font-serif text-base whitespace-pre-wrap">
               {explanationText}
