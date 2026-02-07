@@ -5,7 +5,13 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
-import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Lightbulb } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default function AnswerView() {
   const { id, questionId } = useParams<{ id: string; questionId: string }>();
@@ -63,26 +69,58 @@ export default function AnswerView() {
 
   // --- RENDER ANSWER TEXT ---
   const renderAnswer = (text: string) => {
-    const parts = text.split(/(?=### )/g);
-    
-    return parts.map((part, i) => {
-      const trimmed = part.trim();
-      if (!trimmed) return null;
+    // First, split out %%% explanation %%% blocks
+    const segments = text.split(/(%%%[\s\S]*?%%%)/g);
 
-      if (trimmed.startsWith('### ')) {
-        const [title, ...body] = trimmed.replace('### ', '').split('\n');
+    return segments.map((segment, segIdx) => {
+      const trimmedSeg = segment.trim();
+      if (!trimmedSeg) return null;
+
+      // Check if this is a %%% explanation %%% block
+      if (trimmedSeg.startsWith('%%%') && trimmedSeg.endsWith('%%%')) {
+        const explanationText = trimmedSeg.slice(3, -3).trim();
         return (
-          <div key={i} className="mb-8 pl-4 border-l-2 border-primary/20 relative">
-             <span className="text-[10px] font-bold text-primary uppercase tracking-widest bg-primary/5 px-2 py-1 rounded mb-2 inline-block">
-               {title}
-             </span>
-             <div className="text-slate-600 leading-relaxed font-serif text-lg whitespace-pre-wrap">
-               {body.join('\n').trim()}
-             </div>
-          </div>
+          <Accordion key={`exp-${segIdx}`} type="single" collapsible className="mb-6">
+            <AccordionItem value="explanation" className="border border-primary/15 rounded-2xl bg-primary/[0.03] overflow-hidden">
+              <AccordionTrigger className="px-4 py-3 hover:no-underline gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Lightbulb className="w-4 h-4 text-primary" />
+                  </div>
+                  <span className="text-sm font-bold text-primary tracking-wide">Why This Is Correct</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-4 pb-4 pt-0">
+                <div className="text-muted-foreground leading-relaxed font-serif text-base whitespace-pre-wrap pl-[2.375rem]">
+                  {explanationText}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         );
       }
-      return <div key={i} className="text-slate-600 leading-relaxed font-serif text-lg mb-6 whitespace-pre-wrap">{trimmed}</div>;
+
+      // Then handle ### headers within normal text segments
+      const parts = trimmedSeg.split(/(?=### )/g);
+      return parts.map((part, i) => {
+        const trimmed = part.trim();
+        if (!trimmed) return null;
+
+        if (trimmed.startsWith('### ')) {
+          const [title, ...body] = trimmed.replace('### ', '').split('\n');
+          return (
+            <div key={`${segIdx}-${i}`} className="mb-8 pl-4 border-l-2 border-primary/20 relative">
+              <span className="text-[10px] font-bold text-primary uppercase tracking-widest bg-primary/5 px-2 py-1 rounded mb-2 inline-block">
+                {title}
+              </span>
+              <div className="text-muted-foreground leading-relaxed font-serif text-lg whitespace-pre-wrap">
+                {body.join('\n').trim()}
+              </div>
+            </div>
+          );
+        }
+        return <div key={`${segIdx}-${i}`} className="text-muted-foreground leading-relaxed font-serif text-lg mb-6 whitespace-pre-wrap">{trimmed}</div>;
+      });
     });
   };
 
