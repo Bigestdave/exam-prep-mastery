@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
-import { ArrowLeft, ChevronLeft, ChevronRight, Lightbulb } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -83,12 +83,7 @@ export default function AnswerView() {
           <Accordion key={`exp-${segIdx}`} type="single" collapsible className="mb-6">
             <AccordionItem value="explanation" className="border border-primary/15 rounded-2xl bg-primary/[0.03] overflow-hidden">
               <AccordionTrigger className="px-4 py-3 hover:no-underline gap-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Lightbulb className="w-4 h-4 text-primary" />
-                  </div>
-                  <span className="text-sm font-bold text-primary tracking-wide">Why This Is Correct</span>
-                </div>
+                <span className="text-xs font-bold text-primary uppercase tracking-widest">Why This Is Correct</span>
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4 pt-0">
                 <div className="text-muted-foreground leading-relaxed font-serif text-base whitespace-pre-wrap pl-[2.375rem]">
