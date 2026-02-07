@@ -1,0 +1,1 @@
+INSERT INTO courses (code, title, faculty, level, price) VALUES ('PER 101', 'Introduction to Dance and Dance Production', 'Performing Art and Film Studies', '100L', 1000);
