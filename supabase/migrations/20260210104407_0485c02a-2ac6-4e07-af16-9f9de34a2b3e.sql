@@ -1,0 +1,1 @@
+DELETE FROM courses WHERE code = 'SOC 101' AND faculty = 'Criminology & Security Studies';
