@@ -1,0 +1,1 @@
+INSERT INTO courses (code, title, faculty, level, price) VALUES ('CMT 104', 'Writing for the Media', 'Mass Communication & Media Studies', '100L', 1000);
