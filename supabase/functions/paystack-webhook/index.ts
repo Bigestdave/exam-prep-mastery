@@ -167,7 +167,7 @@ serve(async (req) => {
     console.log(`Webhook complete: ${recordedCount} new purchases recorded for reference:`, reference);
 
     return new Response(
-      JSON.stringify({ success: true, purchase_id: purchase.id }),
+      JSON.stringify({ success: true, recorded: recordedCount }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
