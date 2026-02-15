@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.notify-course-request]
 verify_jwt = false
+
+[functions.track-session]
+verify_jwt = false
