@@ -39,6 +39,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [purchases, setPurchases] = useState<string[]>([]);
 
+  const trackSession = async () => {
+    try {
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      if (!currentSession?.access_token) return;
+      
+      await supabase.functions.invoke('track-session', {
+        headers: {
+          Authorization: `Bearer ${currentSession.access_token}`,
+        },
+      });
+    } catch (err) {
+      console.error('Failed to track session:', err);
+    }
+  };
+
   const fetchProfile = async (userId: string) => {
     const { data, error } = await supabase
       .from('profiles')
@@ -87,6 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setTimeout(() => {
             fetchProfile(session.user.id);
             fetchPurchases(session.user.id);
+            trackSession();
           }, 0);
         } else {
           setProfile(null);
@@ -114,6 +130,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (!error) {
       sessionStorage.setItem('showWelcomeToast', 'true');
+      // Track session IP
+      trackSession();
     }
     return { error: error as Error | null };
   };

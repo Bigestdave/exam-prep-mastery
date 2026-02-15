@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      active_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: string
+          last_active: string
+          session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address: string
+          last_active?: string
+          session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: string
+          last_active?: string
+          session_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       course_questions: {
         Row: {
           answer_text: string
