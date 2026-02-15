@@ -32,6 +32,17 @@ interface SignupData {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Generate or retrieve a persistent device ID
+function getDeviceId(): string {
+  const key = 'lcuprep_device_id';
+  let deviceId = localStorage.getItem(key);
+  if (!deviceId) {
+    deviceId = crypto.randomUUID();
+    localStorage.setItem(key, deviceId);
+  }
+  return deviceId;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -39,18 +50,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [purchases, setPurchases] = useState<string[]>([]);
 
-  const trackSession = async () => {
+  const trackSession = async (action: 'track' | 'check' = 'track') => {
     try {
       const { data: { session: currentSession } } = await supabase.auth.getSession();
-      if (!currentSession?.access_token) return;
-      
-      await supabase.functions.invoke('track-session', {
+      if (!currentSession?.access_token) return true;
+
+      const { data, error } = await supabase.functions.invoke('track-session', {
         headers: {
           Authorization: `Bearer ${currentSession.access_token}`,
         },
+        body: {
+          device_id: getDeviceId(),
+          action,
+        },
       });
+
+      if (error) {
+        console.error('Failed to track session:', error);
+        return true; // Don't block on errors
+      }
+
+      // If checking validity and device was kicked out
+      if (action === 'check' && data && data.valid === false) {
+        console.log('Device session invalidated, signing out...');
+        await supabase.auth.signOut();
+        setProfile(null);
+        setPurchases([]);
+        return false;
+      }
+
+      return true;
     } catch (err) {
       console.error('Failed to track session:', err);
+      return true;
     }
   };
 
@@ -64,7 +96,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!error && data) {
       setProfile(data);
     } else {
-      // Profile might not exist yet for new signups, retry after a short delay
       setTimeout(async () => {
         const { data: retryData } = await supabase
           .from('profiles')
@@ -85,14 +116,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .eq('user_id', userId);
     
     if (!error && data) {
-      // Deduplicate course IDs (safety net)
       const uniqueCourseIds = [...new Set(data.map(p => p.course_id))];
       setPurchases(uniqueCourseIds);
     }
   };
 
   useEffect(() => {
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
@@ -102,7 +131,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setTimeout(() => {
             fetchProfile(session.user.id);
             fetchPurchases(session.user.id);
-            trackSession();
+            // Track device on login/token refresh
+            trackSession('track');
           }, 0);
         } else {
           setProfile(null);
@@ -111,7 +141,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
-    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -119,19 +148,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         fetchProfile(session.user.id);
         fetchPurchases(session.user.id);
+        // Check if this device is still valid
+        trackSession('check');
       }
       setIsLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    // Periodic check every 5 minutes — if device was kicked, sign out
+    const interval = setInterval(() => {
+      if (user) {
+        trackSession('check');
+      }
+    }, 5 * 60 * 1000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (!error) {
       sessionStorage.setItem('showWelcomeToast', 'true');
-      // Track session IP
-      trackSession();
+      trackSession('track');
     }
     return { error: error as Error | null };
   };

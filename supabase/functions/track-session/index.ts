@@ -6,7 +6,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const MAX_IPS = 3;
+const MAX_DEVICES = 2;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -22,7 +22,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Verify user
     const supabaseUser = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,
@@ -40,68 +39,84 @@ Deno.serve(async (req) => {
 
     const userId = claimsData.claims.sub;
 
-    // Get client IP from headers
-    const ip =
-      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      req.headers.get("x-real-ip") ||
-      "unknown";
+    // Get device_id from request body
+    const body = await req.json().catch(() => ({}));
+    const deviceId = body.device_id;
+    const action = body.action || "track"; // "track" or "check"
 
-    // Use service role for admin operations
+    if (!deviceId) {
+      return new Response(JSON.stringify({ error: "device_id required" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Upsert current session (update last_active if IP already exists)
+    if (action === "check") {
+      // Check if this device is still in active sessions
+      const { data: session } = await supabaseAdmin
+        .from("active_sessions")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("device_id", deviceId)
+        .maybeSingle();
+
+      return new Response(
+        JSON.stringify({ valid: !!session }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Upsert current device session
     await supabaseAdmin
       .from("active_sessions")
       .upsert(
-        { user_id: userId, ip_address: ip, last_active: new Date().toISOString() },
-        { onConflict: "user_id,ip_address" }
+        {
+          user_id: userId,
+          device_id: deviceId,
+          ip_address: req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown",
+          last_active: new Date().toISOString(),
+        },
+        { onConflict: "user_id,device_id" }
       );
 
-    // Get all active sessions for this user, ordered by last_active
+    // Get all sessions for this user
     const { data: sessions } = await supabaseAdmin
       .from("active_sessions")
       .select("*")
       .eq("user_id", userId)
       .order("last_active", { ascending: true });
 
-    if (sessions && sessions.length > MAX_IPS) {
-      // Get unique IPs
-      const uniqueIPs = [...new Set(sessions.map((s) => s.ip_address))];
+    if (sessions && sessions.length > MAX_DEVICES) {
+      // Remove oldest sessions to stay within limit
+      const toRemove = sessions.length - MAX_DEVICES;
+      const oldIds = sessions.slice(0, toRemove).map((s) => s.id);
 
-      if (uniqueIPs.length > MAX_IPS) {
-        // Too many IPs - revoke oldest sessions to get back to MAX_IPS
-        const sessionsToRemove = sessions.length - MAX_IPS;
-        const oldSessionIds = sessions.slice(0, sessionsToRemove).map((s) => s.id);
+      await supabaseAdmin
+        .from("active_sessions")
+        .delete()
+        .in("id", oldIds);
 
-        // Remove old session records
-        await supabaseAdmin
-          .from("active_sessions")
-          .delete()
-          .in("id", oldSessionIds);
-
-        // Sign out the user from those old sessions by revoking via admin API
-        // Note: We can't target specific sessions, but cleaning the records
-        // means the old IPs won't be tracked anymore
-
-        return new Response(
-          JSON.stringify({
-            success: true,
-            message: "Session recorded. Oldest sessions were revoked due to IP limit.",
-            active_ips: MAX_IPS,
-          }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: "Session recorded. Oldest device sessions were removed.",
+          removed_count: toRemove,
+          active_devices: MAX_DEVICES,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     return new Response(
       JSON.stringify({
         success: true,
         message: "Session recorded.",
-        active_ips: sessions?.length || 1,
+        active_devices: sessions?.length || 1,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
