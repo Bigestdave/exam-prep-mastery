@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { CourseCard } from "@/components/CourseCard";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { SurveyDialog } from "@/components/SurveyDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { supabase } from "@/integrations/supabase/client";
@@ -158,6 +159,7 @@ export default function Dashboard() {
         )}
       </main>
 
+      <SurveyDialog />
       <MobileBottomNav />
     </div>
   );
