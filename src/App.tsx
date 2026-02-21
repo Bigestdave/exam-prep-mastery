@@ -16,6 +16,7 @@ import AnswerView from "./pages/AnswerView";
 import Profile from "./pages/Profile";
 import RequestCourse from "./pages/RequestCourse";
 import Library from "./pages/Library";
+import Survey from "./pages/Survey";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/request-course" element={<RequestCourse />} />
             <Route path="/library" element={<Library />} />
+            <Route path="/survey" element={<Survey />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
