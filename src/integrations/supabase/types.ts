@@ -205,6 +205,39 @@ export type Database = {
         }
         Relationships: []
       }
+      survey_responses: {
+        Row: {
+          created_at: string
+          id: string
+          q1_buy_reason: string
+          q2_buy_timing: string
+          q3_question_overlap: string
+          q4_hesitation: string
+          q5_return_intent: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          q1_buy_reason: string
+          q2_buy_timing: string
+          q3_question_overlap: string
+          q4_hesitation: string
+          q5_return_intent: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          q1_buy_reason?: string
+          q2_buy_timing?: string
+          q3_question_overlap?: string
+          q4_hesitation?: string
+          q5_return_intent?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
