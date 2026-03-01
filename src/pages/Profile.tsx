@@ -20,42 +20,40 @@ export default function Profile() {
 
   if (isLoading || coursesLoading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] pb-20 md:pb-0">
+      <div className="min-h-screen bg-background pb-20 md:pb-0">
         <Header isLoggedIn userName="" />
         <main className="container py-8 max-w-xl px-4">
-          <div className="h-4 w-32 bg-slate-100 rounded-lg animate-pulse mb-6"></div>
+          <div className="h-4 w-32 bg-muted rounded-lg animate-pulse mb-6"></div>
           <div className="mb-8 space-y-2">
-            <div className="h-7 w-40 bg-slate-200 rounded-lg animate-pulse"></div>
-            <div className="h-4 w-48 bg-slate-100 rounded-lg animate-pulse"></div>
-            <div className="h-4 w-32 bg-slate-100 rounded-lg animate-pulse"></div>
+            <div className="h-7 w-40 bg-secondary rounded-lg animate-pulse"></div>
+            <div className="h-4 w-48 bg-muted rounded-lg animate-pulse"></div>
+            <div className="h-4 w-32 bg-muted rounded-lg animate-pulse"></div>
           </div>
-          {/* Request Course Skeleton */}
-          <div className="bg-white rounded-2xl border border-slate-100 p-5 mb-6 shadow-sm">
+          <div className="bg-card rounded-2xl border border-border p-5 mb-6 shadow-card">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-slate-100 rounded-xl animate-pulse"></div>
+              <div className="w-10 h-10 bg-secondary rounded-xl animate-pulse"></div>
               <div className="space-y-2">
-                <div className="h-4 w-32 bg-slate-200 rounded animate-pulse"></div>
-                <div className="h-3 w-48 bg-slate-100 rounded animate-pulse"></div>
+                <div className="h-4 w-32 bg-secondary rounded animate-pulse"></div>
+                <div className="h-3 w-48 bg-muted rounded animate-pulse"></div>
               </div>
             </div>
           </div>
-          {/* Library Skeleton */}
-          <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden mb-6 shadow-sm">
-            <div className="p-5 border-b border-slate-100">
+          <div className="bg-card rounded-2xl border border-border overflow-hidden mb-6 shadow-card">
+            <div className="p-5 border-b border-border">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-slate-100 rounded-xl animate-pulse"></div>
+                <div className="w-10 h-10 bg-secondary rounded-xl animate-pulse"></div>
                 <div className="space-y-2">
-                  <div className="h-4 w-24 bg-slate-200 rounded animate-pulse"></div>
-                  <div className="h-3 w-32 bg-slate-100 rounded animate-pulse"></div>
+                  <div className="h-4 w-24 bg-secondary rounded animate-pulse"></div>
+                  <div className="h-3 w-32 bg-muted rounded animate-pulse"></div>
                 </div>
               </div>
             </div>
             <div className="p-5 space-y-3">
-              <div className="h-5 w-20 bg-slate-100 rounded animate-pulse"></div>
-              <div className="h-5 w-24 bg-slate-100 rounded animate-pulse"></div>
+              <div className="h-5 w-20 bg-muted rounded animate-pulse"></div>
+              <div className="h-5 w-24 bg-muted rounded animate-pulse"></div>
             </div>
           </div>
-          <div className="h-10 w-full bg-slate-100 rounded-lg animate-pulse"></div>
+          <div className="h-10 w-full bg-muted rounded-lg animate-pulse"></div>
         </main>
         <MobileBottomNav />
       </div>
@@ -64,12 +62,10 @@ export default function Profile() {
 
   if (!user) return null;
 
-  // --- LOGIC FIX START ---
   const getCourseCode = (courseId: string) => {
     const course = courses.find(c => c.id === courseId);
-    return course ? course.code : "Course"; // Shows IRM 103 instead of long ID
+    return course ? course.code : "Course";
   };
-  // --- LOGIC FIX END ---
 
   const handleLogout = async () => {
     navigate("/login");
@@ -90,7 +86,7 @@ export default function Profile() {
         </Link>
 
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-foreground mb-1">{profile?.full_name}</h1>
+          <h1 className="text-2xl font-display font-bold text-foreground mb-1">{profile?.full_name}</h1>
           <p className="text-muted-foreground">{user?.email}</p>
           <p className="text-sm text-muted-foreground mt-1">
             {profile?.faculty} • {profile?.level}
@@ -100,14 +96,14 @@ export default function Profile() {
         {/* Request a Course Card */}
         <Link
           to="/request-course"
-          className="w-full bg-card rounded-2xl border border-border/50 shadow-card p-5 mb-6 flex items-center justify-between hover:bg-secondary/30 transition-colors group"
+          className="w-full bg-card rounded-2xl border border-border shadow-card p-5 mb-6 flex items-center justify-between hover:bg-secondary/30 transition-colors group btn-thud"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
               <BookPlus className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h3 className="font-semibold text-foreground">Request a Course</h3>
+              <h3 className="font-display font-semibold text-foreground">Request a Course</h3>
               <p className="text-sm text-muted-foreground">Don't see your course? Let us know</p>
             </div>
           </div>
@@ -115,14 +111,14 @@ export default function Profile() {
         </Link>
 
         {/* Library */}
-        <div className="bg-card rounded-2xl border border-border/50 shadow-card overflow-hidden mb-6">
-          <div className="p-5 border-b border-border/50">
+        <div className="bg-card rounded-2xl border border-border shadow-card overflow-hidden mb-6">
+          <div className="p-5 border-b border-border">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                 <BookOpen className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground">My Library</h3>
+                <h3 className="font-display font-semibold text-foreground">My Library</h3>
                 <p className="text-sm text-muted-foreground">{purchases.length} courses purchased</p>
               </div>
             </div>
@@ -136,15 +132,14 @@ export default function Profile() {
               </Link>
             </div>
           ) : (
-            <div className="divide-y divide-border/50">
+            <div className="divide-y divide-border">
               {purchases.map((courseId) => (
                 <Link 
                   key={courseId}
                   to={`/course/${courseId}`}
                   className="block p-5 hover:bg-secondary/50 transition-colors"
                 >
-                  {/* FIXED HERE: Now calls getCourseCode function */}
-                  <span className="text-sm font-medium text-foreground uppercase">
+                  <span className="text-sm font-display font-medium text-foreground uppercase">
                     {getCourseCode(courseId)}
                   </span>
                 </Link>

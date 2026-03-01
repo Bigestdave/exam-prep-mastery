@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,71 +6,59 @@
 
 @layer base {
   :root {
-    /* LCU Prep Design System */
-    --background: 210 40% 98%; /* Off-white #F8FAFC */
-    --foreground: 222 47% 11%; /* Deep Navy #0F172A */
+    /* MIDNIGHT LCU Design System */
+    --background: 222 47% 11%; /* The Void #0F172A */
+    --foreground: 210 40% 98%; /* Off-white */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card: 217 33% 17%; /* The Surface #1E293B */
+    --card-foreground: 210 40% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover: 217 33% 17%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 221 83% 53%; /* Royal Blue (Adjusted to be nicer) */
-    --primary-foreground: 0 0% 100%;
+    --primary: 199 89% 60%; /* Sky Blue Accent #38BDF8 */
+    --primary-foreground: 222 47% 11%;
 
-    /* THIS WAS THE ISSUE: Set Secondary to Light Grey/Blue for badges */
-    --secondary: 210 40% 96.1%; 
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 217 33% 22%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 215 20% 65%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 217 33% 25%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 217 33% 22%;
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 221 83% 53%;
+    --border: 217 33% 22%;
+    --input: 217 33% 22%;
+    --ring: 199 89% 60%;
 
     --radius: 0.75rem;
 
     /* Custom tokens */
     --navy: 222 47% 11%;
     --navy-light: 215 28% 17%;
-    --blue-glow: 217 91% 60%;
-    --success: 160 84% 39%;
-    --success-light: 158 64% 94%;
+    --sky-accent: 199 89% 60%;
+    --matrix-green: 145 100% 50%;
+    --success: 145 100% 50%;
+    --success-light: 145 50% 15%;
 
-    /* Shadows - Premium EdTech */
-    --shadow-card: 0px 4px 24px rgba(0, 0, 0, 0.06);
-    --shadow-elevated: 0 20px 40px rgb(0 0 0 / 0.08);
-    --shadow-glow: 0 0 40px hsl(217 91% 60% / 0.2);
+    /* Glassmorphism */
+    --glass-bg: rgba(30, 41, 59, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-blur: 20px;
+
+    /* Shadows - Midnight Premium */
+    --shadow-card: 0px 4px 24px rgba(0, 0, 0, 0.3);
+    --shadow-elevated: 0 20px 40px rgba(0, 0, 0, 0.4);
+    --shadow-glow: 0 0 40px hsl(199 89% 60% / 0.25);
   }
 
+  /* No separate dark mode needed - we ARE dark mode */
   .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
-    --card: 215 28% 17%;
-    --card-foreground: 210 40% 98%;
-    --popover: 215 28% 17%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 217 91% 60%;
+    /* Same as root - Midnight LCU is always dark */
   }
 }
 
@@ -88,11 +76,12 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-sans font-bold tracking-tight text-[#0F172A];
+    @apply font-display font-bold tracking-tight text-foreground;
+    letter-spacing: -0.02em;
   }
 
   .prose-content {
-    @apply font-serif leading-relaxed;
+    @apply font-sans leading-relaxed;
   }
 }
 
@@ -102,7 +91,7 @@
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-sky-400 to-blue-400 bg-clip-text text-transparent;
   }
 
   .card-shadow {
@@ -115,5 +104,41 @@
 
   .glow-shadow {
     box-shadow: var(--shadow-glow);
+  }
+
+  /* Glassmorphism utility */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+  }
+
+  /* 8-Point Grid helpers */
+  .squircle {
+    border-radius: 16px;
+  }
+
+  .squircle-lg {
+    border-radius: 24px;
+  }
+
+  .squircle-xl {
+    border-radius: 32px;
+  }
+}
+
+/* Button Thud - scale down on press */
+@layer components {
+  .btn-thud {
+    transition: transform 0.1s ease-out;
+  }
+  .btn-thud:active {
+    transform: scale(0.96);
+  }
+
+  /* Page enter animation */
+  .page-enter {
+    animation: fade-in 0.3s ease-out forwards;
   }
 }

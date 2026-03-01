@@ -11,8 +11,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.2.8",
     "@fontsource/merriweather": "^5.2.11",
     "@fontsource/plus-jakarta-sans": "^5.2.8",
+    "@fontsource/space-grotesk": "^5.2.10",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
