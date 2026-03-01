@@ -152,4 +152,24 @@
   .page-enter {
     animation: fade-in 0.3s ease-out forwards;
   }
+
+  /* Paper Mode — Kindle Experience */
+  .paper-mode .text-muted-foreground {
+    color: #44403C !important;
+    font-weight: 500;
+  }
+
+  .paper-mode .text-primary {
+    color: #92400E !important;
+  }
+
+  .paper-mode .border-primary\/30,
+  .paper-mode .border-primary\/20 {
+    border-color: rgba(146, 64, 14, 0.25) !important;
+  }
+
+  .paper-mode .bg-primary\/\[0\.03\],
+  .paper-mode .bg-primary\/5 {
+    background-color: rgba(146, 64, 14, 0.06) !important;
+  }
 }

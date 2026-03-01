@@ -1,11 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
-import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Type } from "lucide-react";
 
 export default function AnswerView() {
   const { id, questionId } = useParams<{ id: string; questionId: string }>();
@@ -19,6 +19,7 @@ export default function AnswerView() {
   const isOwned = id ? purchases.includes(id) : false;
   const isFreePreview = questionIndex === 0;
   const question = getQuestionByIndex(questionIndex);
+  const [paperMode, setPaperMode] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) navigate("/login");
@@ -135,17 +136,43 @@ export default function AnswerView() {
         </Link>
 
         {/* Question Card */}
-        <div className="bg-card rounded-3xl p-6 md:p-10 shadow-card border border-border mb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider">Question {questionIndex + 1}</span>
-            {isFreePreview && !isOwned && <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">FREE PREVIEW</span>}
+        <div
+          className={`rounded-3xl p-6 md:p-10 shadow-card border mb-8 transition-all duration-500 ease-in-out ${
+            paperMode
+              ? 'bg-[#FFFBF0] border-[#E8E0D0]'
+              : 'bg-card border-border'
+          }`}
+        >
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <span className={`text-xs font-display font-bold uppercase tracking-wider transition-colors duration-500 ${paperMode ? 'text-[#1C1917]/50' : 'text-muted-foreground'}`}>
+                Question {questionIndex + 1}
+              </span>
+              {isFreePreview && !isOwned && <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">FREE PREVIEW</span>}
+            </div>
+
+            {/* Paper Mode Toggle */}
+            <button
+              onClick={() => setPaperMode(!paperMode)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${
+                paperMode
+                  ? 'bg-[#1C1917] text-[#FFFBF0] shadow-md'
+                  : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80'
+              }`}
+              title={paperMode ? 'Switch to Hacker Mode' : 'Switch to Paper Mode'}
+            >
+              <Type className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{paperMode ? 'Hacker' : 'Paper'}</span>
+            </button>
           </div>
 
-          <h1 className="text-xl md:text-2xl font-display font-bold text-foreground leading-snug mb-8">
+          <h1 className={`text-xl md:text-2xl font-display font-bold leading-snug mb-8 transition-colors duration-500 ${
+            paperMode ? 'text-[#1C1917]' : 'text-foreground'
+          }`}>
             {question.question_text}
           </h1>
 
-          <div className="prose-content relative">
+          <div className={`prose-content relative transition-colors duration-500 ${paperMode ? 'paper-mode' : ''}`}>
             {renderAnswer(question.answer_text)}
           </div>
         </div>
