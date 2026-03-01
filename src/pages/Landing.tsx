@@ -32,13 +32,13 @@ export default function Landing() {
             </div>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-[1.1] mb-6 opacity-0 animate-slide-up" style={{ animationDelay: '100ms' }}>
-              <span className="gradient-text text-5xl md:text-6xl lg:text-7xl">4 out of 15</span>
+              <span className="gradient-text text-5xl md:text-6xl lg:text-7xl">6 out of 15</span>
               <br />
               <span className="text-foreground/90">Tutorial Questions will appear in your exam.</span>
             </h1>
             
             <p className="text-base md:text-lg text-muted-foreground mb-10 max-w-xl mx-auto opacity-0 animate-slide-up leading-relaxed" style={{ animationDelay: '200ms' }}>
-              Stop searching through 40-page PDFs. We solved the exact 15 questions for you — verified, exam-ready, first-class standard.
+              Stop searching through 40-page PDFs. We solved the exact 15 questions for you, verified, exam-ready, first-class standard.
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 opacity-0 animate-slide-up" style={{ animationDelay: '300ms' }}>
