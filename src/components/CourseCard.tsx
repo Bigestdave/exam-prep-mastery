@@ -16,20 +16,15 @@ export function CourseCard({ id, code, title, isOwned = false, questionsCount = 
       to={`/course/${id}`}
       className="block bg-card rounded-3xl p-5 card-float transition-all duration-300 group btn-thud"
     >
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2.5">
         <div className="flex items-center justify-between">
-          <span className="text-[11px] font-mono font-semibold text-primary tracking-wider uppercase">
+          <span className="text-[11px] font-mono font-semibold text-primary tracking-wider">
             {code}
           </span>
           {isOwned ? (
-            <span className="text-[10px] font-bold text-success flex items-center gap-1 bg-success/10 px-2 py-0.5 rounded-full">
-              <CheckCircle className="w-3 h-3" />
-              Unlocked
-            </span>
+            <CheckCircle className="w-4 h-4 text-success" />
           ) : (
-            <span className="text-[10px] font-medium text-muted-foreground flex items-center gap-1">
-              <Lock className="w-3 h-3" />
-            </span>
+            <Lock className="w-3.5 h-3.5 text-muted-foreground/50" />
           )}
         </div>
         
@@ -37,14 +32,9 @@ export function CourseCard({ id, code, title, isOwned = false, questionsCount = 
           {title}
         </h3>
         
-        <div className="flex items-center justify-between pt-1 border-t border-border/50">
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground font-mono">
-              {questionsCount}Q
-            </span>
-            <VerifiedBadge />
-          </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+        <div className="flex items-center gap-2 text-muted-foreground/60">
+          <span className="text-[11px] font-mono">{questionsCount}Q</span>
+          <VerifiedBadge />
         </div>
       </div>
     </Link>
