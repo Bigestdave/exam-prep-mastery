@@ -31,7 +31,6 @@ export default function Library() {
     }
   }, [user, isLoading, navigate]);
 
-  // Fetch purchased courses with question counts
   useEffect(() => {
     const fetchPurchasedCourses = async () => {
       setIsFetchingCounts(true);
@@ -43,10 +42,7 @@ export default function Library() {
           .select('*', { count: 'exact', head: true })
           .eq('course_id', course.id);
 
-        return {
-          ...course,
-          questionCount: count || 0
-        };
+        return { ...course, questionCount: count || 0 };
       });
 
       const results = await Promise.all(countsPromises);
@@ -65,22 +61,22 @@ export default function Library() {
 
   if (isProcessing) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] pb-20 md:pb-0">
+      <div className="min-h-screen bg-background pb-20 md:pb-0">
         <Header isLoggedIn userName="" />
         <main className="container py-8 px-4 md:px-6">
           <div className="mb-8 space-y-3">
-            <div className="h-8 w-32 bg-slate-200 rounded-lg animate-pulse"></div>
-            <div className="h-4 w-48 bg-slate-100 rounded-lg animate-pulse"></div>
+            <div className="h-8 w-32 bg-secondary rounded-lg animate-pulse"></div>
+            <div className="h-4 w-48 bg-muted rounded-lg animate-pulse"></div>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+              <div key={i} className="bg-card rounded-2xl border border-border p-5 shadow-card">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-slate-100 rounded-xl animate-pulse"></div>
+                  <div className="w-12 h-12 bg-secondary rounded-xl animate-pulse"></div>
                   <div className="flex-1 space-y-2">
-                    <div className="h-3 w-16 bg-slate-100 rounded animate-pulse"></div>
-                    <div className="h-5 w-full bg-slate-200 rounded animate-pulse"></div>
-                    <div className="h-4 w-24 bg-slate-100 rounded animate-pulse"></div>
+                    <div className="h-3 w-16 bg-muted rounded animate-pulse"></div>
+                    <div className="h-5 w-full bg-secondary rounded animate-pulse"></div>
+                    <div className="h-4 w-24 bg-muted rounded animate-pulse"></div>
                   </div>
                 </div>
               </div>
@@ -100,7 +96,7 @@ export default function Library() {
       
       <main className="container py-8">
         <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+          <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-2">
             My Library
           </h1>
           <p className="text-muted-foreground">
@@ -117,7 +113,7 @@ export default function Library() {
               <Link 
                 key={course.id}
                 to={`/course/${course.id}`}
-                className="opacity-0 animate-fade-in bg-card rounded-2xl border border-border/50 shadow-card p-5 hover:shadow-elevated transition-all"
+                className="opacity-0 animate-fade-in bg-card rounded-2xl border border-border shadow-card p-5 hover:shadow-glow transition-all btn-thud"
                 style={{ animationDelay: `${i * 50}ms` }}
               >
                 <div className="flex items-start gap-4">
@@ -125,10 +121,10 @@ export default function Library() {
                     <BookOpen className="w-6 h-6 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-primary uppercase tracking-wide mb-1">
+                    <p className="text-xs font-display font-semibold text-primary uppercase tracking-wide mb-1">
                       {course.code}
                     </p>
-                    <h3 className="font-semibold text-foreground line-clamp-2 mb-2">
+                    <h3 className="font-display font-semibold text-foreground line-clamp-2 mb-2">
                       {course.title}
                     </h3>
                     <p className="text-sm text-muted-foreground">
@@ -140,11 +136,11 @@ export default function Library() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
+          <div className="text-center py-16 bg-card rounded-2xl border border-border shadow-card">
             <div className="w-20 h-20 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-6">
               <ShoppingBag className="w-10 h-10 text-muted-foreground" />
             </div>
-            <h3 className="font-semibold text-foreground text-lg mb-2">Your library is empty</h3>
+            <h3 className="font-display font-semibold text-foreground text-lg mb-2">Your library is empty</h3>
             <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
               Get your first tutorial questions answers and it will appear here.
             </p>

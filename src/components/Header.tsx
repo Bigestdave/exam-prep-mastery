@@ -22,13 +22,13 @@ export function Header({ isLoggedIn = false, userName }: HeaderProps) {
     : "U";
 
   return (
-    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-lg border-b border-border/50">
+    <header className="sticky top-0 z-40 glass">
       <div className="container flex items-center justify-between h-16">
         <Link to={isLoggedIn ? "/dashboard" : "/"} className="flex items-center gap-2">
           <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
             <GraduationCap className="w-5 h-5 text-primary-foreground" />
           </div>
-          <span className="font-bold text-lg text-foreground">LCU Prep</span>
+          <span className="font-display font-bold text-lg text-foreground">LCU Prep</span>
         </Link>
 
         {isLoggedIn ? (
@@ -44,7 +44,7 @@ export function Header({ isLoggedIn = false, userName }: HeaderProps) {
             <Link to="/profile">
               <Button variant="ghost" size="sm" className="gap-2">
                 <Avatar className="w-7 h-7">
-                  <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                  <AvatarFallback className="bg-primary text-primary-foreground text-xs font-display">
                     {initials}
                   </AvatarFallback>
                 </Avatar>

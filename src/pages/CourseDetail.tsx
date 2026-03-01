@@ -105,20 +105,20 @@ export default function CourseDetail() {
 
   if (isLoading || coursesLoading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] pb-24 md:pb-8">
+      <div className="min-h-screen bg-background pb-24 md:pb-8">
         <Header isLoggedIn userName="" />
         <main className="container py-8 px-4">
-          <div className="h-4 w-28 bg-slate-100 rounded-lg animate-pulse mb-6"></div>
+          <div className="h-4 w-28 bg-muted rounded-lg animate-pulse mb-6"></div>
           <div className="mb-8 space-y-3">
             <div className="flex items-center gap-3">
-              <div className="h-8 w-20 bg-slate-200 rounded-lg animate-pulse"></div>
+              <div className="h-8 w-20 bg-secondary rounded-lg animate-pulse"></div>
             </div>
-            <div className="h-8 w-3/4 bg-slate-200 rounded-lg animate-pulse"></div>
-            <div className="h-4 w-48 bg-slate-100 rounded-lg animate-pulse"></div>
+            <div className="h-8 w-3/4 bg-secondary rounded-lg animate-pulse"></div>
+            <div className="h-4 w-48 bg-muted rounded-lg animate-pulse"></div>
           </div>
           <div className="space-y-3">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-16 w-full bg-white border border-slate-100 rounded-xl animate-pulse shadow-sm"></div>
+              <div key={i} className="h-16 w-full bg-card border border-border rounded-xl animate-pulse shadow-card"></div>
             ))}
           </div>
         </main>
@@ -219,7 +219,7 @@ export default function CourseDetail() {
         {questionsLoading ? (
           <div className="space-y-3">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-16 w-full bg-white border border-slate-100 rounded-xl animate-pulse shadow-sm"></div>
+              <div key={i} className="h-16 w-full bg-card border border-border rounded-xl animate-pulse shadow-card"></div>
             ))}
           </div>
         ) : (

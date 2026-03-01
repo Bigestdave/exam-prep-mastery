@@ -19,9 +19,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        // Restoring your Fonts
-        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-        serif: ['Merriweather', 'Georgia', 'serif'],
+        display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -57,7 +57,6 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Restoring your Custom Brand Colors
         navy: {
           DEFAULT: "hsl(var(--navy))",
           light: "hsl(var(--navy-light))",
@@ -66,6 +65,8 @@ export default {
           DEFAULT: "hsl(var(--success))",
           light: "hsl(var(--success-light))",
         },
+        "sky-accent": "hsl(var(--sky-accent))",
+        "matrix-green": "hsl(var(--matrix-green))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -74,13 +75,11 @@ export default {
         "2xl": "1rem",
         "3xl": "1.5rem",
       },
-      // Restoring your Premium Shadows
       boxShadow: {
-        'card': '0px 4px 24px rgba(0, 0, 0, 0.06)',
-        'elevated': '0 20px 40px rgb(0 0 0 / 0.08)',
-        'glow': '0 0 40px hsl(217 91% 60% / 0.2)',
+        'card': '0px 4px 24px rgba(0, 0, 0, 0.3)',
+        'elevated': '0 20px 40px rgba(0, 0, 0, 0.4)',
+        'glow': '0 0 40px hsl(199 89% 60% / 0.25)',
       },
-      // Restoring the Animations you lost
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -102,6 +101,10 @@ export default {
           from: { opacity: "0", transform: "scale(0.95)" },
           to: { opacity: "1", transform: "scale(1)" },
         },
+        "shimmer": {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -109,6 +112,7 @@ export default {
         "fade-in": "fade-in 0.5s ease-out forwards",
         "slide-up": "slide-up 0.6s ease-out forwards",
         "scale-in": "scale-in 0.3s ease-out forwards",
+        "shimmer": "shimmer 2s linear infinite",
       },
     },
   },

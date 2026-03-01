@@ -1,5 +1,6 @@
 import { Lock, CheckCircle, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { VerifiedBadge } from "./VerifiedBadge";
 
 interface CourseCardProps {
   id: string;
@@ -13,12 +14,12 @@ export function CourseCard({ id, code, title, isOwned = false, questionsCount = 
   return (
     <Link 
       to={`/course/${id}`}
-      className="block bg-card rounded-2xl p-6 shadow-card border border-border/50 hover:shadow-elevated transition-all duration-300 group"
+      className="block bg-card rounded-2xl p-6 shadow-card border border-border hover:shadow-glow transition-all duration-300 group btn-thud"
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xs font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-lg">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <span className="text-xs font-display font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-lg">
               {code}
             </span>
             {isOwned ? (
@@ -33,12 +34,15 @@ export function CourseCard({ id, code, title, isOwned = false, questionsCount = 
               </span>
             )}
           </div>
-          <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
+          <h3 className="font-display font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
             {title}
           </h3>
-          <p className="text-sm text-muted-foreground">
-            {questionsCount} Tutorial Questions
-          </p>
+          <div className="flex items-center gap-2 mt-2">
+            <p className="text-sm text-muted-foreground">
+              {questionsCount} Tutorial Questions
+            </p>
+            <VerifiedBadge />
+          </div>
         </div>
         <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
       </div>

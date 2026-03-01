@@ -31,7 +31,7 @@ export default function Landing() {
               Exam Preparation Simplified
             </div>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6 opacity-0 animate-slide-up" style={{ animationDelay: '100ms' }}>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight mb-6 opacity-0 animate-slide-up" style={{ animationDelay: '100ms' }}>
               4 out of 15 Tutorial Questions{' '}
               <span className="gradient-text">will appear in your exam.</span>
             </h1>
@@ -43,7 +43,7 @@ export default function Landing() {
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 opacity-0 animate-slide-up" style={{ animationDelay: '300ms' }}>
               <Link to="/signup">
-                <Button size="xl" className="group">
+                <Button size="xl" variant="hero" className="group">
                   Find My Course
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -62,33 +62,18 @@ export default function Landing() {
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <ValueCard
-              icon={CheckCircle}
-              title="All 15 Solved"
-              description="Every tutorial question comes with a comprehensive, exam-ready answer."
-              delay={100}
-            />
-            <ValueCard
-              icon={Target}
-              title="100% Coverage"
-              description="We cover every question that could appear in your examination."
-              delay={200}
-            />
-            <ValueCard
-              icon={Award}
-              title="First Class Answers"
-              description="Solutions crafted to meet the highest academic standards."
-              delay={300}
-            />
+            <ValueCard icon={CheckCircle} title="All 15 Solved" description="Every tutorial question comes with a comprehensive, exam-ready answer." delay={100} />
+            <ValueCard icon={Target} title="100% Coverage" description="We cover every question that could appear in your examination." delay={200} />
+            <ValueCard icon={Award} title="First Class Answers" description="Solutions crafted to meet the highest academic standards." delay={300} />
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="py-16 md:py-24 bg-secondary/30">
+      <section className="py-16 md:py-24 bg-card/50">
         <div className="container">
           <div className="max-w-2xl mx-auto text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4">How It Works</h2>
+            <h2 className="text-3xl font-display font-bold text-foreground mb-4">How It Works</h2>
             <p className="text-muted-foreground">Three simple steps to exam success</p>
           </div>
           
@@ -99,8 +84,8 @@ export default function Landing() {
               { step: '03', title: 'Unlock & Study', desc: 'Access all 15 answers instantly' },
             ].map((item, i) => (
               <div key={i} className="text-center opacity-0 animate-fade-in" style={{ animationDelay: `${i * 100 + 100}ms` }}>
-                <div className="text-5xl font-bold text-primary/20 mb-4">{item.step}</div>
-                <h3 className="font-semibold text-foreground mb-2">{item.title}</h3>
+                <div className="text-5xl font-display font-bold text-primary/20 mb-4">{item.step}</div>
+                <h3 className="font-display font-semibold text-foreground mb-2">{item.title}</h3>
                 <p className="text-sm text-muted-foreground">{item.desc}</p>
               </div>
             ))}
@@ -112,7 +97,7 @@ export default function Landing() {
       <section className="py-16 md:py-24">
         <div className="container">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl font-bold text-foreground mb-8 text-center">How Pricing Works</h2>
+            <h2 className="text-3xl font-display font-bold text-foreground mb-8 text-center">How Pricing Works</h2>
             <div className="space-y-4">
               {[
                 'Each course is unlocked separately',
@@ -131,10 +116,10 @@ export default function Landing() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 md:py-24 bg-secondary/30">
+      <section className="py-16 md:py-24 bg-card/50">
         <div className="container">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl font-bold text-foreground mb-8 text-center">Frequently Asked Questions</h2>
+            <h2 className="text-3xl font-display font-bold text-foreground mb-8 text-center">Frequently Asked Questions</h2>
             <Accordion type="single" collapsible className="w-full">
               {[
                 { q: 'Is payment for all courses or one course?', a: 'Payment is per course. You unlock only the course you choose.' },
@@ -162,7 +147,7 @@ export default function Landing() {
       <section className="py-20 md:py-28">
         <div className="container">
           <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-6">
               Ready to ace your exams?
             </h2>
             <p className="text-muted-foreground mb-8">
@@ -186,7 +171,7 @@ export default function Landing() {
               <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
                 <GraduationCap className="w-4 h-4 text-primary-foreground" />
               </div>
-              <span className="font-semibold text-foreground">LCU Prep</span>
+              <span className="font-display font-semibold text-foreground">LCU Prep</span>
             </div>
             <p>© 2026 LCU Prep. All rights reserved.</p>
           </div>

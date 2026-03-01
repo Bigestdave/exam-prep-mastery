@@ -15,15 +15,13 @@ function NavItem({ to, icon, label, isActive }: NavItemProps) {
       to={to}
       className={cn(
         "flex flex-col items-center justify-center w-14 h-full transition-all duration-300 relative group",
-        isActive ? "text-[#2563EB]" : "text-slate-400 hover:text-slate-600"
+        isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
       )}
     >
-      {/* Icon floats up slightly when active */}
       <div className={cn("transition-transform duration-300", isActive && "-translate-y-1")}>
         {icon}
       </div>
       
-      {/* Label appears/fades in */}
       <span className={cn(
         "text-[9px] font-bold absolute bottom-1.5 transition-opacity duration-300", 
         isActive ? "opacity-100" : "opacity-0"
@@ -31,9 +29,8 @@ function NavItem({ to, icon, label, isActive }: NavItemProps) {
         {label}
       </span>
 
-      {/* Active Dot indicator */}
       {isActive && (
-        <span className="absolute -bottom-2 w-1 h-1 bg-[#2563EB] rounded-full" />
+        <span className="absolute -bottom-2 w-1 h-1 bg-primary rounded-full" />
       )}
     </Link>
   );
@@ -53,11 +50,8 @@ export function MobileBottomNav() {
   const activeState = getActiveState();
 
   return (
-    // FLOATING CAPSULE DESIGN
-    // z-50 ensures it's on top.
-    // bottom-8 lifts it up away from the iPhone home bar rubber-band area.
     <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-auto md:hidden">
-      <nav className="bg-white/95 backdrop-blur-2xl border border-white/20 shadow-[0_8px_40px_rgba(0,0,0,0.12)] rounded-full px-6 h-16 flex items-center gap-2">
+      <nav className="glass rounded-full px-6 h-16 flex items-center gap-2 shadow-elevated">
         
         <NavItem
           to="/dashboard"
@@ -66,7 +60,7 @@ export function MobileBottomNav() {
           isActive={activeState === "home"}
         />
         
-        <div className="w-px h-6 bg-slate-200/50 mx-2"></div>
+        <div className="w-px h-6 bg-foreground/10 mx-2"></div>
         
         <NavItem
           to="/library"
@@ -75,7 +69,7 @@ export function MobileBottomNav() {
           isActive={activeState === "library"}
         />
         
-        <div className="w-px h-6 bg-slate-200/50 mx-2"></div>
+        <div className="w-px h-6 bg-foreground/10 mx-2"></div>
         
         <NavItem
           to="/profile"

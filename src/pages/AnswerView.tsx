@@ -32,27 +32,27 @@ export default function AnswerView() {
 
   if (isLoading || coursesLoading || questionsLoading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC]">
+      <div className="min-h-screen bg-background">
         <Header isLoggedIn userName="" />
         <main className="container py-8 px-4 max-w-3xl">
-          <div className="h-4 w-28 bg-slate-100 rounded-lg animate-pulse mb-6"></div>
-          <div className="bg-white rounded-3xl p-6 md:p-10 shadow-lg shadow-slate-200/50 border border-slate-100 mb-8">
+          <div className="h-4 w-28 bg-muted rounded-lg animate-pulse mb-6"></div>
+          <div className="bg-card rounded-3xl p-6 md:p-10 shadow-card border border-border mb-8">
             <div className="flex items-center gap-3 mb-6">
-              <div className="h-4 w-20 bg-slate-100 rounded animate-pulse"></div>
+              <div className="h-4 w-20 bg-muted rounded animate-pulse"></div>
             </div>
-            <div className="h-8 w-full bg-slate-200 rounded-lg animate-pulse mb-3"></div>
-            <div className="h-6 w-3/4 bg-slate-100 rounded-lg animate-pulse mb-8"></div>
+            <div className="h-8 w-full bg-secondary rounded-lg animate-pulse mb-3"></div>
+            <div className="h-6 w-3/4 bg-muted rounded-lg animate-pulse mb-8"></div>
             <div className="space-y-4">
-              <div className="h-4 w-full bg-slate-100 rounded animate-pulse"></div>
-              <div className="h-4 w-full bg-slate-100 rounded animate-pulse"></div>
-              <div className="h-4 w-5/6 bg-slate-100 rounded animate-pulse"></div>
-              <div className="h-4 w-full bg-slate-100 rounded animate-pulse"></div>
-              <div className="h-4 w-4/5 bg-slate-100 rounded animate-pulse"></div>
+              <div className="h-4 w-full bg-muted rounded animate-pulse"></div>
+              <div className="h-4 w-full bg-muted rounded animate-pulse"></div>
+              <div className="h-4 w-5/6 bg-muted rounded animate-pulse"></div>
+              <div className="h-4 w-full bg-muted rounded animate-pulse"></div>
+              <div className="h-4 w-4/5 bg-muted rounded animate-pulse"></div>
             </div>
           </div>
           <div className="flex items-center justify-between pb-20">
-            <div className="h-10 w-28 bg-slate-100 rounded-xl animate-pulse"></div>
-            <div className="h-10 w-32 bg-slate-200 rounded-xl animate-pulse"></div>
+            <div className="h-10 w-28 bg-muted rounded-xl animate-pulse"></div>
+            <div className="h-10 w-32 bg-secondary rounded-xl animate-pulse"></div>
           </div>
         </main>
       </div>
@@ -112,9 +112,9 @@ export default function AnswerView() {
   // --- WATERMARK COMPONENT (Inside file for simplicity) ---
   const WatermarkOverlay = () => (
     <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden flex items-center justify-center">
-      <div className="grid grid-cols-2 gap-20 opacity-10 rotate-[-30deg] scale-150">
+      <div className="grid grid-cols-2 gap-20 opacity-[0.03] rotate-[-30deg] scale-150">
         {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="text-xl font-black text-slate-900 whitespace-nowrap select-none">
+          <div key={i} className="text-xl font-black text-foreground whitespace-nowrap select-none">
             {profile?.full_name?.toUpperCase() || user.email}
           </div>
         ))}
@@ -123,27 +123,25 @@ export default function AnswerView() {
   );
 
   return (
-    // FIX: overflow-hidden prevents the page from zooming out due to watermark
-    <div className="min-h-screen bg-[#F8FAFC] relative overflow-hidden page-enter">
+    <div className="min-h-screen bg-background relative overflow-hidden page-enter">
       
-      {/* THE NEW WATERMARK */}
       {user && <WatermarkOverlay />}
       
       <Header isLoggedIn userName={profile?.full_name || ''} />
       
       <main className="container py-8 px-4 max-w-3xl relative z-10">
-        <Link to={`/course/${id}`} className="inline-flex items-center gap-2 text-slate-400 hover:text-slate-700 mb-6 font-medium text-sm transition-colors">
+        <Link to={`/course/${id}`} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 font-medium text-sm transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to {course.code}
         </Link>
 
         {/* Question Card */}
-        <div className="bg-white rounded-3xl p-6 md:p-10 shadow-lg shadow-slate-200/50 border border-slate-100 mb-8">
+        <div className="bg-card rounded-3xl p-6 md:p-10 shadow-card border border-border mb-8">
           <div className="flex items-center gap-3 mb-6">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Question {questionIndex + 1}</span>
-            {isFreePreview && !isOwned && <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">FREE PREVIEW</span>}
+            <span className="text-xs font-display font-bold text-muted-foreground uppercase tracking-wider">Question {questionIndex + 1}</span>
+            {isFreePreview && !isOwned && <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">FREE PREVIEW</span>}
           </div>
 
-          <h1 className="text-xl md:text-2xl font-bold text-[#0F172A] leading-snug mb-8 font-serif">
+          <h1 className="text-xl md:text-2xl font-display font-bold text-foreground leading-snug mb-8">
             {question.question_text}
           </h1>
 
@@ -152,12 +150,10 @@ export default function AnswerView() {
           </div>
         </div>
 
-        {/* REMOVED EXAM TIP CARD HERE */}
-
         {/* Navigation Buttons */}
         <div className="flex items-center justify-between pb-20">
           <Link to={questionIndex > 0 ? `/course/${id}/answer/${questionIndex - 1}` : '#'}>
-             <Button variant="outline" disabled={questionIndex === 0} className="gap-2 rounded-xl bg-white">
+             <Button variant="outline" disabled={questionIndex === 0} className="gap-2 rounded-xl">
                <ChevronLeft className="w-4 h-4" /> Previous
              </Button>
           </Link>
@@ -184,15 +180,14 @@ function hasNext(current: number, total: number) {
 function NextButton({ hasNext, isOwned, id }: { hasNext: boolean, isOwned: boolean, id: string }) {
   if (hasNext && isOwned) {
     return (
-      <Button className="gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/20 text-white font-bold">
+      <Button className="gap-2 rounded-xl shadow-glow font-display font-bold">
         Next Question <ChevronRight className="w-4 h-4" />
       </Button>
     );
   } else if (hasNext && !isOwned) {
-    // If they don't own it, send them back to course page to buy
     return (
        <Link to={`/course/${id}`}>
-         <Button className="gap-2 rounded-xl bg-slate-900 text-white font-bold">
+         <Button variant="outline" className="gap-2 rounded-xl font-display font-bold">
            Unlock Full Course <ChevronRight className="w-4 h-4" />
          </Button>
        </Link>
