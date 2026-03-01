@@ -24,7 +24,7 @@ export default function Landing() {
       <section className="relative">
         <div className="container py-24 md:py-36 px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 border border-border text-muted-foreground px-4 py-2 text-xs font-mono font-semibold tracking-[0.15em] uppercase mb-10 opacity-0 animate-fade-in">
+            <div className="inline-flex items-center gap-2 glass-pill rounded-full text-muted-foreground px-5 py-2.5 text-xs font-mono font-semibold tracking-[0.15em] uppercase mb-10 opacity-0 animate-fade-in">
               <GraduationCap className="w-4 h-4" />
               Lead City University
             </div>
@@ -57,8 +57,8 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Trust Bar — Editorial */}
-      <section className="border-y border-border">
+      {/* Trust Bar — Editorial + Glass */}
+      <section className="border-y border-border glass">
         <div className="container px-4">
           <div className="flex items-center justify-center gap-4 md:gap-8 py-5 trust-bar text-center flex-wrap">
             <span>Verified Answers</span>
@@ -84,7 +84,7 @@ export default function Landing() {
               { step: '02', title: 'Find Your Course', desc: 'We show courses matched to your level' },
               { step: '03', title: 'Unlock & Study', desc: 'Access all 15 verified answers instantly' },
             ].map((item, i) => (
-              <div key={i} className="text-center opacity-0 animate-fade-in" style={{ animationDelay: `${i * 100 + 100}ms` }}>
+              <div key={i} className="glass-card rounded-lg p-6 text-center opacity-0 animate-fade-in" style={{ animationDelay: `${i * 100 + 100}ms` }}>
                 <div className="text-5xl font-display font-bold text-border mb-4">{item.step}</div>
                 <h3 className="font-display font-semibold text-foreground mb-2">{item.title}</h3>
                 <p className="text-sm text-muted-foreground">{item.desc}</p>

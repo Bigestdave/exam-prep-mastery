@@ -51,7 +51,7 @@ export function MobileBottomNav() {
 
   return (
     <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-auto md:hidden">
-      <nav className="glass rounded-full px-8 h-14 flex items-center gap-3 shadow-elevated">
+      <nav className="glass-pill rounded-full px-8 h-14 flex items-center gap-3 shadow-elevated">
         
         <NavItem
           to="/dashboard"
