@@ -84,7 +84,7 @@ export default function Landing() {
               { step: '02', title: 'Find Your Course', desc: 'We show courses matched to your level' },
               { step: '03', title: 'Unlock & Study', desc: 'Access all 15 verified answers instantly' },
             ].map((item, i) => (
-              <div key={i} className="glass-card rounded-lg p-6 text-center opacity-0 animate-fade-in" style={{ animationDelay: `${i * 100 + 100}ms` }}>
+              <div key={i} className="glass-card rounded-2xl p-8 text-center opacity-0 animate-fade-in" style={{ animationDelay: `${i * 100 + 100}ms` }}>
                 <div className="text-5xl font-display font-bold text-border mb-4">{item.step}</div>
                 <h3 className="font-display font-semibold text-foreground mb-2">{item.title}</h3>
                 <p className="text-sm text-muted-foreground">{item.desc}</p>
@@ -169,7 +169,7 @@ export default function Landing() {
         <div className="container px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 border border-foreground flex items-center justify-center">
+              <div className="w-7 h-7 rounded-lg border border-foreground flex items-center justify-center">
                 <GraduationCap className="w-4 h-4 text-foreground" />
               </div>
               <span className="font-display font-semibold text-foreground">LCU Prep</span>

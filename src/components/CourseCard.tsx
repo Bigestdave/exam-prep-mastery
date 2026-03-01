@@ -13,7 +13,7 @@ export function CourseCard({ id, code, title, isOwned = false, questionsCount = 
   return (
     <Link 
       to={`/course/${id}`}
-      className="flex flex-col bg-card border border-border p-5 card-float transition-all duration-150 group h-full"
+      className="flex flex-col bg-card border border-border rounded-2xl p-5 card-float transition-all duration-200 group h-full"
     >
       <div className="flex flex-col gap-2.5">
         <div className="flex items-center justify-between">
