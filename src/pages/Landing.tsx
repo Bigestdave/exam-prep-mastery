@@ -29,10 +29,11 @@ export default function Landing() {
               Lead City University
             </div>
             
-            <h1 className="font-display font-bold text-foreground leading-[1.05] mb-6 opacity-0 animate-slide-up" style={{ animationDelay: '100ms' }}>
-              <span className="block text-6xl md:text-7xl lg:text-8xl tracking-[-0.03em]">6 out of 15</span>
-              <span className="block text-2xl md:text-3xl lg:text-4xl mt-2 text-foreground/85 tracking-[-0.02em]">Tutorial Questions will appear in your exam,</span>
-              {' '}<span className="font-serif italic text-accent text-2xl md:text-3xl lg:text-4xl">guaranteed.</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-[1.1] mb-6 opacity-0 animate-slide-up" style={{ animationDelay: '100ms' }}>
+              <span className="text-5xl md:text-6xl lg:text-7xl">6 out of 15</span>
+              <br />
+              <span className="text-foreground/90">Tutorial Questions will appear in your exam,</span>
+              {' '}<span className="font-serif italic text-accent">guaranteed.</span>
             </h1>
             
             <p className="text-base md:text-lg text-muted-foreground mb-10 max-w-xl mx-auto opacity-0 animate-slide-up leading-relaxed" style={{ animationDelay: '200ms' }}>
@@ -83,14 +84,10 @@ export default function Landing() {
               { step: '02', title: 'Find Your Course', desc: 'We show courses matched to your level' },
               { step: '03', title: 'Unlock & Study', desc: 'Access all 15 verified answers instantly' },
             ].map((item, i) => (
-              <div key={i} className="glass-card rounded-lg p-8 text-center opacity-0 animate-fade-in relative overflow-hidden" style={{ animationDelay: `${i * 100 + 100}ms` }}>
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                  <span className="text-[120px] md:text-[160px] font-display font-bold text-foreground/[0.04] leading-none">{item.step}</span>
-                </div>
-                <div className="relative z-10 pt-6">
-                  <h3 className="font-display font-semibold text-foreground mb-2 text-lg">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground">{item.desc}</p>
-                </div>
+              <div key={i} className="glass-card rounded-lg p-6 text-center opacity-0 animate-fade-in" style={{ animationDelay: `${i * 100 + 100}ms` }}>
+                <div className="text-5xl font-display font-bold text-border mb-4">{item.step}</div>
+                <h3 className="font-display font-semibold text-foreground mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground">{item.desc}</p>
               </div>
             ))}
           </div>
