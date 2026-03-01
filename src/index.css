@@ -71,7 +71,7 @@
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display font-bold text-foreground;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.05em;
   }
 
   .prose-content {
@@ -184,6 +184,7 @@
   .paper-mode .text-muted-foreground {
     color: #44403C !important;
     font-weight: 500;
+    line-height: 1.8;
   }
 
   .paper-mode .text-primary {

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -9,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 export default function Landing() {
   const { user, profile, isLoading } = useAuth();
   const navigate = useNavigate();
+  const MotionButton = motion.create(Button);
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -29,30 +31,64 @@ export default function Landing() {
               Lead City University
             </div>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-[1.1] mb-6 opacity-0 animate-slide-up" style={{ animationDelay: '100ms' }}>
-              <span className="text-5xl md:text-6xl lg:text-7xl">6 out of 15</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-[1.1] mb-6">
+              {["6 out of 15", "Tutorial Questions", "will appear in", "your exam,"].map((word, i) => (
+                <motion.span
+                  key={i}
+                  className="inline-block mr-[0.25em]"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 + i * 0.08, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                >
+                  {i === 0 ? <span className="text-5xl md:text-6xl lg:text-7xl">{word}</span> : word}
+                </motion.span>
+              ))}
               <br />
-              <span className="text-foreground/90">Tutorial Questions will appear in your exam,</span>
-              {' '}<span className="font-serif italic text-accent">guaranteed.</span>
+              <motion.span
+                className="font-serif italic text-accent inline-block"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+              >
+                guaranteed.
+              </motion.span>
             </h1>
             
-            <p className="text-base md:text-lg text-muted-foreground mb-10 max-w-xl mx-auto opacity-0 animate-slide-up leading-relaxed" style={{ animationDelay: '200ms' }}>
+            <motion.p 
+              className="text-base md:text-lg text-muted-foreground mb-10 max-w-xl mx-auto leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55, duration: 0.5 }}
+            >
               Stop searching through 40-page PDFs. We solved the exact 15 questions for you, verified, exam-ready, first-class standard.
-            </p>
+            </motion.p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 opacity-0 animate-slide-up" style={{ animationDelay: '300ms' }}>
+            <motion.div 
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.65, duration: 0.5 }}
+            >
               <Link to="/signup">
-                <Button size="xl" variant="hero" className="group">
+                <MotionButton 
+                  size="xl" variant="hero" className="group"
+                  whileTap={{ scale: 0.96 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                >
                   Find My Course
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
+                </MotionButton>
               </Link>
               <Link to="/login">
-                <Button variant="hero-outline" size="xl">
+                <MotionButton 
+                  variant="hero-outline" size="xl"
+                  whileTap={{ scale: 0.96 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                >
                   I have an account
-                </Button>
+                </MotionButton>
               </Link>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>

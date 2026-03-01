@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
-import { ArrowLeft, ChevronLeft, ChevronRight, Type, X } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, X } from "lucide-react";
 
 export default function AnswerView() {
   const { id, questionId } = useParams<{ id: string; questionId: string }>();
@@ -124,9 +124,9 @@ export default function AnswerView() {
   // --- WATERMARK COMPONENT (Inside file for simplicity) ---
   const WatermarkOverlay = () => (
     <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden flex items-center justify-center">
-      <div className="grid grid-cols-2 gap-20 opacity-[0.03] rotate-[-30deg] scale-150">
+      <div className="grid grid-cols-2 gap-20 rotate-[-30deg] scale-150">
         {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="text-xl font-black text-foreground whitespace-nowrap select-none">
+          <div key={i} className="text-xl font-black whitespace-nowrap select-none" style={{ color: '#F5F2ED' }}>
             {profile?.full_name?.toUpperCase() || user.email}
           </div>
         ))}
@@ -166,15 +166,14 @@ export default function AnswerView() {
             <div className="relative">
               <button
                 onClick={handleToggle}
-                className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${
+                className={`relative flex items-center justify-center w-9 h-9 rounded-xl text-sm font-serif font-bold transition-all duration-300 ${
                   paperMode
-                    ? 'bg-[#1C1917] text-[#FFFBF0] shadow-md'
+                    ? 'bg-foreground text-background shadow-md'
                     : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80'
                 } ${showHint ? 'ring-2 ring-primary/50 ring-offset-2 ring-offset-card' : ''}`}
-                title={paperMode ? 'Switch to Hacker Mode' : 'Switch to Paper Mode'}
+                title={paperMode ? 'Switch to Default Mode' : 'Switch to Paper Mode'}
               >
-                <Type className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">{paperMode ? 'Hacker' : 'Paper'}</span>
+                Aa
               </button>
 
               {/* One-time hint tooltip */}
