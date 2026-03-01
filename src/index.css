@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,59 +6,59 @@
 
 @layer base {
   :root {
-    /* MIDNIGHT LCU — Elite Dark Vault */
-    --background: 222 47% 7%; /* Deeper Void #0B1120 */
-    --foreground: 210 40% 98%;
+    /* THE LEAD CITY DOSSIER — "Old Money" Editorial */
+    
+    /* Canvas: Warm Alabaster (never pure white) */
+    --background: 40 33% 98%; /* #FDFBF7 */
+    --foreground: 20 14% 9%; /* #1C1917 Deep Espresso */
 
-    --card: 220 40% 13%; /* Elevated Surface #161D2F */
-    --card-foreground: 210 40% 98%;
+    /* Cards: Clean White with hard edges */
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 20 14% 9%;
 
-    --popover: 220 40% 13%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14% 9%;
 
-    --primary: 199 89% 48%; /* Sharper Accent #0EA5E9 — signals "The Key" */
-    --primary-foreground: 222 47% 7%;
+    /* Primary: Deep Espresso (The Ink) */
+    --primary: 20 14% 9%; /* #1C1917 */
+    --primary-foreground: 40 33% 98%;
 
-    --secondary: 220 30% 18%;
-    --secondary-foreground: 210 40% 98%;
+    /* Secondary: Warm Stone */
+    --secondary: 30 10% 94%; /* #F0EDEA */
+    --secondary-foreground: 20 14% 9%;
 
-    --muted: 220 25% 20%;
-    --muted-foreground: 215 20% 55%;
+    /* Muted: Parchment */
+    --muted: 30 10% 94%;
+    --muted-foreground: 25 8% 45%; /* Warm grey */
 
-    --accent: 220 30% 18%;
-    --accent-foreground: 210 40% 98%;
+    /* Accent: Deep Academic Green */
+    --accent: 142 64% 24%; /* #15803D */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    /* Destructive / Alert: Burnt Sienna */
+    --destructive: 28 91% 37%; /* #B45309 */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 30% 18%;
-    --input: 220 30% 18%;
-    --ring: 199 89% 48%;
+    --border: 30 12% 89%; /* #E7E5E4 subtle grey */
+    --input: 30 12% 89%;
+    --ring: 20 14% 9%;
 
-    --radius: 0.75rem;
+    --radius: 0.25rem; /* Sharp corners — 4px max */
 
     /* Custom tokens */
-    --navy: 222 47% 7%;
-    --navy-light: 220 40% 13%;
-    --sky-accent: 199 89% 48%;
-    --matrix-green: 145 80% 45%;
-    --success: 145 80% 45%;
-    --success-light: 145 40% 12%;
+    --success: 142 64% 24%; /* Deep Academic Green */
+    --success-light: 142 30% 94%;
+    --alert: 28 91% 37%; /* Burnt Sienna */
+    --alert-light: 28 40% 95%;
 
-    /* Glassmorphism — Elite */
-    --glass-bg: rgba(11, 17, 32, 0.75);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-blur: 24px;
-
-    /* Shadows — Deep Vault */
-    --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    --shadow-elevated: 0 16px 48px rgba(0, 0, 0, 0.6);
-    --shadow-glow: 0 0 32px hsl(199 89% 48% / 0.2), 0 0 64px hsl(199 89% 48% / 0.08);
+    /* Hard Shadow — Tactile, like a card on a desk */
+    --shadow-card: 4px 4px 0px hsl(20 14% 9%);
+    --shadow-card-hover: 2px 2px 0px hsl(20 14% 9%);
+    --shadow-elevated: 6px 6px 0px hsl(20 14% 9%);
   }
 
-  /* No separate dark mode needed - we ARE dark mode */
   .dark {
-    /* Same as root - Midnight LCU is always dark */
+    /* Dark mode inherits root for now — we ARE the light */
   }
 }
 
@@ -76,7 +76,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-bold tracking-tight text-foreground;
+    @apply font-display font-bold text-foreground;
     letter-spacing: -0.02em;
   }
 
@@ -90,19 +90,22 @@
     text-wrap: balance;
   }
 
-  .gradient-text {
-    @apply bg-gradient-to-r from-primary to-sky-400 bg-clip-text text-transparent;
+  /* Editorial serif accent — for emotional words */
+  .text-serif {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-style: italic;
   }
 
-  /* Floating card — carved into the void */
+  /* Hard shadow card — sits on the desk */
   .card-float {
     box-shadow: var(--shadow-card);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid hsl(var(--border));
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
   }
 
   .card-float:hover {
-    border-color: rgba(255, 255, 255, 0.12);
-    box-shadow: var(--shadow-glow);
+    box-shadow: var(--shadow-card-hover);
+    transform: translate(2px, 2px);
   }
 
   .card-shadow {
@@ -113,39 +116,39 @@
     box-shadow: var(--shadow-elevated);
   }
 
-  .glow-shadow {
-    box-shadow: var(--shadow-glow);
+  /* Trust bar — editorial separator */
+  .trust-bar {
+    @apply text-xs font-mono uppercase tracking-[0.2em] text-muted-foreground;
+    letter-spacing: 0.2em;
   }
 
-  /* Glassmorphism utility */
-  .glass {
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border);
-  }
-
-  /* 8-Point Grid helpers */
+  /* Squircle overrides — now sharp */
   .squircle {
-    border-radius: 16px;
+    border-radius: 4px;
   }
 
   .squircle-lg {
-    border-radius: 24px;
+    border-radius: 6px;
   }
 
   .squircle-xl {
-    border-radius: 32px;
+    border-radius: 8px;
   }
 }
 
-/* Button Thud - scale down on press */
+/* Button Physics — Mechanical press, not rubber bounce */
 @layer components {
   .btn-thud {
-    transition: transform 0.1s ease-out;
+    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+    box-shadow: var(--shadow-card);
+  }
+  .btn-thud:hover {
+    box-shadow: 2px 2px 0px hsl(20 14% 9%);
+    transform: translate(2px, 2px);
   }
   .btn-thud:active {
-    transform: scale(0.96);
+    box-shadow: 0px 0px 0px hsl(20 14% 9%);
+    transform: translate(4px, 4px);
   }
 
   /* Page enter animation */
@@ -153,7 +156,15 @@
     animation: fade-in 0.3s ease-out forwards;
   }
 
-  /* Paper Mode — Kindle Experience */
+  /* Rubber stamp effect for verified badges */
+  .rubber-stamp {
+    transform: rotate(-3deg);
+    border: 2px solid currentColor;
+    letter-spacing: 0.15em;
+    opacity: 0.85;
+  }
+
+  /* Paper Mode — Kindle Experience (for Answer View toggle) */
   .paper-mode .text-muted-foreground {
     color: #44403C !important;
     font-weight: 500;

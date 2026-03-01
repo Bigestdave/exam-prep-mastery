@@ -2,9 +2,8 @@ import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
-import { ValueCard } from "@/components/ValueCard";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { CheckCircle, Target, Award, ArrowRight, GraduationCap } from "lucide-react";
+import { CheckCircle, ArrowRight, GraduationCap } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Landing() {
@@ -21,20 +20,20 @@ export default function Landing() {
     <div className="min-h-screen bg-background">
       <Header isLoggedIn={!!user} userName={profile?.full_name || ''} />
       
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
-        <div className="container relative py-24 md:py-36 px-4">
+      {/* Hero Section — The Manifesto */}
+      <section className="relative">
+        <div className="container py-24 md:py-36 px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 text-primary px-4 py-2 rounded-full text-xs font-mono font-semibold tracking-wider uppercase mb-8 opacity-0 animate-fade-in">
+            <div className="inline-flex items-center gap-2 border border-border text-muted-foreground px-4 py-2 text-xs font-mono font-semibold tracking-[0.15em] uppercase mb-10 opacity-0 animate-fade-in">
               <GraduationCap className="w-4 h-4" />
               Lead City University
             </div>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-[1.1] mb-6 opacity-0 animate-slide-up" style={{ animationDelay: '100ms' }}>
-              <span className="gradient-text text-5xl md:text-6xl lg:text-7xl">6 out of 15</span>
+              <span className="text-5xl md:text-6xl lg:text-7xl">6 out of 15</span>
               <br />
-              <span className="text-foreground/90">Tutorial Questions will appear in your exam.</span>
+              <span className="text-foreground/90">Tutorial Questions will appear in your exam,</span>
+              {' '}<span className="font-serif italic text-accent">guaranteed.</span>
             </h1>
             
             <p className="text-base md:text-lg text-muted-foreground mb-10 max-w-xl mx-auto opacity-0 animate-slide-up leading-relaxed" style={{ animationDelay: '200ms' }}>
@@ -58,19 +57,21 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Value Props */}
-      <section className="py-16 md:py-24">
+      {/* Trust Bar — Editorial */}
+      <section className="border-y border-border">
         <div className="container px-4">
-          <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-            <ValueCard icon={CheckCircle} title="All 15 Solved" description="Every tutorial question with a comprehensive, exam-ready answer." delay={100} />
-            <ValueCard icon={Target} title="100% Coverage" description="Every question that could appear in your examination." delay={200} />
-            <ValueCard icon={Award} title="First Class Standard" description="Solutions crafted to meet the highest academic bar." delay={300} />
+          <div className="flex items-center justify-center gap-4 md:gap-8 py-5 trust-bar text-center flex-wrap">
+            <span>Verified Answers</span>
+            <span className="text-border">✦</span>
+            <span>LCU Standard</span>
+            <span className="text-border">✦</span>
+            <span>Instant Access</span>
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="py-16 md:py-24 border-t border-border/50">
+      <section className="py-16 md:py-24">
         <div className="container px-4">
           <div className="max-w-2xl mx-auto text-center mb-12">
             <h2 className="text-3xl font-display font-bold text-foreground mb-3">How It Works</h2>
@@ -84,7 +85,7 @@ export default function Landing() {
               { step: '03', title: 'Unlock & Study', desc: 'Access all 15 verified answers instantly' },
             ].map((item, i) => (
               <div key={i} className="text-center opacity-0 animate-fade-in" style={{ animationDelay: `${i * 100 + 100}ms` }}>
-                <div className="text-5xl font-display font-bold text-primary/15 mb-4">{item.step}</div>
+                <div className="text-5xl font-display font-bold text-border mb-4">{item.step}</div>
                 <h3 className="font-display font-semibold text-foreground mb-2">{item.title}</h3>
                 <p className="text-sm text-muted-foreground">{item.desc}</p>
               </div>
@@ -94,7 +95,7 @@ export default function Landing() {
       </section>
 
       {/* How Pricing Works */}
-      <section className="py-16 md:py-24">
+      <section className="py-16 md:py-24 border-t border-border">
         <div className="container px-4">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-3xl font-display font-bold text-foreground mb-8 text-center">How Pricing Works</h2>
@@ -106,7 +107,7 @@ export default function Landing() {
                 'Access is instant after payment',
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-3 opacity-0 animate-fade-in" style={{ animationDelay: `${i * 50 + 100}ms` }}>
-                  <CheckCircle className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="w-5 h-5 text-accent mt-0.5 flex-shrink-0" />
                   <p className="text-muted-foreground">{item}</p>
                 </div>
               ))}
@@ -116,7 +117,7 @@ export default function Landing() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 md:py-24 border-t border-border/50">
+      <section className="py-16 md:py-24 border-t border-border">
         <div className="container px-4">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-3xl font-display font-bold text-foreground mb-8 text-center">Frequently Asked Questions</h2>
@@ -129,7 +130,7 @@ export default function Landing() {
                 { q: 'How long do I have access after paying?', a: 'Access lasts for the current semester.' },
                 { q: 'What if I have an issue after payment?', a: 'Access is automatic. If there\'s any issue, support is available.' },
               ].map((faq, i) => (
-                <AccordionItem key={i} value={`faq-${i}`} className="border-border/50">
+                <AccordionItem key={i} value={`faq-${i}`} className="border-border">
                   <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline">
                     {faq.q}
                   </AccordionTrigger>
@@ -144,14 +145,14 @@ export default function Landing() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 md:py-28">
+      <section className="py-20 md:py-28 border-t border-border">
         <div className="container px-4">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-6">
               Ready to ace your exams?
             </h2>
             <p className="text-muted-foreground mb-8">
-              Join thousands of students already preparing smarter.
+              Join thousands of students already preparing <span className="font-serif italic">smarter.</span>
             </p>
             <Link to="/signup">
               <Button size="xl" variant="hero" className="group">
@@ -164,12 +165,12 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 py-8">
+      <footer className="border-t border-border py-8">
         <div className="container px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-                <GraduationCap className="w-4 h-4 text-primary-foreground" />
+              <div className="w-7 h-7 border border-foreground flex items-center justify-center">
+                <GraduationCap className="w-4 h-4 text-foreground" />
               </div>
               <span className="font-display font-semibold text-foreground">LCU Prep</span>
             </div>
