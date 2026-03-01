@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/Header";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { CheckCircle, ArrowRight, GraduationCap } from "lucide-react";
+import { CheckCircle, ArrowRight } from "lucide-react";
+import sovereignKey from "@/assets/sovereign-key.png";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Landing() {
@@ -27,7 +28,7 @@ export default function Landing() {
         <div className="container py-24 md:py-36 px-4">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 glass-pill rounded-full text-muted-foreground px-5 py-2.5 text-xs font-mono font-semibold tracking-[0.15em] uppercase mb-10 opacity-0 animate-fade-in">
-              <GraduationCap className="w-4 h-4" />
+              <img src={sovereignKey} alt="" className="w-4 h-4 object-contain" style={{ filter: 'brightness(0)' }} />
               Lead City University
             </div>
             
@@ -205,8 +206,8 @@ export default function Landing() {
         <div className="container px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg border border-foreground flex items-center justify-center">
-                <GraduationCap className="w-4 h-4 text-foreground" />
+              <div className="w-6 h-6 flex items-center justify-center">
+                <img src={sovereignKey} alt="LCU Prep" className="w-5 h-5 object-contain" style={{ filter: 'brightness(0)' }} />
               </div>
               <span className="font-display font-semibold text-foreground">LCU Prep</span>
             </div>

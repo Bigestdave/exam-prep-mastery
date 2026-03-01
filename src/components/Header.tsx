@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { GraduationCap, User, Settings } from "lucide-react";
+import { User, Settings } from "lucide-react";
 import { Button } from "./ui/button";
+import sovereignKey from "@/assets/sovereign-key.png";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useAdmin } from "@/hooks/useAdmin";
 
@@ -25,8 +26,8 @@ export function Header({ isLoggedIn = false, userName }: HeaderProps) {
     <header className="sticky top-0 z-40 glass shadow-sm">
       <div className="container flex items-center justify-between h-16">
         <Link to={isLoggedIn ? "/dashboard" : "/"} className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center shadow-card">
-            <GraduationCap className="w-5 h-5 text-primary-foreground" />
+          <div className="w-9 h-9 flex items-center justify-center">
+            <img src={sovereignKey} alt="LCU Prep" className="w-7 h-7 object-contain" style={{ filter: 'brightness(0)' }} />
           </div>
           <span className="font-display font-bold text-lg text-foreground">LCU Prep</span>
         </Link>
