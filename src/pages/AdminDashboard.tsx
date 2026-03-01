@@ -13,7 +13,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen, ClipboardList } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen, ClipboardList, DollarSign, TrendingUp, Users, ShoppingCart } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { facultyCategories, allDepartments } from "@/data/departments";
 
 interface Question {
@@ -161,6 +162,228 @@ function SurveyResultsTab() {
                   <TableCell className="text-xs">{r.q4_hesitation}</TableCell>
                   <TableCell className="text-xs">{r.q5_return_intent}</TableCell>
                   <TableCell className="text-xs whitespace-nowrap">{new Date(r.created_at).toLocaleDateString()}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+interface PurchaseWithDetails {
+  id: string;
+  course_id: string;
+  user_id: string;
+  created_at: string;
+  course_code?: string;
+  course_title?: string;
+  course_faculty?: string;
+  course_price?: number;
+  user_name?: string;
+}
+
+function SalesTab() {
+  const [purchases, setPurchases] = useState<PurchaseWithDetails[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSalesData = async () => {
+      const { data: purchasesData } = await supabase
+        .from('purchases')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!purchasesData) { setLoading(false); return; }
+
+      const courseIds = [...new Set(purchasesData.map(p => p.course_id))];
+      const userIds = [...new Set(purchasesData.map(p => p.user_id))];
+
+      const [{ data: coursesData }, { data: profilesData }] = await Promise.all([
+        supabase.from('courses').select('id, code, title, faculty, price').in('id', courseIds),
+        supabase.from('profiles').select('id, full_name').in('id', userIds),
+      ]);
+
+      const courseMap = new Map(coursesData?.map(c => [c.id, c]) || []);
+      const profileMap = new Map(profilesData?.map(p => [p.id, p.full_name]) || []);
+
+      setPurchases(purchasesData.map(p => {
+        const course = courseMap.get(p.course_id);
+        return {
+          ...p,
+          course_code: course?.code || 'Unknown',
+          course_title: course?.title || 'Unknown',
+          course_faculty: course?.faculty || 'Unknown',
+          course_price: course?.price || 1000,
+          user_name: profileMap.get(p.user_id) || 'Unknown',
+        };
+      }));
+      setLoading(false);
+    };
+    fetchSalesData();
+  }, []);
+
+  if (loading) {
+    return <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin" /></div>;
+  }
+
+  const totalRevenue = purchases.reduce((sum, p) => sum + (p.course_price || 1000), 0);
+  const uniqueBuyers = new Set(purchases.map(p => p.user_id)).size;
+
+  // Department breakdown
+  const deptStats = purchases.reduce<Record<string, { count: number; revenue: number }>>((acc, p) => {
+    const dept = p.course_faculty || 'Unknown';
+    if (!acc[dept]) acc[dept] = { count: 0, revenue: 0 };
+    acc[dept].count++;
+    acc[dept].revenue += p.course_price || 1000;
+    return acc;
+  }, {});
+
+  const deptEntries = Object.entries(deptStats).sort((a, b) => b[1].revenue - a[1].revenue);
+
+  // Course breakdown
+  const courseStats = purchases.reduce<Record<string, { code: string; title: string; count: number; revenue: number }>>((acc, p) => {
+    const key = p.course_id;
+    if (!acc[key]) acc[key] = { code: p.course_code || '', title: p.course_title || '', count: 0, revenue: 0 };
+    acc[key].count++;
+    acc[key].revenue += p.course_price || 1000;
+    return acc;
+  }, {});
+
+  const topCourses = Object.values(courseStats).sort((a, b) => b.count - a.count).slice(0, 10);
+
+  return (
+    <div className="space-y-6">
+      {/* Summary Cards */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <DollarSign className="w-4 h-4" />Total Revenue
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">₦{totalRevenue.toLocaleString()}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <ShoppingCart className="w-4 h-4" />Total Purchases
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{purchases.length}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <Users className="w-4 h-4" />Unique Buyers
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">{uniqueBuyers}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />Avg per Buyer
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">₦{uniqueBuyers > 0 ? Math.round(totalRevenue / uniqueBuyers).toLocaleString() : 0}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Department Breakdown */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-semibold">Sales by Department</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Department</TableHead>
+                <TableHead className="text-right">Purchases</TableHead>
+                <TableHead className="text-right">Revenue</TableHead>
+                <TableHead className="text-right">Share</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {deptEntries.map(([dept, stats]) => (
+                <TableRow key={dept}>
+                  <TableCell className="font-medium">{dept}</TableCell>
+                  <TableCell className="text-right">{stats.count}</TableCell>
+                  <TableCell className="text-right">₦{stats.revenue.toLocaleString()}</TableCell>
+                  <TableCell className="text-right">{Math.round((stats.revenue / totalRevenue) * 100)}%</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Top Courses */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-semibold">Top Courses</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Code</TableHead>
+                <TableHead>Title</TableHead>
+                <TableHead className="text-right">Sales</TableHead>
+                <TableHead className="text-right">Revenue</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {topCourses.map(c => (
+                <TableRow key={c.code + c.title}>
+                  <TableCell className="font-medium">{c.code}</TableCell>
+                  <TableCell>{c.title}</TableCell>
+                  <TableCell className="text-right">{c.count}</TableCell>
+                  <TableCell className="text-right">₦{c.revenue.toLocaleString()}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Recent Purchases */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-semibold">Recent Purchases</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Student</TableHead>
+                <TableHead>Course</TableHead>
+                <TableHead>Department</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="text-right">Date</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {purchases.slice(0, 25).map(p => (
+                <TableRow key={p.id}>
+                  <TableCell className="font-medium whitespace-nowrap">{p.user_name}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="mr-1">{p.course_code}</Badge>
+                    <span className="text-xs text-muted-foreground">{p.course_title}</span>
+                  </TableCell>
+                  <TableCell className="text-xs">{p.course_faculty}</TableCell>
+                  <TableCell className="text-right">₦{(p.course_price || 1000).toLocaleString()}</TableCell>
+                  <TableCell className="text-right text-xs whitespace-nowrap">{new Date(p.created_at!).toLocaleDateString()}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -392,6 +615,7 @@ export default function AdminDashboard() {
         <Tabs defaultValue="courses">
           <TabsList className="mb-6">
             <TabsTrigger value="courses" className="gap-2"><BookOpen className="w-4 h-4" />Courses</TabsTrigger>
+            <TabsTrigger value="sales" className="gap-2"><DollarSign className="w-4 h-4" />Sales</TabsTrigger>
             <TabsTrigger value="survey" className="gap-2"><ClipboardList className="w-4 h-4" />Survey Results</TabsTrigger>
           </TabsList>
 
@@ -438,6 +662,10 @@ export default function AdminDashboard() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="sales">
+            <SalesTab />
           </TabsContent>
 
           <TabsContent value="survey">
