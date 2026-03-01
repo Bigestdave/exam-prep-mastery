@@ -70,12 +70,12 @@ export default function Dashboard() {
         <Header isLoggedIn userName="" />
         <main className="container py-8 px-4 md:px-6">
           <div className="mb-10 space-y-3">
-             <div className="h-8 w-48 bg-secondary rounded-lg animate-pulse"></div>
-             <div className="h-4 w-64 bg-muted rounded-lg animate-pulse"></div>
+             <div className="h-8 w-48 bg-card rounded-2xl animate-pulse"></div>
+             <div className="h-4 w-64 bg-card rounded-xl animate-pulse"></div>
           </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-48 bg-card rounded-2xl border border-border p-6 animate-pulse shadow-card"></div>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-40 bg-card rounded-3xl card-float animate-pulse"></div>
             ))}
           </div>
         </main>
@@ -92,33 +92,41 @@ export default function Dashboard() {
 
   const departmentHasCoursesInDb = coursesWithCounts.some(c => c.faculty === profile?.faculty);
   const displayCourses = filteredCourses;
+  const ownedCount = displayCourses.filter(c => purchases.includes(c.id)).length;
 
   return (
     <div className="min-h-screen bg-background pb-32 md:pb-0 page-enter relative">
       <Header isLoggedIn userName={profile?.full_name || ''} />
       
       <main className="container py-8 px-4 md:px-6">
+        {/* Greeting + Stats */}
         <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-2">
-            Hi, {profile?.full_name?.split(' ')[0] || 'Student'} 👋
-          </h1>
-          <p className="text-muted-foreground font-medium">
-            {displayCourses.length > 0 
-              ? `Showing courses for ${profile?.faculty} - ${profile?.level}`
-              : departmentHasCoursesInDb 
-                ? `No courses found for ${profile?.level} yet`
-                : `Tutorial courses for your department are coming soon`
-            }
+          <p className="text-sm text-muted-foreground font-mono tracking-wider uppercase mb-1">
+            {profile?.faculty} · {profile?.level}
           </p>
+          <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">
+            {profile?.full_name?.split(' ')[0] || 'Student'}
+          </h1>
+          
+          {displayCourses.length > 0 && (
+            <div className="flex items-center gap-4 mt-4">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-success" />
+                <span className="text-sm text-muted-foreground">
+                  <span className="text-foreground font-bold">{ownedCount}</span>/{displayCourses.length} unlocked
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {displayCourses.length > 0 ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-3">
             {displayCourses.map((course, i) => (
               <div 
                 key={course.id} 
                 className="opacity-0 animate-fade-in"
-                style={{ animationDelay: `${i * 50}ms` }}
+                style={{ animationDelay: `${i * 60}ms` }}
               >
                 <CourseCard
                   id={course.id}
@@ -131,7 +139,7 @@ export default function Dashboard() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 bg-card rounded-2xl border border-border shadow-card">
+          <div className="text-center py-16 bg-card rounded-3xl card-float">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <BookOpen className="w-8 h-8 text-primary" />
             </div>
@@ -140,8 +148,8 @@ export default function Dashboard() {
             </h3>
             <p className="text-muted-foreground text-sm max-w-xs mx-auto">
               {departmentHasCoursesInDb 
-                ? `We couldn't find any courses for ${profile?.level} in your department just yet.`
-                : `Tutorial courses for ${profile?.faculty || "your department"} are being prepared and will be available soon.`
+                ? `No courses for ${profile?.level} in your department yet.`
+                : `Courses for ${profile?.faculty || "your department"} are being prepared.`
               }
             </p>
           </div>
