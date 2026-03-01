@@ -22,6 +22,7 @@ export default {
         display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
+        serif: ['"Playfair Display"', 'Georgia', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -57,28 +58,24 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        navy: {
-          DEFAULT: "hsl(var(--navy))",
-          light: "hsl(var(--navy-light))",
-        },
         success: {
           DEFAULT: "hsl(var(--success))",
           light: "hsl(var(--success-light))",
         },
-        "sky-accent": "hsl(var(--sky-accent))",
-        "matrix-green": "hsl(var(--matrix-green))",
+        alert: {
+          DEFAULT: "hsl(var(--alert))",
+          light: "hsl(var(--alert-light))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-        "2xl": "1rem",
-        "3xl": "1.5rem",
       },
       boxShadow: {
-        'card': '0 2px 16px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
-        'elevated': '0 16px 48px rgba(0, 0, 0, 0.6)',
-        'glow': '0 0 32px hsl(199 89% 48% / 0.2), 0 0 64px hsl(199 89% 48% / 0.08)',
+        'card': '4px 4px 0px hsl(20 14% 9%)',
+        'card-hover': '2px 2px 0px hsl(20 14% 9%)',
+        'elevated': '6px 6px 0px hsl(20 14% 9%)',
       },
       keyframes: {
         "accordion-down": {
