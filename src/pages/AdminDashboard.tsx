@@ -200,12 +200,14 @@ function SalesTab() {
       const courseIds = [...new Set(purchasesData.map(p => p.course_id))];
       const userIds = [...new Set(purchasesData.map(p => p.user_id))];
 
+      // Fetch all courses since purchases.course_id is text and may not match UUID filter
       const [{ data: coursesData }, { data: profilesData }] = await Promise.all([
-        supabase.from('courses').select('id, code, title, faculty, price').in('id', courseIds),
+        supabase.from('courses').select('id, code, title, faculty, price'),
         supabase.from('profiles').select('id, full_name').in('id', userIds),
       ]);
 
-      const courseMap = new Map(coursesData?.map(c => [c.id, c]) || []);
+      // Build map keyed by course id (string) to handle text/uuid matching
+      const courseMap = new Map(coursesData?.map(c => [String(c.id), c]) || []);
       const profileMap = new Map(profilesData?.map(p => [p.id, p.full_name]) || []);
 
       setPurchases(purchasesData.map(p => {
