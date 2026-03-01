@@ -125,7 +125,7 @@ export default function Dashboard() {
             {displayCourses.map((course, i) => (
               <div 
                 key={course.id} 
-                className="opacity-0 animate-fade-in"
+                className="opacity-0 animate-fade-in h-full"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 <CourseCard
