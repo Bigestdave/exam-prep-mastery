@@ -90,6 +90,28 @@
     text-wrap: balance;
   }
 
+  /* Glassmorphism — frosted glass panels */
+  .glass {
+    background: hsla(40, 33%, 98%, 0.72);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border-bottom: 1px solid hsla(0, 0%, 100%, 0.18);
+  }
+
+  .glass-card {
+    background: hsla(0, 0%, 100%, 0.55);
+    backdrop-filter: blur(16px) saturate(1.3);
+    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+    border: 1px solid hsla(0, 0%, 100%, 0.25);
+  }
+
+  .glass-pill {
+    background: hsla(0, 0%, 100%, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid hsla(0, 0%, 100%, 0.3);
+  }
+
   /* Editorial serif accent — for emotional words */
   .text-serif {
     font-family: 'Playfair Display', Georgia, serif;

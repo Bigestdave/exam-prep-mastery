@@ -22,7 +22,7 @@ export function Header({ isLoggedIn = false, userName }: HeaderProps) {
     : "U";
 
   return (
-    <header className="sticky top-0 z-40 glass">
+    <header className="sticky top-0 z-40 glass shadow-sm">
       <div className="container flex items-center justify-between h-16">
         <Link to={isLoggedIn ? "/dashboard" : "/"} className="flex items-center gap-2">
           <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
