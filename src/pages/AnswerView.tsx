@@ -124,9 +124,9 @@ export default function AnswerView() {
   // --- WATERMARK COMPONENT (Inside file for simplicity) ---
   const WatermarkOverlay = () => (
     <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden flex items-center justify-center">
-      <div className="grid grid-cols-2 gap-20 rotate-[-30deg] scale-150">
+      <div className="grid grid-cols-2 gap-20 rotate-[-30deg] scale-150 opacity-[0.025]">
         {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="text-xl font-black whitespace-nowrap select-none" style={{ color: '#F5F2ED' }}>
+          <div key={i} className="text-xl font-black text-foreground whitespace-nowrap select-none">
             {profile?.full_name?.toUpperCase() || user.email}
           </div>
         ))}
