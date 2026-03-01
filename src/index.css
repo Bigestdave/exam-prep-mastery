@@ -6,54 +6,54 @@
 
 @layer base {
   :root {
-    /* MIDNIGHT LCU Design System */
-    --background: 222 47% 11%; /* The Void #0F172A */
-    --foreground: 210 40% 98%; /* Off-white */
+    /* MIDNIGHT LCU — Elite Dark Vault */
+    --background: 222 47% 7%; /* Deeper Void #0B1120 */
+    --foreground: 210 40% 98%;
 
-    --card: 217 33% 17%; /* The Surface #1E293B */
+    --card: 220 40% 13%; /* Elevated Surface #161D2F */
     --card-foreground: 210 40% 98%;
 
-    --popover: 217 33% 17%;
+    --popover: 220 40% 13%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 199 89% 60%; /* Sky Blue Accent #38BDF8 */
-    --primary-foreground: 222 47% 11%;
+    --primary: 199 89% 48%; /* Sharper Accent #0EA5E9 — signals "The Key" */
+    --primary-foreground: 222 47% 7%;
 
-    --secondary: 217 33% 22%;
+    --secondary: 220 30% 18%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217 33% 25%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 220 25% 20%;
+    --muted-foreground: 215 20% 55%;
 
-    --accent: 217 33% 22%;
+    --accent: 220 30% 18%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 217 33% 22%;
-    --input: 217 33% 22%;
-    --ring: 199 89% 60%;
+    --border: 220 30% 18%;
+    --input: 220 30% 18%;
+    --ring: 199 89% 48%;
 
     --radius: 0.75rem;
 
     /* Custom tokens */
-    --navy: 222 47% 11%;
-    --navy-light: 215 28% 17%;
-    --sky-accent: 199 89% 60%;
-    --matrix-green: 145 100% 50%;
-    --success: 145 100% 50%;
-    --success-light: 145 50% 15%;
+    --navy: 222 47% 7%;
+    --navy-light: 220 40% 13%;
+    --sky-accent: 199 89% 48%;
+    --matrix-green: 145 80% 45%;
+    --success: 145 80% 45%;
+    --success-light: 145 40% 12%;
 
-    /* Glassmorphism */
-    --glass-bg: rgba(30, 41, 59, 0.8);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-blur: 20px;
+    /* Glassmorphism — Elite */
+    --glass-bg: rgba(11, 17, 32, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: 24px;
 
-    /* Shadows - Midnight Premium */
-    --shadow-card: 0px 4px 24px rgba(0, 0, 0, 0.3);
-    --shadow-elevated: 0 20px 40px rgba(0, 0, 0, 0.4);
-    --shadow-glow: 0 0 40px hsl(199 89% 60% / 0.25);
+    /* Shadows — Deep Vault */
+    --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --shadow-elevated: 0 16px 48px rgba(0, 0, 0, 0.6);
+    --shadow-glow: 0 0 32px hsl(199 89% 48% / 0.2), 0 0 64px hsl(199 89% 48% / 0.08);
   }
 
   /* No separate dark mode needed - we ARE dark mode */
@@ -91,7 +91,18 @@
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-sky-400 to-blue-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary to-sky-400 bg-clip-text text-transparent;
+  }
+
+  /* Floating card — carved into the void */
+  .card-float {
+    box-shadow: var(--shadow-card);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .card-float:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: var(--shadow-glow);
   }
 
   .card-shadow {
