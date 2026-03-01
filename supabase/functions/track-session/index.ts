@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    const { data: { user }, error: userError } = await supabaseUser.auth.getUser(token);
+    const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
     if (userError || !user) {
       console.error("Auth validation failed:", userError);
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
