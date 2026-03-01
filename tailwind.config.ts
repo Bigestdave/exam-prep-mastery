@@ -73,9 +73,10 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        'card': '4px 4px 0px hsl(20 14% 9%)',
-        'card-hover': '2px 2px 0px hsl(20 14% 9%)',
-        'elevated': '6px 6px 0px hsl(20 14% 9%)',
+        'card': '0 4px 16px -2px rgba(28, 25, 23, 0.06), 0 2px 6px -2px rgba(28, 25, 23, 0.03)',
+        'card-hover': '0 20px 25px -5px rgba(28, 25, 23, 0.08), 0 10px 10px -5px rgba(28, 25, 23, 0.03)',
+        'elevated': '0 25px 50px -12px rgba(28, 25, 23, 0.12)',
+        'plush': '0 8px 30px -4px rgba(28, 25, 23, 0.07)',
       },
       keyframes: {
         "accordion-down": {

@@ -10,9 +10,9 @@ export function VerifiedBadge({ className, size = "sm" }: VerifiedBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.15em] text-accent border-2 border-accent rubber-stamp",
-        size === "sm" && "text-[9px] px-2 py-0.5",
-        size === "md" && "text-[10px] px-2.5 py-1",
+        "inline-flex items-center gap-1.5 font-mono uppercase tracking-[0.15em] text-accent border border-accent/30 bg-accent/5 rounded-lg",
+        size === "sm" && "text-[9px] px-2.5 py-1",
+        size === "md" && "text-[10px] px-3 py-1.5",
         className
       )}
     >

@@ -43,18 +43,12 @@
     --input: 30 12% 89%;
     --ring: 20 14% 9%;
 
-    --radius: 0.25rem; /* Sharp corners — 4px max */
+    --radius: 1rem; /* Squircle — 16px default */
 
-    /* Custom tokens */
-    --success: 142 64% 24%; /* Deep Academic Green */
-    --success-light: 142 30% 94%;
-    --alert: 28 91% 37%; /* Burnt Sienna */
-    --alert-light: 28 40% 95%;
-
-    /* Hard Shadow — Tactile, like a card on a desk */
-    --shadow-card: 4px 4px 0px hsl(20 14% 9%);
-    --shadow-card-hover: 2px 2px 0px hsl(20 14% 9%);
-    --shadow-elevated: 6px 6px 0px hsl(20 14% 9%);
+    /* Plush Shadows — hovering off paper */
+    --shadow-card: 0 4px 16px -2px rgba(28, 25, 23, 0.06), 0 2px 6px -2px rgba(28, 25, 23, 0.03);
+    --shadow-card-hover: 0 20px 25px -5px rgba(28, 25, 23, 0.08), 0 10px 10px -5px rgba(28, 25, 23, 0.03);
+    --shadow-elevated: 0 25px 50px -12px rgba(28, 25, 23, 0.12);
   }
 
   .dark {
@@ -118,16 +112,16 @@
     font-style: italic;
   }
 
-  /* Hard shadow card — sits on the desk */
+  /* Plush float card — hovering off the paper */
   .card-float {
     box-shadow: var(--shadow-card);
     border: 1px solid hsl(var(--border));
-    transition: box-shadow 0.15s ease, transform 0.15s ease;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
   }
 
   .card-float:hover {
     box-shadow: var(--shadow-card-hover);
-    transform: translate(2px, 2px);
+    transform: translateY(-2px);
   }
 
   .card-shadow {
@@ -144,33 +138,33 @@
     letter-spacing: 0.2em;
   }
 
-  /* Squircle overrides — now sharp */
+  /* Squircle — Apple-style curves */
   .squircle {
-    border-radius: 4px;
+    border-radius: 16px;
   }
 
   .squircle-lg {
-    border-radius: 6px;
+    border-radius: 20px;
   }
 
   .squircle-xl {
-    border-radius: 8px;
+    border-radius: 24px;
   }
 }
 
 /* Button Physics — Mechanical press, not rubber bounce */
 @layer components {
   .btn-thud {
-    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
     box-shadow: var(--shadow-card);
   }
   .btn-thud:hover {
-    box-shadow: 2px 2px 0px hsl(20 14% 9%);
-    transform: translate(2px, 2px);
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-1px);
   }
   .btn-thud:active {
-    box-shadow: 0px 0px 0px hsl(20 14% 9%);
-    transform: translate(4px, 4px);
+    box-shadow: var(--shadow-card);
+    transform: translateY(0px);
   }
 
   /* Page enter animation */
