@@ -28,7 +28,7 @@ export default function Landing() {
         <div className="container py-24 md:py-36 px-4">
           <div className="max-w-3xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 glass-pill rounded-full text-muted-foreground px-5 py-2.5 text-xs font-mono font-semibold tracking-[0.15em] uppercase mb-10 opacity-0 animate-fade-in">
-              <img src={sovereignKey} alt="" className="w-4 h-4 object-contain" style={{ filter: 'brightness(0)' }} />
+              <img src={sovereignKey} alt="" className="w-4 h-4 object-contain" style={{ filter: 'brightness(0) saturate(100%) invert(27%) sepia(89%) saturate(1220%) hue-rotate(117deg) brightness(96%) contrast(88%)' }} />
               Lead City University
             </div>
             
@@ -65,7 +65,7 @@ export default function Landing() {
             </motion.p>
             
             <motion.div 
-              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 [&>a+a]:mt-0 sm:[&>a+a]:mt-0"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.65, duration: 0.5 }}
