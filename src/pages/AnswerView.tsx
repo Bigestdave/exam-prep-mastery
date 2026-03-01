@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
-import { ArrowLeft, ChevronLeft, ChevronRight, Type } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Type, X } from "lucide-react";
 
 export default function AnswerView() {
   const { id, questionId } = useParams<{ id: string; questionId: string }>();
@@ -20,6 +20,17 @@ export default function AnswerView() {
   const isFreePreview = questionIndex === 0;
   const question = getQuestionByIndex(questionIndex);
   const [paperMode, setPaperMode] = useState(false);
+  const [showHint, setShowHint] = useState(() => !localStorage.getItem('lcu_paper_hint_seen'));
+
+  const dismissHint = () => {
+    setShowHint(false);
+    localStorage.setItem('lcu_paper_hint_seen', '1');
+  };
+
+  const handleToggle = () => {
+    setPaperMode(!paperMode);
+    if (showHint) dismissHint();
+  };
 
   useEffect(() => {
     if (!isLoading && !user) navigate("/login");
@@ -152,18 +163,34 @@ export default function AnswerView() {
             </div>
 
             {/* Paper Mode Toggle */}
-            <button
-              onClick={() => setPaperMode(!paperMode)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${
-                paperMode
-                  ? 'bg-[#1C1917] text-[#FFFBF0] shadow-md'
-                  : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80'
-              }`}
-              title={paperMode ? 'Switch to Hacker Mode' : 'Switch to Paper Mode'}
-            >
-              <Type className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{paperMode ? 'Hacker' : 'Paper'}</span>
-            </button>
+            <div className="relative">
+              <button
+                onClick={handleToggle}
+                className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-300 ${
+                  paperMode
+                    ? 'bg-[#1C1917] text-[#FFFBF0] shadow-md'
+                    : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80'
+                } ${showHint ? 'ring-2 ring-primary/50 ring-offset-2 ring-offset-card' : ''}`}
+                title={paperMode ? 'Switch to Hacker Mode' : 'Switch to Paper Mode'}
+              >
+                <Type className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{paperMode ? 'Hacker' : 'Paper'}</span>
+              </button>
+
+              {/* One-time hint tooltip */}
+              {showHint && (
+                <div className="absolute right-0 top-full mt-2.5 z-20 w-56 animate-fade-in">
+                  <div className="bg-foreground text-background rounded-xl px-4 py-3 text-xs leading-relaxed shadow-elevated relative">
+                    <div className="absolute -top-1.5 right-4 w-3 h-3 bg-foreground rotate-45 rounded-sm" />
+                    <p className="font-medium mb-1">👀 Easy on your eyes</p>
+                    <p className="opacity-80">Tap to switch to Paper Mode — a warm, book-like reading experience.</p>
+                    <button onClick={dismissHint} className="absolute top-2 right-2 opacity-60 hover:opacity-100 transition-opacity">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <h1 className={`text-xl md:text-2xl font-display font-bold leading-snug mb-8 transition-colors duration-500 ${
