@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
-import { useSemesterReadiness } from "@/hooks/useQuizData";
-import { ArrowRight, RotateCcw } from "lucide-react";
+import { useSemesterReadiness, QuizQuestion } from "@/hooks/useQuizData";
+import { ArrowRight, RotateCcw, CheckCircle2, XCircle } from "lucide-react";
 
 interface QuizResultProps {
   courseId: string;
@@ -12,6 +12,8 @@ interface QuizResultProps {
   courseTitle: string;
   score: number;
   total: number;
+  questions: QuizQuestion[];
+  answers: Map<number, number>; // questionIndex (in array) -> selected option index
 }
 
 function getScoringTier(percentage: number) {
@@ -45,11 +47,12 @@ function getScoringTier(percentage: number) {
   };
 }
 
-export default function QuizResult({ courseId, courseCode, courseTitle, score, total }: QuizResultProps) {
+export default function QuizResult({ courseId, courseCode, courseTitle, score, total, questions, answers }: QuizResultProps) {
   const navigate = useNavigate();
   const { user, profile, purchases } = useAuth();
   const { courses } = useCourses();
   const [phase, setPhase] = useState<"stamp" | "content">("stamp");
+  const [showReview, setShowReview] = useState(false);
 
   const percentage = Math.round((score / total) * 100);
   const tier = getScoringTier(percentage);
@@ -63,13 +66,11 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
   const nextUnowned = departmentCourses.find(c => c.id !== courseId && !purchases.includes(c.id));
   const exposedCount = departmentCourses.filter(c => (readiness.get(c.id) ?? 0) < 80 && c.id !== courseId).length;
 
-  // Auto-transition from stamp to content
   useEffect(() => {
     const timer = setTimeout(() => setPhase("content"), 2200);
     return () => clearTimeout(timer);
   }, []);
 
-  // Ring segments
   const ringSegments = departmentCourses.map(c => ({
     ...c,
     pct: c.id === courseId ? percentage : (readiness.get(c.id) ?? 0),
@@ -78,9 +79,7 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
   if (phase === "stamp") {
     return (
       <div className="fixed inset-0 bg-foreground z-50 flex items-center justify-center overflow-hidden">
-        {/* Subtle radial glow */}
         <div className="absolute inset-0 bg-gradient-radial from-foreground via-foreground to-foreground/95" />
-
         <motion.div
           initial={{ scale: 2.5, opacity: 0, rotate: -10 }}
           animate={{ scale: 1, opacity: 1, rotate: 0 }}
@@ -147,7 +146,70 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
           </p>
         </div>
 
-        {/* Semester Ring — The Zeigarnik Trap */}
+        {/* Answer Review Toggle */}
+        <button
+          onClick={() => setShowReview(!showReview)}
+          className="w-full bg-card border border-border rounded-2xl p-4 mb-6 text-left shadow-card"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-display font-bold text-foreground" style={{ letterSpacing: '-0.05em' }}>
+              {showReview ? "Hide" : "Review"} Answers
+            </span>
+            <span className="text-xs text-muted-foreground font-mono">
+              {score}/{total} correct
+            </span>
+          </div>
+        </button>
+
+        {/* Answer Review */}
+        {showReview && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="space-y-4 mb-6"
+          >
+            {questions.map((q, qIdx) => {
+              const userAnswer = answers.get(qIdx);
+              const opts = q.quiz_options ?? [];
+              const correctIdx = opts.findIndex(o => o.is_correct);
+              const isCorrect = userAnswer === correctIdx;
+
+              return (
+                <div key={q.id} className="bg-card border border-border rounded-2xl p-4 shadow-card">
+                  <div className="flex items-start gap-3 mb-3">
+                    {isCorrect ? (
+                      <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+                    ) : (
+                      <XCircle className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
+                    )}
+                    <p className="text-sm font-medium text-foreground leading-relaxed">
+                      {q.question_text}
+                    </p>
+                  </div>
+                  <div className="space-y-1.5 ml-8">
+                    {opts.map((opt, oIdx) => {
+                      let style = "text-xs px-3 py-2 rounded-xl ";
+                      if (oIdx === correctIdx) {
+                        style += "bg-accent/10 text-accent font-semibold";
+                      } else if (oIdx === userAnswer && !isCorrect) {
+                        style += "bg-secondary text-muted-foreground line-through";
+                      } else {
+                        style += "text-muted-foreground/60";
+                      }
+                      return (
+                        <div key={oIdx} className={style}>
+                          {opt.text}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </motion.div>
+        )}
+
+        {/* Semester Ring */}
         {departmentCourses.length > 1 && (
           <div className="bg-card border border-border rounded-3xl p-6 mb-6 shadow-card">
             <h3 className="font-display font-bold text-foreground text-sm mb-1" style={{ letterSpacing: '-0.05em' }}>
@@ -155,7 +217,6 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
               {exposedCount > 0 && ` But you are exposed in ${exposedCount} other course${exposedCount > 1 ? 's' : ''}.`}
             </h3>
 
-            {/* Ring visualization */}
             <div className="flex items-center justify-center my-6">
               <div className="relative w-32 h-32">
                 <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
@@ -197,7 +258,6 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
               </div>
             </div>
 
-            {/* Per-course breakdown */}
             <div className="space-y-2 mb-5">
               {ringSegments.map(seg => (
                 <div key={seg.id} className="flex items-center justify-between text-xs">
@@ -211,7 +271,6 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
               ))}
             </div>
 
-            {/* Upsell CTA */}
             {nextUnowned && (
               <motion.button
                 whileTap={{ scale: 0.96 }}
@@ -231,7 +290,6 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
           <motion.button
             whileTap={{ scale: 0.96 }}
             onClick={() => {
-              // Reset and retake
               window.location.href = `/course/${courseId}/quiz`;
             }}
             className="w-full h-14 bg-foreground text-background rounded-2xl font-display font-bold flex items-center justify-center gap-2 shadow-card text-sm"

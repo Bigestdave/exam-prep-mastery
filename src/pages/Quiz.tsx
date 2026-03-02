@@ -8,8 +8,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { X } from "lucide-react";
 import QuizResult from "@/components/quiz/QuizResult";
 
-type FeedbackState = "idle" | "correct" | "incorrect";
-
 export default function Quiz() {
   const { id } = useParams<{ id: string }>();
   const { user, purchases } = useAuth();
@@ -21,11 +19,10 @@ export default function Quiz() {
   const isOwned = id ? purchases.includes(id) : false;
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [feedback, setFeedback] = useState<FeedbackState>("idle");
+  const [answers, setAnswers] = useState<Map<number, number>>(new Map()); // questionIndex -> selectedOptionIndex
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
-  const [showSeniorNote, setShowSeniorNote] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     if (!user) navigate("/login");
@@ -36,45 +33,43 @@ export default function Quiz() {
   const currentQuestion = questions[currentIndex];
   const options = currentQuestion?.quiz_options ?? [];
   const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
-  const correctIndex = options.findIndex(o => o.is_correct);
 
-  const handleSelect = (index: number) => {
-    if (feedback !== "idle") return;
-    setSelectedOption(index);
-  };
+  const handleSelect = useCallback(async (optionIndex: number) => {
+    if (isTransitioning) return;
+    if (answers.has(currentIndex)) return; // Already answered
 
-  const handleCheck = () => {
-    if (selectedOption === null || feedback !== "idle") return;
-    const isCorrect = options[selectedOption]?.is_correct;
-    if (isCorrect) {
-      setFeedback("correct");
-      setScore(s => s + 1);
-    } else {
-      setFeedback("incorrect");
-      setShowSeniorNote(true);
-    }
-  };
+    setIsTransitioning(true);
 
-  const handleNext = useCallback(async () => {
+    // Record answer
+    const newAnswers = new Map(answers);
+    newAnswers.set(currentIndex, optionIndex);
+    setAnswers(newAnswers);
+
+    const isCorrect = options[optionIndex]?.is_correct;
+    const newScore = isCorrect ? score + 1 : score;
+    if (isCorrect) setScore(newScore);
+
+    // Brief pause to show selection, then auto-advance
+    await new Promise(r => setTimeout(r, 600));
+
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(i => i + 1);
-      setSelectedOption(null);
-      setFeedback("idle");
-      setShowSeniorNote(false);
     } else {
-      const percentage = Math.round((score / questions.length) * 100);
+      // Last question — save attempt and show results
+      const percentage = Math.round((newScore / questions.length) * 100);
       if (user && id) {
         await supabase.from("quiz_attempts").insert({
           user_id: user.id,
           course_id: id,
-          score,
+          score: newScore,
           total_questions: questions.length,
           percentage,
         });
       }
       setShowResult(true);
     }
-  }, [currentIndex, questions.length, score, user, id]);
+    setIsTransitioning(false);
+  }, [currentIndex, questions.length, score, user, id, answers, options, isTransitioning]);
 
   if (isLoading) {
     return (
@@ -94,30 +89,25 @@ export default function Quiz() {
         courseTitle={course.title}
         score={score}
         total={questions.length}
+        questions={questions}
+        answers={answers}
       />
     );
   }
 
+  const selectedOption = answers.get(currentIndex) ?? null;
+
   const getOptionStyle = (index: number) => {
     const base = "w-full text-left p-5 rounded-2xl border transition-all duration-200 flex items-center gap-4";
 
-    if (feedback === "idle") {
-      if (selectedOption === index) {
-        return `${base} border-2 border-foreground bg-card shadow-card`;
-      }
-      return `${base} border border-border bg-card`;
+    if (selectedOption === index) {
+      return `${base} border-2 border-foreground bg-card shadow-card`;
     }
-
-    // After checking — no red. Ever.
-    if (index === correctIndex) {
-      // Soft Academic Green
-      return `${base} border border-accent/40 bg-accent/5`;
+    if (selectedOption !== null) {
+      // Another option was selected, dim this one
+      return `${base} border border-border/30 bg-card opacity-40`;
     }
-    if (index === selectedOption && feedback === "incorrect") {
-      // Muted Grey — not red, not punishing
-      return `${base} border border-border bg-secondary`;
-    }
-    return `${base} border border-border/30 bg-card opacity-40`;
+    return `${base} border border-border bg-card`;
   };
 
   return (
@@ -159,7 +149,7 @@ export default function Quiz() {
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.25 }}
           >
-            {/* Question — Space Grotesk Bold, tight tracking */}
+            {/* Question */}
             <h2
               className="text-xl md:text-2xl font-display font-bold text-foreground text-center mb-10 leading-snug"
               style={{ letterSpacing: '-0.05em' }}
@@ -167,32 +157,23 @@ export default function Quiz() {
               {currentQuestion.question_text}
             </h2>
 
-            {/* Option Cards — Heavy mechanical piano key feel */}
+            {/* Option Cards — tap to select and auto-advance */}
             <div className="space-y-3 mb-8">
               {options.map((option, i) => (
                 <motion.button
                   key={i}
-                  whileTap={feedback === "idle" ? { scale: 0.97 } : {}}
+                  whileTap={selectedOption === null ? { scale: 0.97 } : {}}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   className={getOptionStyle(i)}
                   onClick={() => handleSelect(i)}
-                  disabled={feedback !== "idle"}
+                  disabled={selectedOption !== null || isTransitioning}
                 >
                   {/* Radio Dot */}
                   <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
-                    feedback === "idle" && selectedOption === i
-                      ? "border-foreground"
-                      : feedback !== "idle" && i === correctIndex
-                        ? "border-accent"
-                        : "border-border"
+                    selectedOption === i ? "border-foreground" : "border-border"
                   }`}>
-                    {((feedback === "idle" && selectedOption === i) ||
-                      (feedback !== "idle" && i === correctIndex)) && (
-                      <div className={`w-2.5 h-2.5 rounded-full ${
-                        feedback !== "idle" && i === correctIndex
-                          ? "bg-accent"
-                          : "bg-foreground"
-                      }`} />
+                    {selectedOption === i && (
+                      <div className="w-2.5 h-2.5 rounded-full bg-foreground" />
                     )}
                   </div>
                   <span className="text-sm font-medium text-foreground leading-relaxed">
@@ -203,66 +184,6 @@ export default function Quiz() {
             </div>
           </motion.div>
         </AnimatePresence>
-
-        {/* Correct feedback — elegant, not loud */}
-        <AnimatePresence>
-          {feedback === "correct" && (
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="text-center mb-6"
-            >
-              <p className="text-sm font-medium text-accent">
-                ✓ Solid. You own this concept.
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Senior's Note — The Soft Landing */}
-        <AnimatePresence>
-          {showSeniorNote && feedback === "incorrect" && (
-            <motion.div
-              initial={{ opacity: 0, y: 32 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 32 }}
-              transition={{ type: "spring", stiffness: 200, damping: 25 }}
-              className="bg-card border border-border rounded-3xl p-5 mb-6 shadow-card"
-            >
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2 block">
-                💡 Senior's Note
-              </span>
-              <p className="text-sm text-foreground leading-relaxed">
-                The correct answer is <span className="font-semibold text-accent">{options[correctIndex]?.text}</span>.
-                {" "}Review Question {currentQuestion.question_index + 1} to lock this concept in.
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Action Button — Espresso solid, heavy press */}
-        <motion.button
-          whileTap={{ scale: 0.96 }}
-          transition={{ type: "spring", stiffness: 400, damping: 30 }}
-          onClick={feedback === "idle" ? handleCheck : handleNext}
-          disabled={feedback === "idle" && selectedOption === null}
-          className={`w-full h-14 rounded-2xl font-display font-bold text-sm transition-all ${
-            feedback === "idle"
-              ? selectedOption !== null
-                ? "bg-foreground text-background shadow-card"
-                : "bg-secondary text-muted-foreground cursor-not-allowed"
-              : "bg-foreground text-background shadow-card"
-          }`}
-          style={{ letterSpacing: '-0.05em' }}
-        >
-          {feedback === "idle"
-            ? "Check Answer"
-            : feedback === "correct"
-              ? currentIndex < questions.length - 1 ? "Next Question →" : "See Results →"
-              : "Got it. Next →"
-          }
-        </motion.button>
       </div>
     </div>
   );
