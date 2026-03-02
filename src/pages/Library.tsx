@@ -128,7 +128,7 @@ export default function Library() {
                       {course.title}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      {course.questionCount} questions
+                      {course.questionCount > 0 ? `${course.questionCount} questions` : ''}
                     </p>
                   </div>
                 </div>
