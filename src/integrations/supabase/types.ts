@@ -216,6 +216,7 @@ export type Database = {
           id: string
           is_admin: boolean | null
           level: string | null
+          wallet_balance: number
         }
         Insert: {
           created_at?: string | null
@@ -224,6 +225,7 @@ export type Database = {
           id: string
           is_admin?: boolean | null
           level?: string | null
+          wallet_balance?: number
         }
         Update: {
           created_at?: string | null
@@ -232,6 +234,7 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           level?: string | null
+          wallet_balance?: number
         }
         Relationships: []
       }
