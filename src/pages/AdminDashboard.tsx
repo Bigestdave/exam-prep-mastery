@@ -13,7 +13,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen, ClipboardList, DollarSign, TrendingUp, Users, ShoppingCart } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen, ClipboardList, DollarSign, TrendingUp, Users, ShoppingCart, Crown, Upload } from "lucide-react";
+import { AmbassadorsTab } from "@/components/admin/AmbassadorsTab";
+import { UploadsTab } from "@/components/admin/UploadsTab";
 import { Badge } from "@/components/ui/badge";
 import { facultyCategories, allDepartments } from "@/data/departments";
 
@@ -615,10 +617,12 @@ export default function AdminDashboard() {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="courses">
-          <TabsList className="mb-6">
+          <TabsList className="mb-6 flex-wrap">
             <TabsTrigger value="courses" className="gap-2"><BookOpen className="w-4 h-4" />Courses</TabsTrigger>
             <TabsTrigger value="sales" className="gap-2"><DollarSign className="w-4 h-4" />Sales</TabsTrigger>
-            <TabsTrigger value="survey" className="gap-2"><ClipboardList className="w-4 h-4" />Survey Results</TabsTrigger>
+            <TabsTrigger value="uploads" className="gap-2"><Upload className="w-4 h-4" />Uploads</TabsTrigger>
+            <TabsTrigger value="ambassadors" className="gap-2"><Crown className="w-4 h-4" />Ambassadors</TabsTrigger>
+            <TabsTrigger value="survey" className="gap-2"><ClipboardList className="w-4 h-4" />Survey</TabsTrigger>
           </TabsList>
 
           <TabsContent value="courses">
@@ -668,6 +672,14 @@ export default function AdminDashboard() {
 
           <TabsContent value="sales">
             <SalesTab />
+          </TabsContent>
+
+          <TabsContent value="uploads">
+            <UploadsTab />
+          </TabsContent>
+
+          <TabsContent value="ambassadors">
+            <AmbassadorsTab />
           </TabsContent>
 
           <TabsContent value="survey">

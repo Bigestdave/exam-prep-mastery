@@ -18,6 +18,7 @@ import RequestCourse from "./pages/RequestCourse";
 import Library from "./pages/Library";
 import Survey from "./pages/Survey";
 import AmbassadorUpload from "./pages/AmbassadorUpload";
+import AmbassadorDashboard from "./pages/AmbassadorDashboard";
 import Quiz from "./pages/Quiz";
 import NotFound from "./pages/NotFound";
 
@@ -46,6 +47,7 @@ const App = () => (
             <Route path="/library" element={<Library />} />
             <Route path="/survey" element={<Survey />} />
             <Route path="/upload" element={<AmbassadorUpload />} />
+            <Route path="/ambassador" element={<AmbassadorDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
