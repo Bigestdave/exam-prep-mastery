@@ -1,0 +1,1 @@
+UPDATE course_questions SET quiz_options = NULL WHERE quiz_options IS NOT NULL;
