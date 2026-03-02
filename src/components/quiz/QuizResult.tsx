@@ -183,7 +183,7 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
                       <XCircle className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
                     )}
                     <p className="text-sm font-medium text-foreground leading-relaxed">
-                      {q.question_text}
+                      {q.quiz_question_text}
                     </p>
                   </div>
                   <div className="space-y-1.5 ml-8">
