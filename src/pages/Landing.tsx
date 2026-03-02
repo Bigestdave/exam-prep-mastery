@@ -25,9 +25,9 @@ export default function Landing() {
       
       {/* Hero Section — The Manifesto */}
       <section className="relative">
-        <div className="container py-24 md:py-36 px-4">
+        <div className="container py-16 md:py-24 px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 glass-pill rounded-full text-muted-foreground px-5 py-2.5 text-xs font-mono font-semibold tracking-[0.15em] uppercase mb-10 opacity-0 animate-fade-in">
+            <div className="inline-flex items-center gap-2 glass-pill rounded-full text-muted-foreground px-5 py-2 text-xs font-mono font-semibold tracking-[0.15em] uppercase mb-8 opacity-0 animate-fade-in">
               <img src={sovereignKey} alt="" className="w-4 h-4 object-contain" style={{ filter: 'brightness(0) saturate(100%) invert(27%) sepia(89%) saturate(1220%) hue-rotate(117deg) brightness(96%) contrast(88%)' }} />
               Lead City University
             </div>
@@ -56,7 +56,7 @@ export default function Landing() {
             </h1>
             
             <motion.p 
-              className="text-base md:text-lg text-muted-foreground mb-10 max-w-xl mx-auto leading-relaxed"
+              className="text-base md:text-lg text-muted-foreground mb-8 max-w-xl mx-auto leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.55, duration: 0.5 }}
@@ -108,10 +108,10 @@ export default function Landing() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 md:py-24">
+      <section className="py-14 md:py-20">
         <div className="container px-4">
-          <div className="max-w-2xl mx-auto text-center mb-12">
-            <h2 className="text-3xl font-display font-bold text-foreground mb-3">How It Works</h2>
+          <div className="max-w-2xl mx-auto text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-2">How It Works</h2>
             <p className="text-muted-foreground text-sm">Three steps to exam confidence</p>
           </div>
           
@@ -132,10 +132,10 @@ export default function Landing() {
       </section>
 
       {/* How Pricing Works */}
-      <section className="py-16 md:py-24 border-t border-border">
+      <section className="py-14 md:py-20 border-t border-border">
         <div className="container px-4">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl font-display font-bold text-foreground mb-8 text-center">How Pricing Works</h2>
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-6 text-center">How Pricing Works</h2>
             <div className="space-y-4">
               {[
                 'Each course is unlocked separately',
@@ -154,10 +154,10 @@ export default function Landing() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 md:py-24 border-t border-border">
+      <section className="py-14 md:py-20 border-t border-border">
         <div className="container px-4">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl font-display font-bold text-foreground mb-8 text-center">Frequently Asked Questions</h2>
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-6 text-center">Frequently Asked Questions</h2>
             <Accordion type="single" collapsible className="w-full">
               {[
                 { q: 'Is payment for all courses or one course?', a: 'Payment is per course. You unlock only the course you choose.' },
@@ -182,10 +182,10 @@ export default function Landing() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 md:py-28 border-t border-border">
+      <section className="py-16 md:py-24 border-t border-border">
         <div className="container px-4">
           <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-6">
+            <h2 className="text-2xl md:text-4xl font-display font-bold text-foreground mb-5">
               Ready to ace your exams?
             </h2>
             <p className="text-muted-foreground mb-8">
