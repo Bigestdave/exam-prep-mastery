@@ -107,8 +107,9 @@ export default function AmbassadorUpload() {
     setIsUploading(true);
 
     try {
+      // 1. Upload ALL PDFs to storage first
+      const pdfUrls: string[] = [];
       for (const file of files) {
-        // 1. Upload PDF to Supabase Storage
         const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
         const filePath = `pdfs/${user!.id}/${fileName}`;
 
@@ -122,42 +123,41 @@ export default function AmbassadorUpload() {
           .from("course_materials")
           .getPublicUrl(fileData.path);
 
-        const pdfUrl = urlData.publicUrl;
-
-        // 2. Create upload record in DB
-        const { data: uploadRecord, error: insertError } = await supabase
-          .from("course_uploads")
-          .insert({
-            user_id: user!.id,
-            course_code: courseCode.trim().toUpperCase(),
-            course_title: courseTitle.trim(),
-            department,
-            level,
-            pdf_url: pdfUrl,
-            status: "pending",
-          })
-          .select()
-          .single();
-
-        if (insertError) throw new Error(`Record creation failed: ${insertError.message}`);
-
-        // 3. Trigger n8n via edge function
-        const { error: fnError } = await supabase.functions.invoke("trigger-processing", {
-          body: {
-            course_code: courseCode.trim().toUpperCase(),
-            course_title: courseTitle.trim(),
-            department,
-            level,
-            pdf_url: pdfUrl,
-            upload_id: uploadRecord.id,
-          },
-        });
-
-        if (fnError) throw new Error(`Processing trigger failed: ${fnError.message}`);
-
-        // 4. Update local state
-        setUploads(prev => [uploadRecord as UploadRecord, ...prev]);
+        pdfUrls.push(urlData.publicUrl);
       }
+
+      // 2. Create a single upload record for the batch
+      const { data: uploadRecord, error: insertError } = await supabase
+        .from("course_uploads")
+        .insert({
+          user_id: user!.id,
+          course_code: courseCode.trim().toUpperCase(),
+          course_title: courseTitle.trim(),
+          department,
+          level,
+          pdf_url: pdfUrls[0], // Primary URL for the record
+          status: "pending",
+        })
+        .select()
+        .single();
+
+      if (insertError) throw new Error(`Record creation failed: ${insertError.message}`);
+
+      // 3. Trigger n8n via edge function with ALL pdf_urls
+      const { error: fnError } = await supabase.functions.invoke("trigger-processing", {
+        body: {
+          course_code: courseCode.trim().toUpperCase(),
+          course_title: courseTitle.trim(),
+          department,
+          level,
+          pdf_urls: pdfUrls,
+          upload_id: uploadRecord.id,
+        },
+      });
+
+      if (fnError) throw new Error(`Processing trigger failed: ${fnError.message}`);
+
+      setUploads(prev => [uploadRecord as UploadRecord, ...prev]);
 
       // Reset form
       setCourseCode("");

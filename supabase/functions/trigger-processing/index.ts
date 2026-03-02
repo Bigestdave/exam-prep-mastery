@@ -39,9 +39,12 @@ serve(async (req) => {
       });
     }
 
-    const { course_code, course_title, department, level, pdf_url, upload_id } = await req.json();
+    const { course_code, course_title, department, level, pdf_urls, pdf_url, upload_id } = await req.json();
 
-    if (!course_code || !course_title || !department || !pdf_url || !upload_id) {
+    // Support both pdf_urls (array) and legacy pdf_url (string)
+    const allPdfUrls: string[] = pdf_urls || (pdf_url ? [pdf_url] : []);
+
+    if (!course_code || !course_title || !department || allPdfUrls.length === 0 || !upload_id) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -58,7 +61,7 @@ serve(async (req) => {
       .update({ status: "processing" })
       .eq("id", upload_id);
 
-    // Trigger n8n webhook
+    // Trigger n8n webhook with pdf_urls array
     const N8N_WEBHOOK_URL = Deno.env.get("N8N_WEBHOOK_URL");
     if (!N8N_WEBHOOK_URL) {
       throw new Error("N8N_WEBHOOK_URL is not configured");
@@ -72,7 +75,8 @@ serve(async (req) => {
         course_title,
         department,
         level: level || "100L",
-        pdf_url,
+        pdf_urls: allPdfUrls,
+        pdf_url: allPdfUrls[0], // backward compat for n8n if needed
         upload_id,
         ambassador_user_id: userId,
       }),
@@ -94,7 +98,6 @@ serve(async (req) => {
     }
 
     // After n8n succeeds, trigger quiz generation in background
-    // Find the course_id for this course_code + department
     const { data: courseData } = await serviceClient
       .from("courses")
       .select("id")
@@ -103,10 +106,8 @@ serve(async (req) => {
       .maybeSingle();
 
     if (courseData?.id) {
-      // Fire-and-forget: trigger quiz generation
       const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
       if (LOVABLE_API_KEY) {
-        // Call generate-quiz-options edge function via fetch
         const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
         const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
         
