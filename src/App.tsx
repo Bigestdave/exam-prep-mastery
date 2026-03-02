@@ -18,6 +18,7 @@ import RequestCourse from "./pages/RequestCourse";
 import Library from "./pages/Library";
 import Survey from "./pages/Survey";
 import AmbassadorUpload from "./pages/AmbassadorUpload";
+import Quiz from "./pages/Quiz";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/course/:id" element={<CourseDetail />} />
             <Route path="/course/:id/answer/:questionId" element={<AnswerView />} />
+            <Route path="/course/:id/quiz" element={<Quiz />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/request-course" element={<RequestCourse />} />
             <Route path="/library" element={<Library />} />

@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
 import { ArrowLeft, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useQuizData } from "@/hooks/useQuizData";
 
 export default function AnswerView() {
   const { id, questionId } = useParams<{ id: string; questionId: string }>();
@@ -19,6 +20,7 @@ export default function AnswerView() {
   const isOwned = id ? purchases.includes(id) : false;
   const isFreePreview = questionIndex === 0;
   const question = getQuestionByIndex(questionIndex);
+  const { hasQuizData } = useQuizData(id);
   const [paperMode, setPaperMode] = useState(false);
   const [showHint, setShowHint] = useState(() => !localStorage.getItem('lcu_paper_hint_seen'));
 
@@ -212,11 +214,11 @@ export default function AnswerView() {
           </Link>
 
           <Link to={hasNext(questionIndex, questions.length) ? `/course/${id}/answer/${questionIndex + 1}` : '#'}>
-            {/* Logic to show Unlock or Next */}
              <NextButton 
                hasNext={hasNext(questionIndex, questions.length)} 
                isOwned={isOwned} 
-               id={id} 
+               id={id!}
+               hasQuiz={hasQuizData}
              />
           </Link>
         </div>
@@ -230,7 +232,7 @@ function hasNext(current: number, total: number) {
   return current < total - 1;
 }
 
-function NextButton({ hasNext, isOwned, id }: { hasNext: boolean, isOwned: boolean, id: string }) {
+function NextButton({ hasNext, isOwned, id, hasQuiz }: { hasNext: boolean, isOwned: boolean, id: string, hasQuiz?: boolean }) {
   if (hasNext && isOwned) {
     return (
       <Button className="gap-2 rounded-xl shadow-glow font-display font-bold">
@@ -245,8 +247,16 @@ function NextButton({ hasNext, isOwned, id }: { hasNext: boolean, isOwned: boole
          </Button>
        </Link>
     );
+  } else if (!hasNext && isOwned && hasQuiz) {
+    // Last question + owned + has quiz data → "Lock in Knowledge" CTA
+    return (
+      <Link to={`/course/${id}/quiz`}>
+        <Button className="gap-2 rounded-xl shadow-glow font-display font-bold bg-accent hover:bg-accent/90 text-accent-foreground">
+          Lock in Your Knowledge <ChevronRight className="w-4 h-4" />
+        </Button>
+      </Link>
+    );
   } else {
-    // End of questions
     return (
       <Link to={`/course/${id}`}>
         <Button variant="outline" className="gap-2 rounded-xl">

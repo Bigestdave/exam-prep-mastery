@@ -9,6 +9,7 @@ import { useCourses } from "@/hooks/useCourses";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { BookOpen } from "lucide-react";
+import { SemesterReadiness } from "@/components/quiz/SemesterReadiness";
 
 interface CourseWithCount {
   id: string;
@@ -121,23 +122,28 @@ export default function Dashboard() {
         </div>
 
         {displayCourses.length > 0 ? (
-          <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-3">
-            {displayCourses.map((course, i) => (
-              <div 
-                key={course.id} 
-                className="opacity-0 animate-fade-in h-full"
-                style={{ animationDelay: `${i * 60}ms` }}
-              >
-                <CourseCard
-                  id={course.id}
-                  code={course.code}
-                  title={course.title}
-                  isOwned={purchases.includes(course.id)}
-                  questionsCount={course.questionCount}
-                />
-              </div>
-            ))}
-          </div>
+          <>
+            {/* Semester Readiness (only appears after first quiz attempt) */}
+            <SemesterReadiness courses={displayCourses.map(c => ({ id: c.id, code: c.code, title: c.title }))} />
+
+            <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-3">
+              {displayCourses.map((course, i) => (
+                <div 
+                  key={course.id} 
+                  className="opacity-0 animate-fade-in h-full"
+                  style={{ animationDelay: `${i * 60}ms` }}
+                >
+                  <CourseCard
+                    id={course.id}
+                    code={course.code}
+                    title={course.title}
+                    isOwned={purchases.includes(course.id)}
+                    questionsCount={course.questionCount}
+                  />
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="text-center py-16 bg-card rounded-3xl card-float">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
