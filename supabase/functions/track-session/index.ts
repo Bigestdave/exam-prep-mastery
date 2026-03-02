@@ -28,16 +28,17 @@ Deno.serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    const { data: { user }, error: userError } = await supabaseUser.auth.getUser();
-    if (userError || !user) {
-      console.error("Auth validation failed:", userError);
+    const token = authHeader.replace("Bearer ", "");
+    const { data, error: claimsError } = await supabaseUser.auth.getClaims(token);
+    if (claimsError || !data?.claims?.sub) {
+      console.error("Auth validation failed:", claimsError);
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const userId = user.id;
+    const userId = data.claims.sub;
 
     // Get device_id from request body
     const body = await req.json().catch(() => ({}));
