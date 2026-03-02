@@ -1,0 +1,1 @@
+ALTER TABLE public.course_questions ADD COLUMN IF NOT EXISTS content jsonb;

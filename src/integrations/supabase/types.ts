@@ -47,6 +47,7 @@ export type Database = {
       course_questions: {
         Row: {
           answer_text: string
+          content: Json | null
           course_id: string
           created_at: string | null
           id: string
@@ -58,6 +59,7 @@ export type Database = {
         }
         Insert: {
           answer_text: string
+          content?: Json | null
           course_id: string
           created_at?: string | null
           id?: string
@@ -69,6 +71,7 @@ export type Database = {
         }
         Update: {
           answer_text?: string
+          content?: Json | null
           course_id?: string
           created_at?: string | null
           id?: string
