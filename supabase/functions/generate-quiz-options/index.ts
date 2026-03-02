@@ -6,6 +6,41 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Try to parse existing MCQ content from answer_text (e.g. GST 107 format)
+function tryParseMCQs(answerText: string): Array<{text: string; is_correct: boolean}[]> | null {
+  // Match patterns like: "1. Question?\na) Option\nb) Option\n- ANSWER: b) ..."
+  const questionBlocks = answerText.split(/\n(?=\d+\.\s)/);
+  const parsed: Array<{text: string; is_correct: boolean}[]> = [];
+
+  for (const block of questionBlocks) {
+    // Find options (a-d patterns)
+    const optionMatches = block.match(/^[a-d]\)\s*(.+)$/gm);
+    // Find answer
+    const answerMatch = block.match(/ANSWER:\s*([a-d])\)/i);
+    
+    if (optionMatches && optionMatches.length >= 4 && answerMatch) {
+      const correctLetter = answerMatch[1].toLowerCase();
+      const options = optionMatches.slice(0, 4).map((opt, i) => {
+        const letter = String.fromCharCode(97 + i); // a, b, c, d
+        const text = opt.replace(/^[a-d]\)\s*/, '').trim();
+        return { text, is_correct: letter === correctLetter };
+      });
+      
+      if (options.some(o => o.is_correct)) {
+        parsed.push(options);
+      }
+    }
+  }
+  
+  return parsed.length >= 3 ? parsed : null; // Only use if we found enough MCQs
+}
+
+// Pick a random subset of MCQs and create a single quiz option set
+function pickRandomMCQ(mcqs: Array<{text: string; is_correct: boolean}[]>): {text: string; is_correct: boolean}[] {
+  const idx = Math.floor(Math.random() * mcqs.length);
+  return mcqs[idx];
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -70,26 +105,56 @@ serve(async (req) => {
 
     for (const q of questions) {
       try {
-        const prompt = `Based on this educational content, generate exactly 4 multiple-choice quiz options. One must be correct, three must be plausible but wrong.
+        // STRATEGY 1: Try to parse existing MCQs from the answer_text
+        const existingMCQs = tryParseMCQs(q.answer_text);
+        
+        if (existingMCQs && existingMCQs.length > 0) {
+          // Content already has MCQs - pick one at random
+          const quizOptions = pickRandomMCQ(existingMCQs);
+          
+          const { error: updateError } = await supabase
+            .from("course_questions")
+            .update({ quiz_options: quizOptions })
+            .eq("id", q.id);
 
-Question/Topic: ${q.question_text}
+          if (updateError) {
+            console.error(`Update error for q${q.question_index}:`, updateError);
+          } else {
+            processed++;
+            console.log(`q${q.question_index}: Parsed existing MCQ directly from content`);
+          }
+          continue;
+        }
 
-Answer Content (first 1500 chars): ${q.answer_text.substring(0, 1500)}
+        // STRATEGY 2: Use AI to generate quiz from the tutorial CONTENT (not header)
+        // Send more content (up to 4000 chars) for better context
+        const contentSnippet = q.answer_text.substring(0, 4000);
+        
+        const prompt = `You are a quiz generator for a Nigerian university exam prep app called LCU Prep.
 
-Respond with ONLY a JSON array, no markdown, no explanation:
+Below is the TUTORIAL CONTENT (explanations, notes, or Q&A) for a specific module. Your job is to generate exactly 4 multiple-choice options that test the student's understanding of the KEY CONCEPTS in this content.
+
+--- TUTORIAL CONTENT START ---
+${contentSnippet}
+--- TUTORIAL CONTENT END ---
+
+Module Title (for context only): ${q.question_text}
+
+RULES:
+1. The correct answer MUST come directly from the tutorial content above. Do NOT invent facts.
+2. Generate 4 options: exactly 1 correct, 3 plausible but wrong.
+3. Wrong options should be related to the topic but factually incorrect based on the content.
+4. Keep each option under 20 words. Be concise.
+5. Randomize which position (1-4) is the correct answer.
+6. The question being tested should focus on a CORE concept from the content, not a trivial detail.
+
+Respond with ONLY a valid JSON array. No markdown, no backticks, no explanation:
 [
-  {"text": "Option A text", "is_correct": false},
-  {"text": "Option B text (correct one)", "is_correct": true},
-  {"text": "Option C text", "is_correct": false},
-  {"text": "Option D text", "is_correct": false}
-]
-
-Rules:
-- The correct answer MUST come from the provided content
-- Wrong answers must be plausible (related to the topic, not absurd)
-- Keep options concise (under 15 words each)
-- Randomize which position (A-D) is correct
-- Make the question testable from the content provided`;
+  {"text": "Option text here", "is_correct": false},
+  {"text": "Correct option text here", "is_correct": true},
+  {"text": "Option text here", "is_correct": false},
+  {"text": "Option text here", "is_correct": false}
+]`;
 
         const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
@@ -142,6 +207,7 @@ Rules:
           console.error(`Update error for q${q.question_index}:`, updateError);
         } else {
           processed++;
+          console.log(`q${q.question_index}: AI-generated quiz from content`);
         }
       } catch (e) {
         console.error(`Error processing q${q.question_index}:`, e);
@@ -157,7 +223,6 @@ Rules:
         .neq("id", courseId);
 
       if (allCourses?.length) {
-        // Get source questions with quiz_options
         const { data: sourceQs } = await supabase
           .from("course_questions")
           .select("question_index, quiz_options")
