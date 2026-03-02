@@ -28,15 +28,17 @@ serve(async (req) => {
     );
 
     const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    let userId: string;
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      userId = payload.sub;
+      if (!userId) throw new Error("No sub in token");
+    } catch {
+      return new Response(JSON.stringify({ error: "Invalid token" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    const userId = claimsData.claims.sub;
 
     const { course_code, course_title, department, level, pdf_url, upload_id } = await req.json();
 
