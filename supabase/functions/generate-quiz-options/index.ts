@@ -52,7 +52,7 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const { course_code, source_course_id } = await req.json();
+    const { course_code, source_course_id, force } = await req.json();
 
     if (!source_course_id && !course_code) {
       return new Response(JSON.stringify({ error: "Provide source_course_id or course_code" }), {
@@ -77,6 +77,14 @@ serve(async (req) => {
         });
       }
       courseId = course.id;
+    }
+
+    // If force mode, clear existing quiz_options first
+    if (force) {
+      await supabase
+        .from("course_questions")
+        .update({ quiz_options: null })
+        .eq("course_id", courseId);
     }
 
     const { data: questions, error: qError } = await supabase
@@ -124,6 +132,11 @@ serve(async (req) => {
             console.log(`q${q.question_index}: Parsed existing MCQ directly from content`);
           }
           continue;
+        }
+
+        // Rate limit: wait 2s between AI calls to avoid gateway throttling
+        if (processed > 0) {
+          await new Promise(r => setTimeout(r, 2000));
         }
 
         // STRATEGY 2: Use AI to generate quiz from the tutorial CONTENT (not header)
