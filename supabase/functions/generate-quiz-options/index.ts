@@ -52,7 +52,8 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const { course_code, source_course_id, force } = await req.json();
+    const { course_code, source_course_id, force, limit } = await req.json();
+    const batchLimit = limit || 10; // Process max 10 at a time to avoid timeout
 
     if (!source_course_id && !course_code) {
       return new Response(JSON.stringify({ error: "Provide source_course_id or course_code" }), {
@@ -92,7 +93,8 @@ serve(async (req) => {
       .select("id, question_index, question_text, answer_text")
       .eq("course_id", courseId)
       .is("quiz_options", null)
-      .order("question_index");
+      .order("question_index")
+      .limit(batchLimit);
 
     if (qError || !questions?.length) {
       return new Response(JSON.stringify({ error: "No questions to process", details: qError }), {
