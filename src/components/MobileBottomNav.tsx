@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Home, BookOpen, User, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -40,7 +41,7 @@ function NavItem({ to, icon, label, isActive }: NavItemProps) {
 export function MobileBottomNav() {
   const location = useLocation();
   const currentPath = location.pathname;
-  const { isAmbassador } = useRole();
+  const { isAmbassador, isLoading: isRoleLoading } = useRole();
 
   const getActiveState = () => {
     if (currentPath === "/profile") return "account";
@@ -51,6 +52,24 @@ export function MobileBottomNav() {
   };
 
   const activeState = getActiveState();
+
+  // Cache ambassador status to prevent flicker
+  const [cachedIsAmbassador, setCachedIsAmbassador] = useState(() => {
+    try {
+      return localStorage.getItem('is_ambassador') === 'true';
+    } catch { return false; }
+  });
+
+  useEffect(() => {
+    if (!isRoleLoading) {
+      setCachedIsAmbassador(isAmbassador);
+      try {
+        localStorage.setItem('is_ambassador', String(isAmbassador));
+      } catch {}
+    }
+  }, [isAmbassador, isRoleLoading]);
+
+  const showAmbassador = isRoleLoading ? cachedIsAmbassador : isAmbassador;
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] w-auto md:hidden pointer-events-auto">
@@ -65,7 +84,7 @@ export function MobileBottomNav() {
         
         <div className="w-px h-6 bg-foreground/10 mx-2"></div>
 
-        {isAmbassador && (
+        {showAmbassador && (
           <>
             <NavItem
               to="/ambassador"
