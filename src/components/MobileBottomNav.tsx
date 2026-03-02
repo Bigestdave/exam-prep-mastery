@@ -50,7 +50,7 @@ export function MobileBottomNav() {
   const activeState = getActiveState();
 
   return (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-auto md:hidden">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] w-auto md:hidden pointer-events-auto">
       <nav className="glass-pill rounded-full px-8 h-14 flex items-center gap-3 shadow-elevated">
         
         <NavItem

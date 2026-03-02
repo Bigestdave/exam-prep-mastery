@@ -86,10 +86,10 @@
 
   /* Glassmorphism — frosted glass panels */
   .glass {
-    background: hsla(40, 33%, 98%, 0.72);
+    background: hsla(40, 33%, 96%, 0.85);
     backdrop-filter: blur(20px) saturate(1.4);
     -webkit-backdrop-filter: blur(20px) saturate(1.4);
-    border-bottom: 1px solid hsla(0, 0%, 100%, 0.18);
+    border-bottom: 1px solid hsla(30, 12%, 85%, 0.5);
   }
 
   .glass-card {
