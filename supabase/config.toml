@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.trigger-processing]
 verify_jwt = false
+
+[functions.generate-quiz-options]
+verify_jwt = false
