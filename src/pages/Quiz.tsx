@@ -36,7 +36,6 @@ export default function Quiz() {
   const currentQuestion = questions[currentIndex];
   const options = currentQuestion?.quiz_options ?? [];
   const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
-
   const correctIndex = options.findIndex(o => o.is_correct);
 
   const handleSelect = (index: number) => {
@@ -46,7 +45,6 @@ export default function Quiz() {
 
   const handleCheck = () => {
     if (selectedOption === null || feedback !== "idle") return;
-
     const isCorrect = options[selectedOption]?.is_correct;
     if (isCorrect) {
       setFeedback("correct");
@@ -64,7 +62,6 @@ export default function Quiz() {
       setFeedback("idle");
       setShowSeniorNote(false);
     } else {
-      // Quiz complete — save attempt
       const percentage = Math.round((score / questions.length) * 100);
       if (user && id) {
         await supabase.from("quiz_attempts").insert({
@@ -102,29 +99,31 @@ export default function Quiz() {
   }
 
   const getOptionStyle = (index: number) => {
-    const base = "w-full text-left p-5 rounded-2xl border-2 transition-all duration-200 flex items-center gap-4";
+    const base = "w-full text-left p-5 rounded-2xl border transition-all duration-200 flex items-center gap-4";
 
     if (feedback === "idle") {
       if (selectedOption === index) {
-        return `${base} border-foreground bg-card shadow-card`;
+        return `${base} border-2 border-foreground bg-card shadow-card`;
       }
-      return `${base} border-border bg-card hover:border-foreground/30`;
+      return `${base} border border-border bg-card`;
     }
 
-    // After checking
+    // After checking — no red. Ever.
     if (index === correctIndex) {
-      return `${base} border-accent bg-accent/5`;
+      // Soft Academic Green
+      return `${base} border border-accent/40 bg-accent/5`;
     }
     if (index === selectedOption && feedback === "incorrect") {
-      return `${base} border-border bg-secondary`;
+      // Muted Grey — not red, not punishing
+      return `${base} border border-border bg-secondary`;
     }
-    return `${base} border-border/50 bg-card opacity-50`;
+    return `${base} border border-border/30 bg-card opacity-40`;
   };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Zen Mode Progress Bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 h-[3px] bg-border">
+      {/* Zen Mode — 2px Espresso progress line */}
+      <div className="fixed top-0 left-0 right-0 z-50 h-[2px] bg-border">
         <motion.div
           className="h-full bg-foreground"
           initial={{ width: 0 }}
@@ -137,46 +136,49 @@ export default function Quiz() {
       <div className="fixed top-4 right-4 z-50">
         <button
           onClick={() => navigate(`/course/${id}`)}
-          className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center hover:bg-secondary transition-colors shadow-card"
+          className="w-10 h-10 rounded-2xl bg-card border border-border flex items-center justify-center hover:bg-secondary transition-colors shadow-card"
         >
           <X className="w-5 h-5 text-muted-foreground" />
         </button>
       </div>
 
       {/* Question counter */}
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-4 left-5 z-50">
         <span className="text-xs font-mono text-muted-foreground tracking-wider">
-          {currentIndex + 1}/{questions.length}
+          {currentIndex + 1} of {questions.length}
         </span>
       </div>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col justify-center px-5 py-20 max-w-lg mx-auto w-full">
+      {/* Main content — centered, breathing whitespace */}
+      <div className="flex-1 flex flex-col justify-center px-5 py-24 max-w-lg mx-auto w-full">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.25 }}
           >
-            {/* Question */}
-            <h2 className="text-xl md:text-2xl font-display font-bold text-foreground text-center mb-10 leading-snug">
+            {/* Question — Space Grotesk Bold, tight tracking */}
+            <h2
+              className="text-xl md:text-2xl font-display font-bold text-foreground text-center mb-10 leading-snug"
+              style={{ letterSpacing: '-0.05em' }}
+            >
               {currentQuestion.question_text}
             </h2>
 
-            {/* Option Cards */}
+            {/* Option Cards — Heavy mechanical piano key feel */}
             <div className="space-y-3 mb-8">
               {options.map((option, i) => (
                 <motion.button
                   key={i}
-                  whileTap={feedback === "idle" ? { scale: 0.98 } : {}}
+                  whileTap={feedback === "idle" ? { scale: 0.97 } : {}}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   className={getOptionStyle(i)}
                   onClick={() => handleSelect(i)}
                   disabled={feedback !== "idle"}
                 >
-                  {/* Radio dot */}
+                  {/* Radio Dot */}
                   <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
                     feedback === "idle" && selectedOption === i
                       ? "border-foreground"
@@ -202,62 +204,63 @@ export default function Quiz() {
           </motion.div>
         </AnimatePresence>
 
-        {/* Correct feedback toast */}
+        {/* Correct feedback — elegant, not loud */}
         <AnimatePresence>
           {feedback === "correct" && (
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               className="text-center mb-6"
             >
               <p className="text-sm font-medium text-accent">
-                Solid. You own this concept. ✓
+                ✓ Solid. You own this concept.
               </p>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Senior's Note bottom sheet */}
+        {/* Senior's Note — The Soft Landing */}
         <AnimatePresence>
           {showSeniorNote && feedback === "incorrect" && (
             <motion.div
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 32 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 40 }}
+              exit={{ opacity: 0, y: 32 }}
               transition={{ type: "spring", stiffness: 200, damping: 25 }}
-              className="bg-card border border-border rounded-2xl p-5 mb-6 shadow-card"
+              className="bg-card border border-border rounded-3xl p-5 mb-6 shadow-card"
             >
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2 block">
-                Senior's Note
+                💡 Senior's Note
               </span>
               <p className="text-sm text-foreground leading-relaxed">
-                The correct answer is: <span className="font-semibold text-accent">{options[correctIndex]?.text}</span>.
-                {" "}Review this topic in Question {currentQuestion.question_index + 1} to lock it in.
+                The correct answer is <span className="font-semibold text-accent">{options[correctIndex]?.text}</span>.
+                {" "}Review Question {currentQuestion.question_index + 1} to lock this concept in.
               </p>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Action Button */}
+        {/* Action Button — Espresso solid, heavy press */}
         <motion.button
           whileTap={{ scale: 0.96 }}
           transition={{ type: "spring", stiffness: 400, damping: 30 }}
           onClick={feedback === "idle" ? handleCheck : handleNext}
           disabled={feedback === "idle" && selectedOption === null}
-          className={`w-full h-14 rounded-2xl font-display font-bold text-base transition-all ${
+          className={`w-full h-14 rounded-2xl font-display font-bold text-sm transition-all ${
             feedback === "idle"
               ? selectedOption !== null
                 ? "bg-foreground text-background shadow-card"
                 : "bg-secondary text-muted-foreground cursor-not-allowed"
               : "bg-foreground text-background shadow-card"
           }`}
+          style={{ letterSpacing: '-0.05em' }}
         >
           {feedback === "idle"
             ? "Check Answer"
-            : currentIndex < questions.length - 1
-              ? "Next Question →"
-              : "See Results →"
+            : feedback === "correct"
+              ? currentIndex < questions.length - 1 ? "Next Question →" : "See Results →"
+              : "Got it. Next →"
           }
         </motion.button>
       </div>

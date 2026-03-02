@@ -248,11 +248,14 @@ function NextButton({ hasNext, isOwned, id, hasQuiz }: { hasNext: boolean, isOwn
        </Link>
     );
   } else if (!hasNext && isOwned && hasQuiz) {
-    // Last question + owned + has quiz data → "Lock in Knowledge" CTA
+    // Last question + owned + has quiz → "Prove You Are Exam Ready" pulsing green CTA
     return (
       <Link to={`/course/${id}/quiz`}>
-        <Button className="gap-2 rounded-xl shadow-glow font-display font-bold bg-accent hover:bg-accent/90 text-accent-foreground">
-          Lock in Your Knowledge <ChevronRight className="w-4 h-4" />
+        <Button
+          className="gap-2 rounded-xl font-display font-bold bg-accent hover:bg-accent/90 text-accent-foreground animate-pulse"
+          style={{ letterSpacing: '-0.05em' }}
+        >
+          Prove You Are Exam Ready <ChevronRight className="w-4 h-4" />
         </Button>
       </Link>
     );
