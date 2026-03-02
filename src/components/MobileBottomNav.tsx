@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, BookOpen, User } from "lucide-react";
+import { Home, BookOpen, User, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useRole } from "@/hooks/useRole";
 
 interface NavItemProps {
   to: string;
@@ -39,10 +40,12 @@ function NavItem({ to, icon, label, isActive }: NavItemProps) {
 export function MobileBottomNav() {
   const location = useLocation();
   const currentPath = location.pathname;
+  const { isAmbassador } = useRole();
 
   const getActiveState = () => {
     if (currentPath === "/profile") return "account";
     if (currentPath === "/library") return "library";
+    if (currentPath === "/ambassador") return "ambassador";
     if (currentPath === "/dashboard" || currentPath.startsWith("/course/")) return "home";
     return "home";
   };
@@ -61,6 +64,18 @@ export function MobileBottomNav() {
         />
         
         <div className="w-px h-6 bg-foreground/10 mx-2"></div>
+
+        {isAmbassador && (
+          <>
+            <NavItem
+              to="/ambassador"
+              icon={<Upload className={cn("w-6 h-6", activeState === "ambassador" && "fill-current")} />}
+              label="Upload"
+              isActive={activeState === "ambassador"}
+            />
+            <div className="w-px h-6 bg-foreground/10 mx-2"></div>
+          </>
+        )}
         
         <NavItem
           to="/library"
