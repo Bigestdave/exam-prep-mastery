@@ -154,7 +154,7 @@ export default function Quiz() {
               className="text-xl md:text-2xl font-display font-bold text-foreground text-center mb-10 leading-snug"
               style={{ letterSpacing: '-0.05em' }}
             >
-              {currentQuestion.question_text}
+              {currentQuestion.quiz_question_text}
             </h2>
 
             {/* Option Cards — tap to select and auto-advance */}
