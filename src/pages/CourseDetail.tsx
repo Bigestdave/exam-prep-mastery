@@ -17,6 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { QuizCTA } from "@/components/quiz/QuizCTA";
 
 const PAYSTACK_PUBLIC_KEY = "pk_live_2320cc6bb508955bd07391f75a4c73d757a0d6f6";
 
@@ -215,6 +216,9 @@ export default function CourseDetail() {
             {displayCount} Tutorial Questions • {course.faculty} • {course.level}
           </p>
         </div>
+
+        {/* Quiz CTA - only shows if quiz data exists and user owns course */}
+        {isOwned && <QuizCTA courseId={course.id} courseCode={course.code} />}
 
         {questionsLoading ? (
           <div className="space-y-3">
