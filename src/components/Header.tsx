@@ -1,9 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { User, Settings } from "lucide-react";
 import { Button } from "./ui/button";
 import sovereignKey from "@/assets/sovereign-key.png";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useAdmin } from "@/hooks/useAdmin";
+import { cn } from "@/lib/utils";
 
 interface HeaderProps {
   isLoggedIn?: boolean;
@@ -12,6 +13,7 @@ interface HeaderProps {
 
 export function Header({ isLoggedIn = false, userName }: HeaderProps) {
   const { isAdmin } = useAdmin();
+  const location = useLocation();
   
   const initials = userName
     ? userName
@@ -33,7 +35,31 @@ export function Header({ isLoggedIn = false, userName }: HeaderProps) {
         </Link>
 
         {isLoggedIn ? (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {/* Desktop nav links */}
+            <nav className="hidden md:flex items-center gap-1 mr-2">
+              <Link to="/dashboard">
+                <Button variant="ghost" size="sm" className={cn(
+                  "text-sm",
+                  location.pathname === "/dashboard" || location.pathname.startsWith("/course/")
+                    ? "text-foreground font-semibold"
+                    : "text-muted-foreground"
+                )}>
+                  Home
+                </Button>
+              </Link>
+              <Link to="/library">
+                <Button variant="ghost" size="sm" className={cn(
+                  "text-sm",
+                  location.pathname === "/library"
+                    ? "text-foreground font-semibold"
+                    : "text-muted-foreground"
+                )}>
+                  Library
+                </Button>
+              </Link>
+            </nav>
+            
             {isAdmin && (
               <Link to="/admin">
                 <Button variant="ghost" size="sm" className="gap-2">
