@@ -97,38 +97,8 @@ serve(async (req) => {
       });
     }
 
-    // After n8n succeeds, trigger quiz generation in background
-    const { data: courseData } = await serviceClient
-      .from("courses")
-      .select("id")
-      .eq("code", course_code)
-      .eq("faculty", department)
-      .maybeSingle();
-
-    if (courseData?.id) {
-      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-      if (LOVABLE_API_KEY) {
-        const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-        const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-        
-        fetch(`${supabaseUrl}/functions/v1/generate-quiz-options`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${serviceKey}`,
-          },
-          body: JSON.stringify({
-            source_course_id: courseData.id,
-            course_code,
-            limit: 50,
-          }),
-        }).then(res => {
-          console.log(`Quiz generation triggered for ${course_code}: ${res.status}`);
-        }).catch(err => {
-          console.error(`Quiz generation trigger failed for ${course_code}:`, err);
-        });
-      }
-    }
+    // Quiz generation is now handled by n8n directly (via structured_content.quiz)
+    // No need to trigger generate-quiz-options edge function
 
     return new Response(JSON.stringify({ success: true, message: "Processing started" }), {
       status: 200,
