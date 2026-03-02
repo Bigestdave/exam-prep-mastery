@@ -272,13 +272,15 @@ export default function AmbassadorUpload() {
               <Upload className="w-8 h-8 text-muted-foreground" />
               <div className="text-center">
                 <p className="text-sm font-semibold text-foreground">Tap to add PDFs</p>
-                <p className="text-xs text-muted-foreground">Max 20MB per file</p>
+                <p className="text-xs text-muted-foreground">Max 20MB per file · Tap again to add more</p>
               </div>
+              {/* iOS Safari doesn't reliably support multiple file selection.
+                  Users can tap multiple times to accumulate files. */}
               <input
                 ref={fileInputRef}
                 id="pdfFile"
                 type="file"
-                accept=".pdf"
+                accept="application/pdf,.pdf"
                 multiple
                 className="hidden"
                 onChange={handleFilesSelected}

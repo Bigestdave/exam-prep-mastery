@@ -12,7 +12,6 @@ serve(async (req) => {
   }
 
   try {
-    // Authenticate the user
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -42,7 +41,6 @@ serve(async (req) => {
 
     const { course_code, course_title, department, level, pdf_url, upload_id } = await req.json();
 
-    // Validate required fields
     if (!course_code || !course_title || !department || !pdf_url || !upload_id) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
         status: 400,
@@ -50,7 +48,6 @@ serve(async (req) => {
       });
     }
 
-    // Update upload status to "processing"
     const serviceClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
@@ -85,7 +82,6 @@ serve(async (req) => {
       const errorText = await webhookResponse.text();
       console.error("n8n webhook error:", webhookResponse.status, errorText);
 
-      // Update upload status to failed
       await serviceClient
         .from("course_uploads")
         .update({ status: "failed", error_message: `n8n error: ${webhookResponse.status}` })
@@ -95,6 +91,42 @@ serve(async (req) => {
         status: 502,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // After n8n succeeds, trigger quiz generation in background
+    // Find the course_id for this course_code + department
+    const { data: courseData } = await serviceClient
+      .from("courses")
+      .select("id")
+      .eq("code", course_code)
+      .eq("faculty", department)
+      .maybeSingle();
+
+    if (courseData?.id) {
+      // Fire-and-forget: trigger quiz generation
+      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+      if (LOVABLE_API_KEY) {
+        // Call generate-quiz-options edge function via fetch
+        const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+        const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+        
+        fetch(`${supabaseUrl}/functions/v1/generate-quiz-options`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${serviceKey}`,
+          },
+          body: JSON.stringify({
+            source_course_id: courseData.id,
+            course_code,
+            limit: 50,
+          }),
+        }).then(res => {
+          console.log(`Quiz generation triggered for ${course_code}: ${res.status}`);
+        }).catch(err => {
+          console.error(`Quiz generation trigger failed for ${course_code}:`, err);
+        });
+      }
     }
 
     return new Response(JSON.stringify({ success: true, message: "Processing started" }), {
