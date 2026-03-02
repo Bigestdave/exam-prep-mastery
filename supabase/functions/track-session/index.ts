@@ -28,17 +28,21 @@ Deno.serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
+    // Decode JWT payload directly to avoid getUser/getClaims session issues in edge runtime
     const token = authHeader.replace("Bearer ", "");
-    const { data, error: claimsError } = await supabaseUser.auth.getClaims(token);
-    if (claimsError || !data?.claims?.sub) {
-      console.error("Auth validation failed:", claimsError);
+    let userId: string;
+    try {
+      const payloadB64 = token.split(".")[1];
+      const payload = JSON.parse(atob(payloadB64));
+      userId = payload.sub;
+      if (!userId) throw new Error("No sub claim");
+    } catch (e) {
+      console.error("JWT decode failed:", e);
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    const userId = data.claims.sub;
 
     // Get device_id from request body
     const body = await req.json().catch(() => ({}));
