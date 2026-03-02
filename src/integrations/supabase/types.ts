@@ -52,6 +52,8 @@ export type Database = {
           id: string
           question_index: number
           question_text: string
+          quiz_options: Json | null
+          structured_content: Json | null
           updated_at: string | null
         }
         Insert: {
@@ -61,6 +63,8 @@ export type Database = {
           id?: string
           question_index: number
           question_text: string
+          quiz_options?: Json | null
+          structured_content?: Json | null
           updated_at?: string | null
         }
         Update: {
@@ -70,6 +74,8 @@ export type Database = {
           id?: string
           question_index?: number
           question_text?: string
+          quiz_options?: Json | null
+          structured_content?: Json | null
           updated_at?: string | null
         }
         Relationships: [
@@ -118,6 +124,51 @@ export type Database = {
           department?: string
           extra_notes?: string | null
           id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      course_uploads: {
+        Row: {
+          course_code: string
+          course_title: string
+          created_at: string
+          department: string
+          error_message: string | null
+          id: string
+          level: string
+          pdf_url: string
+          questions_generated: number | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          course_code: string
+          course_title: string
+          created_at?: string
+          department: string
+          error_message?: string | null
+          id?: string
+          level?: string
+          pdf_url: string
+          questions_generated?: number | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          course_code?: string
+          course_title?: string
+          created_at?: string
+          department?: string
+          error_message?: string | null
+          id?: string
+          level?: string
+          pdf_url?: string
+          questions_generated?: number | null
           status?: string
           updated_at?: string
           user_id?: string
@@ -201,6 +252,39 @@ export type Database = {
           course_id?: string
           created_at?: string | null
           id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      quiz_attempts: {
+        Row: {
+          completed_at: string
+          course_id: string
+          created_at: string
+          id: string
+          percentage: number | null
+          score: number
+          total_questions: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          course_id: string
+          created_at?: string
+          id?: string
+          percentage?: number | null
+          score?: number
+          total_questions?: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          course_id?: string
+          created_at?: string
+          id?: string
+          percentage?: number | null
+          score?: number
+          total_questions?: number
           user_id?: string
         }
         Relationships: []
