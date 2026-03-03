@@ -314,12 +314,13 @@ export default function AmbassadorDashboard() {
           </Button>
         </div>
 
-        {/* Upload History */}
+        {/* Most Recent Upload */}
         {uploads.length > 0 && (
           <div>
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Upload History</h2>
-            <div className="space-y-3">
-              {uploads.map(u => (
+            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Most Recent Upload</h2>
+            {(() => {
+              const u = uploads[0];
+              return (
                 <div key={u.id} className="bg-card rounded-2xl border border-border/50 p-4 flex items-center justify-between">
                   <div>
                     <p className="text-xs font-mono text-muted-foreground">{u.course_code}</p>
@@ -338,8 +339,8 @@ export default function AmbassadorDashboard() {
                     {statusIcon(u.status)}
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })()}
           </div>
         )}
       </main>
