@@ -20,12 +20,6 @@ serve(async (req) => {
       });
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
     const token = authHeader.replace("Bearer ", "");
     let userId: string;
     try {
@@ -41,7 +35,6 @@ serve(async (req) => {
 
     const { course_code, course_title, department, level, pdf_urls, pdf_url, upload_id } = await req.json();
 
-    // Support both pdf_urls (array) and legacy pdf_url (string)
     const allPdfUrls: string[] = pdf_urls || (pdf_url ? [pdf_url] : []);
 
     if (!course_code || !course_title || !department || allPdfUrls.length === 0 || !upload_id) {
@@ -61,46 +54,52 @@ serve(async (req) => {
       .update({ status: "processing" })
       .eq("id", upload_id);
 
-    // Trigger n8n webhook with pdf_urls array
     const N8N_WEBHOOK_URL = Deno.env.get("N8N_WEBHOOK_URL");
     if (!N8N_WEBHOOK_URL) {
       throw new Error("N8N_WEBHOOK_URL is not configured");
     }
 
-    const webhookResponse = await fetch(N8N_WEBHOOK_URL, {
+    // Fire-and-forget: trigger n8n but don't wait for it to finish processing.
+    // n8n should have a "Respond to Webhook" node that replies immediately,
+    // but we also don't block on the response to avoid edge function timeouts.
+    const webhookPayload = {
+      course_code,
+      course_title,
+      department,
+      level: level || "100L",
+      pdf_urls: allPdfUrls,
+      pdf_url: allPdfUrls[0],
+      upload_id,
+      ambassador_user_id: userId,
+    };
+
+    // Use waitUntil pattern: send response immediately, let webhook run in background
+    const webhookPromise = fetch(N8N_WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        course_code,
-        course_title,
-        department,
-        level: level || "100L",
-        pdf_urls: allPdfUrls,
-        pdf_url: allPdfUrls[0], // backward compat for n8n if needed
-        upload_id,
-        ambassador_user_id: userId,
-      }),
-    });
-
-    if (!webhookResponse.ok) {
-      const errorText = await webhookResponse.text();
-      console.error("n8n webhook error:", webhookResponse.status, errorText);
-
+      body: JSON.stringify(webhookPayload),
+    }).then(async (res) => {
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("n8n webhook error:", res.status, errorText);
+        await serviceClient
+          .from("course_uploads")
+          .update({ status: "failed", error_message: `n8n error: ${res.status}` })
+          .eq("id", upload_id);
+      }
+    }).catch(async (err) => {
+      console.error("n8n webhook fetch error:", err);
       await serviceClient
         .from("course_uploads")
-        .update({ status: "failed", error_message: `n8n error: ${webhookResponse.status}` })
+        .update({ status: "failed", error_message: `Webhook unreachable: ${err.message}` })
         .eq("id", upload_id);
+    });
 
-      return new Response(JSON.stringify({ error: "Processing pipeline failed to start" }), {
-        status: 502,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    // Don't await — let it run in the background
+    // EdgeRuntime will keep the function alive for the promise
+    webhookPromise;
 
-    // Quiz generation is now handled by n8n directly (via structured_content.quiz)
-    // No need to trigger generate-quiz-options edge function
-
-    return new Response(JSON.stringify({ success: true, message: "Processing started" }), {
+    return new Response(JSON.stringify({ success: true, upload_id, message: "Processing started" }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
