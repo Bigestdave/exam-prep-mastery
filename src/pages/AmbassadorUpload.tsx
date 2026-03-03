@@ -18,6 +18,8 @@ interface UploadRecord {
   course_code: string;
   course_title: string;
   department: string;
+  level: string;
+  pdf_url: string;
   status: string;
   created_at: string;
   questions_generated: number | null;
@@ -293,6 +295,50 @@ export default function AmbassadorUpload() {
     }
   };
 
+  const handleRetry = async (upload: UploadRecord) => {
+    if (isUploading) return;
+    setIsUploading(true);
+
+    try {
+      // Reset status to pending
+      await supabase
+        .from("course_uploads")
+        .update({ status: "pending", error_message: null })
+        .eq("id", upload.id);
+
+      setUploads(prev => prev.map(u => u.id === upload.id ? { ...u, status: "pending", error_message: null } : u));
+
+      // Re-trigger processing
+      const { error: fnError } = await supabase.functions.invoke("trigger-processing", {
+        body: {
+          course_code: upload.course_code,
+          course_title: upload.course_title,
+          department: upload.department,
+          level: upload.level,
+          pdf_urls: [upload.pdf_url],
+          upload_id: upload.id,
+        },
+      });
+
+      if (fnError) throw new Error(`Retry failed: ${fnError.message}`);
+
+      startPolling(upload.id);
+
+      toast({
+        title: "Retrying! 🔄",
+        description: "Re-processing your course. This takes 5-10 minutes.",
+      });
+    } catch (error) {
+      console.error("Retry error:", error);
+      setIsUploading(false);
+      toast({
+        title: "Retry failed",
+        description: error instanceof Error ? error.message : "Something went wrong.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const statusIcon = (status: string) => {
     switch (status) {
       case "complete": return <CheckCircle2 className="w-4 h-4 text-green-600" />;
@@ -473,34 +519,45 @@ export default function AmbassadorUpload() {
           </Button>
         </div>
 
-        {/* Upload History */}
-        {uploads.length > 0 && (
-          <div>
-            <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Upload History</h2>
-            <div className="space-y-3">
-              {uploads.map(u => (
-                <div key={u.id} className="bg-card rounded-2xl card-shadow p-4 flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-mono text-muted-foreground">{u.course_code}</p>
-                    <p className="text-sm font-semibold">{u.course_title}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {u.department} · {new Date(u.created_at).toLocaleDateString()}
-                    </p>
-                    {u.error_message && (
-                      <p className="text-xs text-destructive mt-1">{u.error_message}</p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {u.questions_generated && u.questions_generated > 0 && (
-                      <span className="text-xs text-muted-foreground">{u.questions_generated} Qs</span>
-                    )}
-                    {statusIcon(u.status)}
-                  </div>
+        {/* Most Recent Upload */}
+        {uploads.length > 0 && (() => {
+          const recent = uploads[0];
+          return (
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Most Recent Upload</h2>
+              <div className="bg-card rounded-2xl card-shadow p-4 flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-mono text-muted-foreground">{recent.course_code}</p>
+                  <p className="text-sm font-semibold">{recent.course_title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {recent.department} · {new Date(recent.created_at).toLocaleDateString()}
+                  </p>
+                  {recent.error_message && (
+                    <p className="text-xs text-destructive mt-1">{recent.error_message}</p>
+                  )}
                 </div>
-              ))}
+                <div className="flex items-center gap-2">
+                  {recent.questions_generated && recent.questions_generated > 0 && (
+                    <span className="text-xs text-muted-foreground">{recent.questions_generated} Qs</span>
+                  )}
+                  {(recent.status === "processing" || recent.status === "failed") && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="rounded-xl text-xs h-8"
+                      disabled={isUploading}
+                      onClick={() => handleRetry(recent)}
+                    >
+                      <Loader2 className={`w-3 h-3 mr-1 ${isUploading ? "animate-spin" : "hidden"}`} />
+                      Retry
+                    </Button>
+                  )}
+                  {statusIcon(recent.status)}
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </main>
 
       <MobileBottomNav />
