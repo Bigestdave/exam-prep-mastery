@@ -69,7 +69,7 @@ export function useQuizData(courseId: string | undefined) {
       // Fetch questions that have EITHER quiz_options OR structured_content with quiz
       const { data, error } = await supabase
         .from('course_questions')
-        .select('id, course_id, question_index, question_text, answer_text, quiz_options, structured_content')
+        .select('id, course_id, question_index, question_text, answer_text, quiz_options, structured_content, content')
         .eq('course_id', courseId)
         .order('question_index', { ascending: true });
 
@@ -77,8 +77,8 @@ export function useQuizData(courseId: string | undefined) {
         const parsed: QuizQuestion[] = [];
 
         for (const q of data) {
-          // Priority 1: n8n structured_content.quiz (higher quality)
-          const n8nQuiz = parseN8nQuiz(q.structured_content);
+          // Priority 1: n8n content.quiz (new column)
+          const n8nQuiz = parseN8nQuiz(q.content) || parseN8nQuiz(q.structured_content);
           if (n8nQuiz) {
             parsed.push({
               id: q.id,
