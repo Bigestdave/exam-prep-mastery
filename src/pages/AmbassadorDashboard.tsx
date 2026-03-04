@@ -301,8 +301,8 @@ export default function AmbassadorDashboard() {
         {/* ─── TAB SWITCHER ─── */}
         <div className="bg-secondary rounded-2xl p-1 flex mb-8">
           {([
-            { key: "sell" as TabKey, label: "💸 Sell", sublabel: "Referrals" },
-            { key: "bounties" as TabKey, label: "📄 Bounties", sublabel: "Upload PDFs" },
+            { key: "sell" as TabKey, label: "Sell", sublabel: "Referrals" },
+            { key: "bounties" as TabKey, label: "Bounties", sublabel: "Upload PDFs" },
           ]).map(tab => (
             <button
               key={tab.key}
