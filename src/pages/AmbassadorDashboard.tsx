@@ -277,7 +277,7 @@ export default function AmbassadorDashboard() {
             <p className="text-[10px] font-bold text-background/40 uppercase tracking-[0.2em] mb-1">
               Ambassador Wallet
             </p>
-            <h1 className="text-4xl md:text-5xl font-mono font-bold tracking-tight">
+            <h1 className="text-4xl md:text-5xl font-mono font-bold tracking-tight text-background">
               ₦{walletBalance.toLocaleString()}
             </h1>
             <p className="text-xs text-background/50 mt-1">
