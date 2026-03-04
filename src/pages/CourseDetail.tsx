@@ -112,7 +112,7 @@ export default function CourseDetail() {
         <main className="container py-8 px-4">
           <div className="h-4 w-28 bg-muted rounded-lg animate-pulse mb-6"></div>
           <div className="mb-8 space-y-3">
-            <TextShimmer as="h1" className="text-xl font-display font-bold" duration={1.5}>Loading course details...</TextShimmer>
+            <TextShimmer as="h1" className="text-xl font-display font-bold" duration={1.2}>Getting things ready</TextShimmer>
             <div className="h-4 w-48 bg-muted rounded-lg animate-pulse"></div>
           </div>
           <div className="space-y-3">

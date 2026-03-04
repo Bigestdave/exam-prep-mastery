@@ -66,7 +66,7 @@ export default function Library() {
         <Header isLoggedIn userName="" />
         <main className="container py-8 px-4 md:px-6">
           <div className="mb-8 space-y-3">
-            <TextShimmer as="h1" className="text-2xl font-display font-bold" duration={1.5}>Loading your library...</TextShimmer>
+            <TextShimmer as="h1" className="text-2xl font-display font-bold" duration={1.2}>My Library</TextShimmer>
             <div className="h-4 w-48 bg-muted rounded-lg animate-pulse"></div>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

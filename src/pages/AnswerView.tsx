@@ -50,7 +50,7 @@ export default function AnswerView() {
       <div className="min-h-screen bg-background">
         <Header isLoggedIn userName="" />
         <main className="container py-8 px-4 max-w-3xl">
-          <TextShimmer className="text-sm mb-6" duration={1.5}>Loading answer...</TextShimmer>
+          <TextShimmer className="text-sm font-display font-semibold mb-6" duration={1.2}>Fetching answer</TextShimmer>
           <div className="bg-card rounded-3xl p-6 md:p-10 shadow-card border border-border mb-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="h-4 w-20 bg-muted rounded animate-pulse"></div>
