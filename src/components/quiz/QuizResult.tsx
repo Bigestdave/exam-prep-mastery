@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useSemesterReadiness, QuizQuestion } from "@/hooks/useQuizData";
-import { ArrowRight, RotateCcw, CheckCircle2, XCircle } from "lucide-react";
+import { ArrowRight, RotateCcw, CheckCircle2, XCircle, Lock } from "lucide-react";
 
 interface QuizResultProps {
   courseId: string;
@@ -13,7 +13,7 @@ interface QuizResultProps {
   score: number;
   total: number;
   questions: QuizQuestion[];
-  answers: Map<number, number>; // questionIndex (in array) -> selected option index
+  answers: Map<number, number>;
 }
 
 function getScoringTier(percentage: number) {
@@ -61,20 +61,29 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
     c => c.faculty === profile?.faculty && c.level === profile?.level
   );
   const departmentCourseIds = departmentCourses.map(c => c.id);
-  const { readiness, totalPercentage } = useSemesterReadiness(user?.id, departmentCourseIds);
+  const { readiness } = useSemesterReadiness(user?.id, departmentCourseIds);
 
   const nextUnowned = departmentCourses.find(c => c.id !== courseId && !purchases.includes(c.id));
-  const exposedCount = departmentCourses.filter(c => (readiness.get(c.id) ?? 0) < 80 && c.id !== courseId).length;
+
+  // Build ring segments with current quiz result overriding DB data
+  const ringSegments = departmentCourses.map(c => ({
+    ...c,
+    pct: c.id === courseId ? percentage : (readiness.get(c.id) ?? 0),
+  }));
+
+  // Calculate CORRECT totalPercentage including current attempt
+  const correctedTotalPercentage = departmentCourses.length > 0
+    ? Math.round(
+        ringSegments.reduce((sum, seg) => sum + seg.pct, 0) / departmentCourses.length
+      )
+    : 0;
+
+  const exposedCount = ringSegments.filter(s => s.pct < 80 && s.id !== courseId).length;
 
   useEffect(() => {
     const timer = setTimeout(() => setPhase("content"), 2200);
     return () => clearTimeout(timer);
   }, []);
-
-  const ringSegments = departmentCourses.map(c => ({
-    ...c,
-    pct: c.id === courseId ? percentage : (readiness.get(c.id) ?? 0),
-  }));
 
   if (phase === "stamp") {
     return (
@@ -127,7 +136,7 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
       transition={{ type: "spring", stiffness: 200, damping: 25 }}
       className="fixed inset-0 z-50 bg-background overflow-y-auto"
     >
-      <div className="max-w-lg mx-auto px-5 py-10 pb-32">
+      <div className="max-w-2xl mx-auto px-5 py-10 pb-32">
         {/* Score card */}
         <div className={`rounded-3xl p-6 ${tier.bg} border ${tier.border} mb-6`}>
           <div className="flex items-center gap-4 mb-3">
@@ -209,7 +218,7 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
           </motion.div>
         )}
 
-        {/* Semester Ring */}
+        {/* Semester Ring — The Zeigarnik Trap */}
         {departmentCourses.length > 1 && (
           <div className="bg-card border border-border rounded-3xl p-6 mb-6 shadow-card">
             <h3 className="font-display font-bold text-foreground text-sm mb-1" style={{ letterSpacing: '-0.05em' }}>
@@ -251,22 +260,40 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
-                    <span className="text-2xl font-display font-bold text-foreground">{totalPercentage}%</span>
+                    <span className="text-2xl font-display font-bold text-foreground">{correctedTotalPercentage}%</span>
                     <p className="text-[9px] font-mono text-muted-foreground uppercase tracking-wider">Semester</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-2 mb-5">
-              {ringSegments.map(seg => (
-                <div key={seg.id} className="flex items-center justify-between text-xs">
-                  <span className="font-mono text-muted-foreground">{seg.code}</span>
-                  <span className={`font-bold ${
-                    seg.pct >= 80 ? "text-accent" : seg.pct > 0 ? "text-amber-600" : "text-muted-foreground/30"
-                  }`}>
-                    {seg.pct > 0 ? `${seg.pct}%` : "—"}
+            {/* Target List — Ledger style */}
+            <div className="mb-5">
+              {ringSegments.map((seg, i) => (
+                <div
+                  key={seg.id}
+                  className={`flex items-center justify-between text-xs py-2.5 ${
+                    i < ringSegments.length - 1 ? "border-b border-dashed border-border" : ""
+                  }`}
+                >
+                  <span className={`font-mono ${seg.pct >= 80 ? "text-accent font-semibold" : "text-muted-foreground"}`}>
+                    {seg.code}
                   </span>
+                  <div className="flex items-center gap-1.5">
+                    {seg.pct >= 80 ? (
+                      <>
+                        <span className="font-bold text-accent">{seg.pct}%</span>
+                        <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
+                      </>
+                    ) : seg.pct > 0 ? (
+                      <span className="font-bold text-amber-600">{seg.pct}%</span>
+                    ) : (
+                      <>
+                        <span className="text-muted-foreground/30">—</span>
+                        <Lock className="w-3 h-3 text-muted-foreground/30" />
+                      </>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
