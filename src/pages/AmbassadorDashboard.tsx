@@ -291,7 +291,7 @@ export default function AmbassadorDashboard() {
   if (!user || (!isAmbassador && !isAdmin)) return null;
 
   const walletBalance = profile ? (profile as any).wallet_balance || 0 : 0;
-  const vipLink = `lcuprep.lovable.app/vip/${referralCode}`;
+  const vipLink = `lcuprep.vercel.app/vip/${referralCode}`;
   const completedUploads = uploads.filter(u => u.status === "complete").length;
 
   const handleCopyLink = () => {
