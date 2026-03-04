@@ -24,7 +24,7 @@ export default function Profile() {
       <div className="min-h-screen bg-background pb-20 md:pb-0">
         <Header isLoggedIn userName="" />
         <main className="container py-8 max-w-xl px-4">
-          <TextShimmer className="text-sm text-muted-foreground mb-6" duration={1.5}>Loading profile...</TextShimmer>
+          <TextShimmer className="text-lg font-display font-bold mb-6" duration={1.2}>Profile</TextShimmer>
           <div className="mb-8 space-y-2">
             <div className="h-7 w-40 bg-secondary rounded-lg animate-pulse"></div>
             <div className="h-4 w-48 bg-muted rounded-lg animate-pulse"></div>
