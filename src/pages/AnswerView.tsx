@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useCourseQuestions } from "@/hooks/useCourseQuestions";
 import { ArrowLeft, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { TextShimmer } from "@/components/ui/text-shimmer";
 import { useQuizData } from "@/hooks/useQuizData";
 
 export default function AnswerView() {
@@ -49,7 +50,7 @@ export default function AnswerView() {
       <div className="min-h-screen bg-background">
         <Header isLoggedIn userName="" />
         <main className="container py-8 px-4 max-w-3xl">
-          <div className="h-4 w-28 bg-muted rounded-lg animate-pulse mb-6"></div>
+          <TextShimmer className="text-sm mb-6" duration={1.5}>Loading answer...</TextShimmer>
           <div className="bg-card rounded-3xl p-6 md:p-10 shadow-card border border-border mb-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="h-4 w-20 bg-muted rounded animate-pulse"></div>

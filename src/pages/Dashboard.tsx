@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { BookOpen } from "lucide-react";
 import { SemesterReadiness } from "@/components/quiz/SemesterReadiness";
+import { TextShimmer } from "@/components/ui/text-shimmer";
 
 interface CourseWithCount {
   id: string;
@@ -71,7 +72,7 @@ export default function Dashboard() {
         <Header isLoggedIn userName="" />
         <main className="container py-8 px-4 md:px-6">
           <div className="mb-10 space-y-3">
-             <div className="h-8 w-48 bg-card rounded-2xl animate-pulse"></div>
+             <TextShimmer as="h1" className="text-2xl font-display font-bold" duration={1.5}>Loading your courses...</TextShimmer>
              <div className="h-4 w-64 bg-card rounded-xl animate-pulse"></div>
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3">

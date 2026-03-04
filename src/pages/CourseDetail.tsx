@@ -18,6 +18,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { QuizCTA } from "@/components/quiz/QuizCTA";
+import { TextShimmer } from "@/components/ui/text-shimmer";
 
 const PAYSTACK_PUBLIC_KEY = "pk_live_2320cc6bb508955bd07391f75a4c73d757a0d6f6";
 
@@ -111,10 +112,7 @@ export default function CourseDetail() {
         <main className="container py-8 px-4">
           <div className="h-4 w-28 bg-muted rounded-lg animate-pulse mb-6"></div>
           <div className="mb-8 space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-20 bg-secondary rounded-lg animate-pulse"></div>
-            </div>
-            <div className="h-8 w-3/4 bg-secondary rounded-lg animate-pulse"></div>
+            <TextShimmer as="h1" className="text-xl font-display font-bold" duration={1.5}>Loading course details...</TextShimmer>
             <div className="h-4 w-48 bg-muted rounded-lg animate-pulse"></div>
           </div>
           <div className="space-y-3">
