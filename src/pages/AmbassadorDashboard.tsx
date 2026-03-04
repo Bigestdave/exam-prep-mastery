@@ -240,7 +240,38 @@ export default function AmbassadorDashboard() {
   };
 
   if (authLoading || roleLoading) {
-    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+    return (
+      <div className="min-h-screen bg-background pb-32 md:pb-0">
+        <Header isLoggedIn userName="" />
+        <main className="container py-8 px-4 md:px-6 max-w-2xl mx-auto">
+          {/* Wallet skeleton */}
+          <div className="bg-foreground rounded-3xl p-6 mb-6 relative overflow-hidden">
+            <div className="relative z-10 space-y-2">
+              <div className="h-3 w-28 bg-background/10 rounded animate-pulse" />
+              <div className="h-10 w-44 bg-background/10 rounded-lg animate-pulse" />
+              <div className="h-3 w-32 bg-background/10 rounded animate-pulse" />
+            </div>
+            <div className="mt-5 h-11 w-full bg-background/10 rounded-xl animate-pulse" />
+            <div className="absolute top-0 right-0 w-40 h-40 bg-accent/20 rounded-full blur-3xl -mr-10 -mt-10" />
+          </div>
+
+          {/* Tab switcher skeleton */}
+          <div className="bg-secondary rounded-2xl p-1 flex mb-8">
+            <div className="flex-1 h-14 bg-background rounded-xl animate-pulse" />
+            <div className="flex-1 h-14 bg-transparent rounded-xl" />
+          </div>
+
+          {/* Content skeleton */}
+          <div className="bg-card rounded-3xl p-6 space-y-4">
+            <div className="h-5 w-32 bg-muted rounded-lg animate-pulse" />
+            <div className="h-4 w-64 bg-muted rounded animate-pulse" />
+            <div className="h-12 w-full bg-secondary/70 rounded-xl animate-pulse" />
+            <div className="h-12 w-full bg-muted rounded-xl animate-pulse" />
+          </div>
+        </main>
+        <MobileBottomNav />
+      </div>
+    );
   }
 
   if (!user || (!isAmbassador && !isAdmin)) return null;
