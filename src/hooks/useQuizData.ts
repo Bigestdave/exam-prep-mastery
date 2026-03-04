@@ -30,6 +30,15 @@ export interface QuizAttempt {
  * 1. Edge Function format: { question, options: ["A","B","C","D"], correct_index: 0, explanation }
  * 2. Legacy n8n format: { question, options: {A:"...",B:"...",C:"...",D:"..."}, correct_answer: "B", hint }
  */
+function shuffleArray<T>(arr: T[]): T[] {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 function parseQuiz(structured: any): { question: string; options: QuizOption[]; hint?: string } | null {
   try {
     const content = typeof structured === 'string' ? JSON.parse(structured) : structured;
@@ -45,7 +54,7 @@ function parseQuiz(structured: any): { question: string; options: QuizOption[]; 
       if (options.length < 2 || !options.some(o => o.is_correct)) return null;
       return {
         question: quiz.question || '',
-        options,
+        options: shuffleArray(options),
         hint: quiz.explanation,
       };
     }
@@ -62,7 +71,7 @@ function parseQuiz(structured: any): { question: string; options: QuizOption[]; 
       if (options.length < 2 || !options.some(o => o.is_correct)) return null;
       return {
         question: quiz.question || '',
-        options,
+        options: shuffleArray(options),
         hint: quiz.hint,
       };
     }
@@ -120,9 +129,9 @@ export function useQuizData(courseId: string | undefined) {
               course_id: q.course_id,
               question_index: q.question_index,
               question_text: q.question_text,
-              quiz_question_text: q.question_text, // Use module title as fallback
+              quiz_question_text: q.question_text,
               answer_text: q.answer_text,
-              quiz_options: legacyOptions,
+              quiz_options: shuffleArray(legacyOptions),
             });
           }
         }
