@@ -2,18 +2,19 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRole } from "@/hooks/useRole";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { allDepartments } from "@/data/departments";
-import { Upload, FileText, Loader2, CheckCircle2, AlertCircle, Clock, Wallet, TrendingUp, X, Trophy, Crown } from "lucide-react";
-import { motion } from "framer-motion";
+import {
+  Upload, FileText, Loader2, CheckCircle2, AlertCircle, Clock,
+  Wallet, X, Trophy, Crown, Copy, Check, Link2, MessageCircle
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface UploadRecord {
   id: string;
@@ -32,6 +33,8 @@ interface LeaderboardEntry {
   upload_count: number;
 }
 
+type TabKey = "sell" | "bounties";
+
 export default function AmbassadorDashboard() {
   const { user, profile, isLoading: authLoading } = useAuth();
   const { isAmbassador, isAdmin, isLoading: roleLoading } = useRole();
@@ -39,6 +42,10 @@ export default function AmbassadorDashboard() {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [activeTab, setActiveTab] = useState<TabKey>("sell");
+  const [copied, setCopied] = useState(false);
+
+  // Bounty form state
   const [courseCode, setCourseCode] = useState("");
   const [courseTitle, setCourseTitle] = useState("");
   const [department, setDepartment] = useState(profile?.faculty || "");
@@ -97,20 +104,17 @@ export default function AmbassadorDashboard() {
   // Fetch leaderboard
   useEffect(() => {
     const fetchLeaderboard = async () => {
-      // Get top ambassadors by completed upload count
       const { data } = await supabase
         .from("course_uploads")
         .select("user_id")
         .eq("status", "complete");
 
       if (data) {
-        // Count per user
         const counts = new Map<string, number>();
         data.forEach(row => {
           counts.set(row.user_id, (counts.get(row.user_id) ?? 0) + 1);
         });
 
-        // Get profiles for top users
         const sorted = Array.from(counts.entries())
           .sort((a, b) => b[1] - a[1])
           .slice(0, 5);
@@ -132,7 +136,7 @@ export default function AmbassadorDashboard() {
       }
     };
     fetchLeaderboard();
-  }, [uploads]); // Refresh when uploads change
+  }, [uploads]);
 
   const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files;
@@ -217,7 +221,7 @@ export default function AmbassadorDashboard() {
       setFiles([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
 
-      toast({ title: "✨ Get Your Course Ready!", description: "AI is generating the course content. This takes about 5-10 minutes." });
+      toast({ title: "✨ Bounty Submitted!", description: "AI is generating the course content. You'll earn ₦500 when approved." });
     } catch (error) {
       console.error("Upload error:", error);
       toast({ title: "Upload failed", description: error instanceof Error ? error.message : "Something went wrong.", variant: "destructive" });
@@ -241,250 +245,349 @@ export default function AmbassadorDashboard() {
 
   if (!user || (!isAmbassador && !isAdmin)) return null;
 
-  const completedUploads = uploads.filter(u => u.status === 'complete').length;
   const walletBalance = profile ? (profile as any).wallet_balance || 0 : 0;
+  const firstName = profile?.full_name?.split(" ")[0]?.toLowerCase() || "ambassador";
+  const vipLink = `lcuprep.com/vip/${firstName}-${user.id.slice(0, 4)}`;
+  const completedUploads = uploads.filter(u => u.status === "complete").length;
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(`https://${vipLink}`);
+    setCopied(true);
+    toast({ title: "Link copied!", description: "Share it with your coursemates." });
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleWhatsAppShare = () => {
+    const text = `🎓 Use my VIP link to get ₦500 off on LCU Prep past questions! 👇\nhttps://${vipLink}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  };
 
   return (
     <div className="min-h-screen bg-background pb-32 md:pb-0 page-enter">
       <Header isLoggedIn userName={profile?.full_name || ""} />
 
-      <main className="container py-8 px-4 md:px-6 max-w-5xl">
-        <div className="mb-8">
-          <p className="text-xs font-mono uppercase tracking-[0.2em] text-muted-foreground mb-1">Ambassador</p>
-          <h1 className="text-2xl md:text-3xl font-display font-bold">Your Dashboard</h1>
+      <main className="container py-8 px-4 md:px-6 max-w-2xl mx-auto">
+        {/* ─── THE BANK ─── */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-foreground rounded-3xl p-6 text-background shadow-elevated mb-6 relative overflow-hidden"
+        >
+          <div className="relative z-10">
+            <p className="text-[10px] font-bold text-background/40 uppercase tracking-[0.2em] mb-1">
+              Ambassador Wallet
+            </p>
+            <h1 className="text-4xl md:text-5xl font-mono font-bold tracking-tight">
+              ₦{walletBalance.toLocaleString()}
+            </h1>
+            <p className="text-xs text-background/50 mt-1">
+              {completedUploads} bounties completed
+            </p>
+          </div>
+
+          <motion.button
+            whileHover={{ y: -1 }}
+            whileTap={{ scale: 0.97 }}
+            className="w-full mt-5 h-11 rounded-xl font-bold text-sm bg-background text-foreground flex items-center justify-center gap-2 btn-thud"
+          >
+            <Wallet className="w-4 h-4" />
+            Withdraw to Bank
+          </motion.button>
+
+          {/* Glow */}
+          <div className="absolute top-0 right-0 w-40 h-40 bg-accent/20 rounded-full blur-3xl -mr-10 -mt-10" />
+        </motion.div>
+
+        {/* ─── TAB SWITCHER ─── */}
+        <div className="bg-secondary rounded-2xl p-1 flex mb-8">
+          {([
+            { key: "sell" as TabKey, label: "💸 Sell", sublabel: "Referrals" },
+            { key: "bounties" as TabKey, label: "📄 Bounties", sublabel: "Upload PDFs" },
+          ]).map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 ${
+                activeTab === tab.key
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground/70"
+              }`}
+            >
+              <span className="block">{tab.label}</span>
+              <span className="block text-[10px] font-medium opacity-60 mt-0.5">{tab.sublabel}</span>
+            </button>
+          ))}
         </div>
 
-        {/* Desktop: two-column layout — Form left, Leaderboard right */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left column — Form & Status */}
-          <div className="lg:col-span-2 max-w-2xl">
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                    <Wallet className="w-3.5 h-3.5" /> Wallet
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-xl font-bold font-mono">₦{walletBalance.toLocaleString()}</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-                    <TrendingUp className="w-3.5 h-3.5" /> Completed
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-xl font-bold">{completedUploads}</p>
-                  <p className="text-[10px] text-muted-foreground">uploads processed</p>
-                </CardContent>
-              </Card>
-            </div>
+        <AnimatePresence mode="wait">
+          {activeTab === "sell" ? (
+            <motion.div
+              key="sell"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-6"
+            >
+              {/* ─── THE WEAPON CARD ─── */}
+              <div className="bg-card rounded-3xl card-float p-6 space-y-4">
+                <div>
+                  <h2 className="text-lg font-display font-bold">Your VIP Link</h2>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Give a coursemate <span className="font-bold text-accent">₦500 off</span>. You get <span className="font-bold text-accent">₦500 instantly</span> when they buy.
+                  </p>
+                </div>
 
-            {/* Upload Form */}
-            <div className="bg-card rounded-3xl card-float p-6 space-y-5 mb-8">
-              <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Upload Course Material</h2>
-              
-              <div className="grid grid-cols-2 gap-4">
+                {/* Link display */}
+                <div className="bg-secondary/70 rounded-xl px-4 py-3 flex items-center gap-3">
+                  <Link2 className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <span className="text-sm font-mono text-foreground truncate flex-1">{vipLink}</span>
+                </div>
+
+                {/* Copy button */}
+                <motion.button
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleCopyLink}
+                  className="w-full h-12 rounded-xl font-bold text-sm bg-foreground text-background flex items-center justify-center gap-2 btn-thud"
+                >
+                  {copied ? (
+                    <><Check className="w-4 h-4" /> Copied!</>
+                  ) : (
+                    <><Copy className="w-4 h-4" /> Copy Link</>
+                  )}
+                </motion.button>
+
+                {/* WhatsApp button */}
+                <motion.button
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleWhatsAppShare}
+                  className="w-full h-11 rounded-xl font-bold text-sm bg-[#25D366] text-white flex items-center justify-center gap-2"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  Share on WhatsApp
+                </motion.button>
+              </div>
+
+              {/* ─── LEADERBOARD ─── */}
+              <div className="bg-card rounded-3xl card-float p-6">
+                <div className="flex items-center gap-2 mb-5">
+                  <Trophy className="w-4 h-4 text-accent" />
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Campus Top Earners</h2>
+                </div>
+
+                {leaderboard.length === 0 ? (
+                  <p className="text-xs text-muted-foreground text-center py-8">
+                    Be the first to earn! Share your link above.
+                  </p>
+                ) : (
+                  <div className="space-y-0">
+                    {leaderboard.map((entry, i) => {
+                      const isCurrentUser = entry.user_id === user?.id;
+                      const earnings = entry.upload_count * 500;
+                      return (
+                        <div
+                          key={entry.user_id}
+                          className={`flex items-center justify-between py-3.5 ${
+                            i < leaderboard.length - 1 ? "border-b border-dashed border-border" : ""
+                          } ${isCurrentUser ? "bg-accent/5 -mx-3 px-3 rounded-xl" : ""}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                              i === 0
+                                ? "bg-amber-100 text-amber-700"
+                                : i === 1
+                                  ? "bg-secondary text-muted-foreground"
+                                  : i === 2
+                                    ? "bg-orange-100 text-orange-700"
+                                    : "bg-secondary text-muted-foreground"
+                            }`}>
+                              {i === 0 ? <Crown className="w-3.5 h-3.5" /> : i + 1}
+                            </div>
+                            <div>
+                              <span className={`text-sm block ${isCurrentUser ? "font-bold text-foreground" : "text-foreground/80"}`}>
+                                {isCurrentUser ? "You" : entry.full_name?.split(" ")[0] || "Anon"}
+                              </span>
+                            </div>
+                          </div>
+                          <span className="text-sm font-mono font-bold text-accent">
+                            ₦{earnings.toLocaleString()}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Motivational nudge */}
+                {leaderboard.length > 0 && leaderboard[0]?.user_id !== user?.id && (
+                  <div className="mt-5 pt-4 border-t border-border">
+                    <p className="text-xs text-muted-foreground text-center">
+                      You need <span className="font-bold text-foreground">{Math.max(1, (leaderboard[0]?.upload_count ?? 0) + 1 - completedUploads)} more sales</span> to take the lead 🔥
+                    </p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="bounties"
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-6"
+            >
+              {/* ─── BOUNTY HEADER ─── */}
+              <div className="mb-2">
+                <h2 className="text-lg font-display font-bold">Help Build The Dossier.</h2>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Upload verified tutorial PDFs. If our AI approves it, you earn <span className="font-bold text-accent">₦500 per course</span>.
+                </p>
+              </div>
+
+              {/* ─── UPLOAD FORM ─── */}
+              <div className="bg-card rounded-3xl card-float p-6 space-y-5">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="courseCode" className="text-xs font-bold uppercase tracking-wider">Course Code</Label>
+                    <Input
+                      id="courseCode"
+                      placeholder="e.g. BUS 101"
+                      value={courseCode}
+                      onChange={e => setCourseCode(e.target.value)}
+                      className="rounded-xl"
+                      maxLength={20}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="level" className="text-xs font-bold uppercase tracking-wider">Level</Label>
+                    <Select value={level} onValueChange={setLevel}>
+                      <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {["100L", "200L", "300L", "400L", "500L"].map(l => (
+                          <SelectItem key={l} value={l}>{l}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="courseCode" className="text-xs font-bold uppercase tracking-wider">Course Code</Label>
+                  <Label htmlFor="courseTitle" className="text-xs font-bold uppercase tracking-wider">Course Title</Label>
                   <Input
-                    id="courseCode"
-                    placeholder="e.g. BUS 101"
-                    value={courseCode}
-                    onChange={e => setCourseCode(e.target.value)}
+                    id="courseTitle"
+                    placeholder="e.g. Introduction to Business"
+                    value={courseTitle}
+                    onChange={e => setCourseTitle(e.target.value)}
                     className="rounded-xl"
-                    maxLength={20}
+                    maxLength={100}
                   />
                 </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="level" className="text-xs font-bold uppercase tracking-wider">Level</Label>
-                  <Select value={level} onValueChange={setLevel}>
-                    <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {["100L", "200L", "300L", "400L", "500L"].map(l => (
-                        <SelectItem key={l} value={l}>{l}</SelectItem>
+                  <Label htmlFor="department" className="text-xs font-bold uppercase tracking-wider">Department</Label>
+                  <Select value={department} onValueChange={setDepartment}>
+                    <SelectTrigger className="rounded-xl"><SelectValue placeholder="Select department" /></SelectTrigger>
+                    <SelectContent className="max-h-60">
+                      {allDepartments.map(d => (
+                        <SelectItem key={d} value={d}>{d}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="courseTitle" className="text-xs font-bold uppercase tracking-wider">Course Title</Label>
-                <Input
-                  id="courseTitle"
-                  placeholder="e.g. Introduction to Business"
-                  value={courseTitle}
-                  onChange={e => setCourseTitle(e.target.value)}
-                  className="rounded-xl"
-                  maxLength={100}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="department" className="text-xs font-bold uppercase tracking-wider">Department</Label>
-                <Select value={department} onValueChange={setDepartment}>
-                  <SelectTrigger className="rounded-xl"><SelectValue placeholder="Select department" /></SelectTrigger>
-                  <SelectContent className="max-h-60">
-                    {allDepartments.map(d => (
-                      <SelectItem key={d} value={d}>{d}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-wider">Tutorial PDFs</Label>
-                <label
-                  htmlFor="pdfFile"
-                  className={`flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-2xl p-8 cursor-pointer transition-all ${
-                    files.length > 0
-                      ? "border-primary/40 bg-primary/[0.03]"
-                      : "border-border hover:border-accent/40 hover:bg-accent/[0.03]"
-                  }`}
-                >
-                  <Upload className="w-8 h-8 text-muted-foreground" />
-                  <div className="text-center">
-                    <p className="text-sm font-semibold text-foreground">Tap to add PDFs</p>
-                    <p className="text-xs text-muted-foreground">Max 20MB each · You can add multiple</p>
-                  </div>
-                  <input
-                    ref={fileInputRef}
-                    id="pdfFile"
-                    type="file"
-                    accept=".pdf"
-                    multiple
-                    className="hidden"
-                    onChange={handleFilesSelected}
-                  />
-                </label>
-
-                {files.length > 0 && (
-                  <div className="space-y-2 mt-2">
-                    {files.map((f, i) => (
-                      <div key={i} className="flex items-center justify-between bg-muted/30 rounded-xl px-3 py-2">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <FileText className="w-4 h-4 text-primary shrink-0" />
-                          <span className="text-xs font-medium truncate">{f.name}</span>
-                          <span className="text-xs text-muted-foreground shrink-0">{(f.size / (1024 * 1024)).toFixed(1)} MB</span>
-                        </div>
-                        <button onClick={() => removeFile(i)} className="p-1 hover:bg-muted rounded-lg">
-                          <X className="w-3.5 h-3.5 text-muted-foreground" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <motion.button
-                whileHover={{ y: -1 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={handleUpload}
-                disabled={isUploading || files.length === 0 || !courseCode || !courseTitle || !department}
-                className="w-full h-12 rounded-xl font-bold text-sm bg-foreground text-background disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 btn-thud"
-              >
-                {isUploading ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> ✨ Getting Your Course Ready...</>
-                ) : (
-                  <><Upload className="w-4 h-4" /> Upload & Process</>
-                )}
-              </motion.button>
-            </div>
-
-            {/* Most Recent Upload */}
-            {uploads.length > 0 && (
-              <div>
-                <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Most Recent Upload</h2>
-                {(() => {
-                  const u = uploads[0];
-                  return (
-                    <div key={u.id} className="bg-card rounded-2xl border border-border/50 p-4 flex items-center justify-between">
-                      <div>
-                        <p className="text-xs font-mono text-muted-foreground">{u.course_code}</p>
-                        <p className="text-sm font-semibold">{u.course_title}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {u.department} · {new Date(u.created_at).toLocaleDateString()}
-                        </p>
-                        {u.error_message && (
-                          <p className="text-xs text-destructive mt-1">{u.error_message}</p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {u.questions_generated && u.questions_generated > 0 && (
-                          <span className="text-xs text-muted-foreground">{u.questions_generated} Qs</span>
-                        )}
-                        {statusIcon(u.status)}
-                      </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold uppercase tracking-wider">Tutorial PDFs</Label>
+                  <label
+                    htmlFor="pdfFile"
+                    className={`flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-2xl p-8 cursor-pointer transition-all ${
+                      files.length > 0
+                        ? "border-accent/40 bg-accent/[0.03]"
+                        : "border-border hover:border-accent/40 hover:bg-accent/[0.04]"
+                    }`}
+                  >
+                    <Upload className="w-8 h-8 text-muted-foreground" />
+                    <div className="text-center">
+                      <p className="text-sm font-semibold text-foreground">Tap to add PDFs</p>
+                      <p className="text-xs text-muted-foreground">Max 20MB each · You can add multiple</p>
                     </div>
-                  );
-                })()}
-              </div>
-            )}
-          </div>
+                    <input
+                      ref={fileInputRef}
+                      id="pdfFile"
+                      type="file"
+                      accept=".pdf"
+                      multiple
+                      className="hidden"
+                      onChange={handleFilesSelected}
+                    />
+                  </label>
 
-          {/* Right column — Leaderboard (Desktop) / Below wallet (Mobile) */}
-          <div className="lg:col-span-1">
-            <div className="bg-card rounded-3xl border border-border p-6 card-float sticky top-24">
-              <div className="flex items-center gap-2 mb-5">
-                <Trophy className="w-4 h-4 text-accent" />
-                <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Campus Leaderboard</h2>
-              </div>
-
-              {leaderboard.length === 0 ? (
-                <p className="text-xs text-muted-foreground text-center py-8">
-                  Be the first to upload!
-                </p>
-              ) : (
-                <div className="space-y-0">
-                  {leaderboard.map((entry, i) => {
-                    const isCurrentUser = entry.user_id === user?.id;
-                    return (
-                      <div
-                        key={entry.user_id}
-                        className={`flex items-center justify-between py-3 ${
-                          i < leaderboard.length - 1 ? "border-b border-dashed border-border" : ""
-                        } ${isCurrentUser ? "bg-accent/5 -mx-3 px-3 rounded-xl" : ""}`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                            i === 0
-                              ? "bg-amber-100 text-amber-700"
-                              : i === 1
-                                ? "bg-secondary text-muted-foreground"
-                                : i === 2
-                                  ? "bg-orange-100 text-orange-700"
-                                  : "bg-secondary text-muted-foreground"
-                          }`}>
-                            {i === 0 ? <Crown className="w-3 h-3" /> : i + 1}
+                  {files.length > 0 && (
+                    <div className="space-y-2 mt-2">
+                      {files.map((f, i) => (
+                        <div key={i} className="flex items-center justify-between bg-muted/30 rounded-xl px-3 py-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <FileText className="w-4 h-4 text-primary shrink-0" />
+                            <span className="text-xs font-medium truncate">{f.name}</span>
+                            <span className="text-xs text-muted-foreground shrink-0">{(f.size / (1024 * 1024)).toFixed(1)} MB</span>
                           </div>
-                          <span className={`text-sm ${isCurrentUser ? "font-bold text-foreground" : "text-foreground/80"}`}>
-                            {isCurrentUser ? "You" : entry.full_name?.split(" ")[0] || "Anon"}
-                          </span>
+                          <button onClick={() => removeFile(i)} className="p-1 hover:bg-muted rounded-lg">
+                            <X className="w-3.5 h-3.5 text-muted-foreground" />
+                          </button>
                         </div>
-                        <span className="text-xs font-mono font-bold text-muted-foreground">
-                          {entry.upload_count} {entry.upload_count === 1 ? "upload" : "uploads"}
-                        </span>
-                      </div>
-                    );
-                  })}
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
 
-              {/* Motivational nudge */}
-              {leaderboard.length > 0 && leaderboard[0]?.user_id !== user?.id && (
-                <div className="mt-5 pt-4 border-t border-border">
-                  <p className="text-xs text-muted-foreground text-center">
-                    Upload <span className="font-bold text-foreground">{(leaderboard[0]?.upload_count ?? 0) + 1 - completedUploads}</span> more to take the lead 🔥
-                  </p>
+                <motion.button
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleUpload}
+                  disabled={isUploading || files.length === 0 || !courseCode || !courseTitle || !department}
+                  className="w-full h-12 rounded-xl font-bold text-sm bg-foreground text-background disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 btn-thud"
+                >
+                  {isUploading ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> ✨ Getting Your Course Ready...</>
+                  ) : (
+                    <><Upload className="w-4 h-4" /> Submit Bounty</>
+                  )}
+                </motion.button>
+              </div>
+
+              {/* Most Recent Upload */}
+              {uploads.length > 0 && (
+                <div>
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Recent Bounties</h2>
+                  <div className="space-y-2">
+                    {uploads.slice(0, 3).map(u => (
+                      <div key={u.id} className="bg-card rounded-2xl border border-border/50 p-4 flex items-center justify-between">
+                        <div>
+                          <p className="text-xs font-mono text-muted-foreground">{u.course_code}</p>
+                          <p className="text-sm font-semibold">{u.course_title}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {u.department} · {new Date(u.created_at).toLocaleDateString()}
+                          </p>
+                          {u.error_message && (
+                            <p className="text-xs text-destructive mt-1">{u.error_message}</p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {u.questions_generated && u.questions_generated > 0 && (
+                            <span className="text-xs text-muted-foreground">{u.questions_generated} Qs</span>
+                          )}
+                          {statusIcon(u.status)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
-            </div>
-          </div>
-        </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
 
       <MobileBottomNav />
