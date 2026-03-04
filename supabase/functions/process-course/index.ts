@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const MODEL = "google/gemini-3-flash-preview";
+const MODEL = "google/gemini-2.5-flash";
 
 interface ProcessPayload {
   course_code: string;
@@ -80,13 +80,18 @@ async function extractQuestions(apiKey: string, pdfText: string): Promise<string
   const systemPrompt = `You are an expert at identifying study questions from academic course materials. 
 Extract ALL numbered or lettered questions, prompts, and study tasks from the text.
 Look for items starting with action words like 'List', 'Define', 'Explain', 'Discuss', 'State', 'Describe', 'What', 'How', 'Why', 'Enumerate', as well as numbered items (1., 2., a., b.).
+
+IMPORTANT: If a question has multiple sub-parts (e.g., 1a, 1b, 1c or 1(i), 1(ii)), you MUST combine them into ONE single question entry. Keep the full numbering and all sub-parts together as one string. For example:
+"1. (a) Define osmosis. (b) List three examples of osmosis in everyday life. (c) Differentiate between osmosis and diffusion."
+This should be ONE entry, NOT three separate entries.
+
 Ignore headers, footers, administrative text, and syllabus information.
-Return ONLY a JSON object in this exact format: {"questions": ["question text 1", "question text 2", ...]}
+Return ONLY a JSON object in this exact format: {"questions": ["full question 1 with all sub-parts", "full question 2 with all sub-parts", ...]}
 If no questions are found, return: {"questions": []}`;
 
   const userPrompt = `Extract all study questions from this course material:\n\n${pdfText.slice(0, 30000)}`;
 
-  const result = await callAI(apiKey, systemPrompt, userPrompt);
+  const result = await callAI(apiKey, systemPrompt, userPrompt, 8192);
 
   // Parse the JSON from the response
   try {
@@ -269,7 +274,7 @@ async function processCourse(payload: ProcessPayload) {
       for (let j = 0; j < batch.length; j++) {
         savedQuestions.push({
           course_id: courseId,
-          question_index: i + j + 1,
+          question_index: i + j,
           question_text: batch[j],
           answer_text: results[j].answer_text,
           content: results[j].content,
