@@ -19,7 +19,7 @@ export default function Quiz() {
   const isOwned = id ? purchases.includes(id) : false;
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<Map<number, number>>(new Map()); // questionIndex -> selectedOptionIndex
+  const [answers, setAnswers] = useState<Map<number, number>>(new Map());
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -36,11 +36,10 @@ export default function Quiz() {
 
   const handleSelect = useCallback(async (optionIndex: number) => {
     if (isTransitioning) return;
-    if (answers.has(currentIndex)) return; // Already answered
+    if (answers.has(currentIndex)) return;
 
     setIsTransitioning(true);
 
-    // Record answer
     const newAnswers = new Map(answers);
     newAnswers.set(currentIndex, optionIndex);
     setAnswers(newAnswers);
@@ -49,13 +48,11 @@ export default function Quiz() {
     const newScore = isCorrect ? score + 1 : score;
     if (isCorrect) setScore(newScore);
 
-    // Brief pause to show selection, then auto-advance
     await new Promise(r => setTimeout(r, 600));
 
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(i => i + 1);
     } else {
-      // Last question — save attempt and show results
       const percentage = Math.round((newScore / questions.length) * 100);
       if (user && id) {
         await supabase.from("quiz_attempts").insert({
@@ -98,24 +95,23 @@ export default function Quiz() {
   const selectedOption = answers.get(currentIndex) ?? null;
 
   const getOptionStyle = (index: number) => {
-    const base = "w-full text-left p-5 rounded-2xl border transition-all duration-200 flex items-center gap-4";
+    const base = "w-full text-left p-5 rounded-2xl transition-all duration-200";
 
     if (selectedOption === index) {
       return `${base} border-2 border-foreground bg-card shadow-card`;
     }
     if (selectedOption !== null) {
-      // Another option was selected, dim this one
       return `${base} border border-border/30 bg-card opacity-40`;
     }
-    return `${base} border border-border bg-card`;
+    return `${base} border border-border bg-card hover:bg-secondary/50`;
   };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Zen Mode — 2px Espresso progress line */}
+      {/* Zen Mode — 2px Academic Green progress line */}
       <div className="fixed top-0 left-0 right-0 z-50 h-[2px] bg-border">
         <motion.div
-          className="h-full bg-foreground"
+          className="h-full bg-accent"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
           transition={{ type: "spring", stiffness: 100, damping: 30 }}
@@ -139,8 +135,8 @@ export default function Quiz() {
         </span>
       </div>
 
-      {/* Main content — centered, breathing whitespace */}
-      <div className="flex-1 flex flex-col justify-center px-5 py-24 max-w-lg mx-auto w-full">
+      {/* Main content — A4 Paper rule */}
+      <div className="flex-1 flex flex-col justify-center px-5 py-24 max-w-2xl mx-auto w-full">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
@@ -157,7 +153,7 @@ export default function Quiz() {
               {currentQuestion.quiz_question_text}
             </h2>
 
-            {/* Option Cards — tap to select and auto-advance */}
+            {/* Option Cards — NO radio dots, entire card is the button */}
             <div className="space-y-3 mb-8">
               {options.map((option, i) => (
                 <motion.button
@@ -168,14 +164,6 @@ export default function Quiz() {
                   onClick={() => handleSelect(i)}
                   disabled={selectedOption !== null || isTransitioning}
                 >
-                  {/* Radio Dot */}
-                  <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all ${
-                    selectedOption === i ? "border-foreground" : "border-border"
-                  }`}>
-                    {selectedOption === i && (
-                      <div className="w-2.5 h-2.5 rounded-full bg-foreground" />
-                    )}
-                  </div>
                   <span className="text-sm font-medium text-foreground leading-relaxed">
                     {option.text}
                   </span>
