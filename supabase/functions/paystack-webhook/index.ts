@@ -164,6 +164,45 @@ serve(async (req) => {
       }
     }
 
+    // ─── REFERRAL CREDIT ───
+    // Check if this buyer was referred by an ambassador
+    if (recordedCount > 0) {
+      try {
+        const { data: referral } = await supabase
+          .from('referrals')
+          .select('id, referrer_id, status')
+          .eq('referred_id', user.id)
+          .eq('status', 'pending')
+          .maybeSingle();
+
+        if (referral) {
+          // Credit the ambassador ₦500
+          const { error: walletError } = await supabase.rpc('credit_ambassador_wallet', {
+            ambassador_id: referral.referrer_id,
+            credit_amount: 500,
+          });
+
+          if (!walletError) {
+            // Mark referral as converted
+            await supabase
+              .from('referrals')
+              .update({
+                status: 'credited',
+                credited_amount: 500,
+                converted_at: new Date().toISOString(),
+              })
+              .eq('id', referral.id);
+
+            console.log(`Ambassador ${referral.referrer_id} credited ₦500 for referral of user ${user.id}`);
+          } else {
+            console.error('Failed to credit ambassador wallet:', walletError);
+          }
+        }
+      } catch (refErr) {
+        console.error('Referral credit error:', refErr);
+      }
+    }
+
     console.log(`Webhook complete: ${recordedCount} new purchases recorded for reference:`, reference);
 
     return new Response(

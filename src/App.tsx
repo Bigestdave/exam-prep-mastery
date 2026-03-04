@@ -20,6 +20,8 @@ import Survey from "./pages/Survey";
 import AmbassadorUpload from "./pages/AmbassadorUpload";
 import AmbassadorDashboard from "./pages/AmbassadorDashboard";
 import Quiz from "./pages/Quiz";
+import VipRedirect from "./pages/VipRedirect";
+import Withdraw from "./pages/Withdraw";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +50,8 @@ const App = () => (
             <Route path="/survey" element={<Survey />} />
             <Route path="/upload" element={<AmbassadorUpload />} />
             <Route path="/ambassador" element={<AmbassadorDashboard />} />
+            <Route path="/withdraw" element={<Withdraw />} />
+            <Route path="/vip/:code" element={<VipRedirect />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
