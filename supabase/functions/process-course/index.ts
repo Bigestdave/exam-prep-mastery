@@ -1,0 +1,365 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const MODEL = "google/gemini-3-flash-preview";
+
+interface ProcessPayload {
+  course_code: string;
+  course_title: string;
+  department: string;
+  level: string;
+  pdf_urls: string[];
+  upload_id: string;
+  ambassador_user_id: string;
+}
+
+async function updateUploadStatus(
+  client: ReturnType<typeof createClient>,
+  uploadId: string,
+  status: string,
+  extra: Record<string, unknown> = {}
+) {
+  await client
+    .from("course_uploads")
+    .update({ status, ...extra })
+    .eq("id", uploadId);
+}
+
+async function extractTextFromPdf(pdfUrl: string): Promise<string> {
+  // Download the PDF
+  const response = await fetch(pdfUrl);
+  if (!response.ok) throw new Error(`Failed to download PDF: ${response.status}`);
+
+  const pdfBuffer = await response.arrayBuffer();
+
+  // Use pdf-parse to extract text
+  const pdfParse = (await import("npm:pdf-parse@1.1.1")).default;
+  const result = await pdfParse(new Uint8Array(pdfBuffer));
+  return result.text || "";
+}
+
+async function callAI(
+  apiKey: string,
+  systemPrompt: string,
+  userPrompt: string,
+  maxTokens = 4096
+): Promise<string> {
+  const response = await fetch(AI_GATEWAY, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      max_tokens: maxTokens,
+    }),
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`AI Gateway error ${response.status}: ${errText}`);
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content || "";
+}
+
+async function extractQuestions(apiKey: string, pdfText: string): Promise<string[]> {
+  const systemPrompt = `You are an expert at identifying study questions from academic course materials. 
+Extract ALL numbered or lettered questions, prompts, and study tasks from the text.
+Look for items starting with action words like 'List', 'Define', 'Explain', 'Discuss', 'State', 'Describe', 'What', 'How', 'Why', 'Enumerate', as well as numbered items (1., 2., a., b.).
+Ignore headers, footers, administrative text, and syllabus information.
+Return ONLY a JSON object in this exact format: {"questions": ["question text 1", "question text 2", ...]}
+If no questions are found, return: {"questions": []}`;
+
+  const userPrompt = `Extract all study questions from this course material:\n\n${pdfText.slice(0, 30000)}`;
+
+  const result = await callAI(apiKey, systemPrompt, userPrompt);
+
+  // Parse the JSON from the response
+  try {
+    // Try to find JSON in the response
+    const jsonMatch = result.match(/\{[\s\S]*"questions"[\s\S]*\}/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]);
+      if (Array.isArray(parsed.questions)) {
+        return parsed.questions.filter((q: string) => q && q.trim().length > 5);
+      }
+    }
+  } catch (e) {
+    console.error("Failed to parse questions JSON:", e, "Raw:", result.slice(0, 500));
+  }
+  return [];
+}
+
+async function generateStudyGuide(
+  apiKey: string,
+  question: string,
+  pdfContext: string,
+  courseTitle: string
+): Promise<{ answer_text: string; content: Record<string, unknown> }> {
+  const systemPrompt = `You are an expert university tutor. Create a comprehensive study guide answer for the given question using ONLY the provided course material context. 
+Break down complex topics clearly. Use examples where helpful.
+Structure your answer with clear sections.
+Return a JSON object with this format:
+{
+  "answer_text": "A concise 2-3 sentence summary answer",
+  "explanation": "The full detailed study guide explanation (can be multiple paragraphs with markdown formatting)",
+  "key_points": ["key point 1", "key point 2", "key point 3"],
+  "quiz": {
+    "question": "A comprehension quiz question based on the study guide",
+    "options": ["option A", "option B", "option C", "option D"],
+    "correct_index": 0,
+    "explanation": "Why the correct answer is right"
+  }
+}`;
+
+  const userPrompt = `Course: ${courseTitle}\n\nQuestion: ${question}\n\nContext from course material:\n${pdfContext.slice(0, 8000)}`;
+
+  const result = await callAI(apiKey, systemPrompt, userPrompt);
+
+  try {
+    const jsonMatch = result.match(/\{[\s\S]*"answer_text"[\s\S]*\}/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]);
+      return {
+        answer_text: parsed.answer_text || "See study guide for details.",
+        content: {
+          explanation: parsed.explanation || "",
+          key_points: parsed.key_points || [],
+          quiz: parsed.quiz || null,
+        },
+      };
+    }
+  } catch (e) {
+    console.error("Failed to parse study guide JSON:", e);
+  }
+
+  return {
+    answer_text: "Study guide content available.",
+    content: { explanation: result, key_points: [], quiz: null },
+  };
+}
+
+async function processCourse(payload: ProcessPayload) {
+  const serviceClient = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
+
+  const apiKey = Deno.env.get("LOVABLE_API_KEY");
+  if (!apiKey) throw new Error("LOVABLE_API_KEY not configured");
+
+  const { course_code, course_title, department, level, pdf_urls, upload_id, ambassador_user_id } = payload;
+
+  try {
+    // Step 1: Update status to processing
+    await updateUploadStatus(serviceClient, upload_id, "processing");
+
+    // Step 2: Download and extract text from all PDFs
+    await updateUploadStatus(serviceClient, upload_id, "extracting");
+    let fullText = "";
+    for (const url of pdf_urls) {
+      try {
+        const text = await extractTextFromPdf(url);
+        fullText += text + "\n\n";
+      } catch (e) {
+        console.error(`Failed to extract text from ${url}:`, e);
+      }
+    }
+
+    if (!fullText.trim()) {
+      await updateUploadStatus(serviceClient, upload_id, "failed", {
+        error_message: "Could not extract text from the uploaded PDF(s). Please ensure the files contain readable text.",
+      });
+      return;
+    }
+
+    console.log(`Extracted ${fullText.length} characters from ${pdf_urls.length} PDF(s)`);
+
+    // Step 3: Find or create the course
+    const { data: existingCourse } = await serviceClient
+      .from("courses")
+      .select("id")
+      .eq("code", course_code)
+      .eq("faculty", department)
+      .maybeSingle();
+
+    let courseId: string;
+
+    if (existingCourse) {
+      courseId = existingCourse.id;
+      // Check if questions already exist
+      const { count } = await serviceClient
+        .from("course_questions")
+        .select("id", { count: "exact", head: true })
+        .eq("course_id", courseId);
+
+      if (count && count > 0) {
+        // Course already has content, mark complete
+        await updateUploadStatus(serviceClient, upload_id, "complete", {
+          questions_generated: count,
+        });
+        // Award ambassador
+        await awardAmbassador(serviceClient, ambassador_user_id);
+        return;
+      }
+    } else {
+      // Create new course
+      const { data: newCourse, error: courseErr } = await serviceClient
+        .from("courses")
+        .insert({
+          code: course_code,
+          title: course_title,
+          faculty: department,
+          level: level || "100L",
+          price: 1000,
+        })
+        .select("id")
+        .single();
+
+      if (courseErr || !newCourse) {
+        throw new Error(`Failed to create course: ${courseErr?.message}`);
+      }
+      courseId = newCourse.id;
+    }
+
+    // Step 4: Extract questions using AI
+    await updateUploadStatus(serviceClient, upload_id, "extracting");
+    const questions = await extractQuestions(apiKey, fullText);
+
+    if (questions.length === 0) {
+      await updateUploadStatus(serviceClient, upload_id, "failed", {
+        error_message: "No study questions could be identified in the uploaded material.",
+      });
+      return;
+    }
+
+    console.log(`Extracted ${questions.length} questions`);
+
+    // Step 5: Generate study guides for each question (in parallel batches of 3)
+    await updateUploadStatus(serviceClient, upload_id, "generating");
+    const BATCH_SIZE = 3;
+    const savedQuestions: Array<{
+      course_id: string;
+      question_index: number;
+      question_text: string;
+      answer_text: string;
+      content: Record<string, unknown>;
+    }> = [];
+
+    for (let i = 0; i < questions.length; i += BATCH_SIZE) {
+      const batch = questions.slice(i, i + BATCH_SIZE);
+      const results = await Promise.all(
+        batch.map((q) => generateStudyGuide(apiKey, q, fullText, course_title))
+      );
+
+      for (let j = 0; j < batch.length; j++) {
+        savedQuestions.push({
+          course_id: courseId,
+          question_index: i + j + 1,
+          question_text: batch[j],
+          answer_text: results[j].answer_text,
+          content: results[j].content,
+        });
+      }
+    }
+
+    // Step 6: Save all questions to database
+    const { error: insertErr } = await serviceClient
+      .from("course_questions")
+      .insert(savedQuestions);
+
+    if (insertErr) {
+      throw new Error(`Failed to save questions: ${insertErr.message}`);
+    }
+
+    // Step 7: Mark upload as complete
+    await updateUploadStatus(serviceClient, upload_id, "complete", {
+      questions_generated: savedQuestions.length,
+    });
+
+    // Step 8: Award ambassador ₦500
+    await awardAmbassador(serviceClient, ambassador_user_id);
+
+    console.log(`✅ Course ${course_code} processed: ${savedQuestions.length} questions saved`);
+  } catch (error) {
+    console.error("Processing error:", error);
+    await updateUploadStatus(serviceClient, upload_id, "failed", {
+      error_message: error instanceof Error ? error.message : "Processing failed unexpectedly",
+    });
+  }
+}
+
+async function awardAmbassador(
+  client: ReturnType<typeof createClient>,
+  userId: string
+) {
+  try {
+    const { data: profile } = await client
+      .from("profiles")
+      .select("wallet_balance")
+      .eq("id", userId)
+      .single();
+
+    if (profile) {
+      await client
+        .from("profiles")
+        .update({ wallet_balance: (profile.wallet_balance || 0) + 500 })
+        .eq("id", userId);
+    }
+  } catch (e) {
+    console.error("Failed to award ambassador:", e);
+  }
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    // Verify this is called internally (from trigger-processing) or by an admin
+    const payload: ProcessPayload = await req.json();
+
+    if (
+      !payload.course_code ||
+      !payload.course_title ||
+      !payload.department ||
+      !payload.pdf_urls?.length ||
+      !payload.upload_id ||
+      !payload.ambassador_user_id
+    ) {
+      return new Response(JSON.stringify({ error: "Missing required fields" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Process synchronously — the caller (trigger-processing) doesn't await this
+    await processCourse(payload);
+
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (e) {
+    console.error("process-course error:", e);
+    return new Response(
+      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+});
