@@ -178,8 +178,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signup = async (data: SignupData) => {
     const redirectUrl = `${window.location.origin}/`;
+    const referralCode = localStorage.getItem("referral_code");
     
-    const { error } = await supabase.auth.signUp({
+    const { data: signupData, error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
       options: {
@@ -193,6 +194,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     if (error) return { error: error as Error };
+
+    // Record referral if there's a code stored
+    if (referralCode && signupData.user) {
+      try {
+        await supabase.functions.invoke("record-referral", {
+          body: {
+            referral_code: referralCode,
+            referred_user_id: signupData.user.id,
+          },
+        });
+        localStorage.removeItem("referral_code");
+      } catch (e) {
+        console.error("Failed to record referral:", e);
+      }
+    }
+
     return { error: null };
   };
 

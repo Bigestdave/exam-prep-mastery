@@ -219,6 +219,7 @@ export type Database = {
           id: string
           is_admin: boolean | null
           level: string | null
+          referral_code: string | null
           wallet_balance: number
         }
         Insert: {
@@ -228,6 +229,7 @@ export type Database = {
           id: string
           is_admin?: boolean | null
           level?: string | null
+          referral_code?: string | null
           wallet_balance?: number
         }
         Update: {
@@ -237,6 +239,7 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           level?: string | null
+          referral_code?: string | null
           wallet_balance?: number
         }
         Relationships: []
@@ -295,6 +298,39 @@ export type Database = {
         }
         Relationships: []
       }
+      referrals: {
+        Row: {
+          converted_at: string | null
+          created_at: string
+          credited_amount: number
+          id: string
+          referral_code: string
+          referred_id: string
+          referrer_id: string
+          status: string
+        }
+        Insert: {
+          converted_at?: string | null
+          created_at?: string
+          credited_amount?: number
+          id?: string
+          referral_code: string
+          referred_id: string
+          referrer_id: string
+          status?: string
+        }
+        Update: {
+          converted_at?: string | null
+          created_at?: string
+          credited_amount?: number
+          id?: string
+          referral_code?: string
+          referred_id?: string
+          referrer_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       survey_responses: {
         Row: {
           created_at: string
@@ -349,11 +385,54 @@ export type Database = {
         }
         Relationships: []
       }
+      withdrawal_requests: {
+        Row: {
+          account_name: string
+          account_number: string
+          admin_note: string | null
+          amount: number
+          bank_name: string
+          created_at: string
+          id: string
+          processed_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          account_name: string
+          account_number: string
+          admin_note?: string | null
+          amount: number
+          bank_name: string
+          created_at?: string
+          id?: string
+          processed_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          account_name?: string
+          account_number?: string
+          admin_note?: string | null
+          amount?: number
+          bank_name?: string
+          created_at?: string
+          id?: string
+          processed_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      credit_ambassador_wallet: {
+        Args: { ambassador_id: string; credit_amount: number }
+        Returns: undefined
+      }
       get_course_question_counts: {
         Args: { p_course_ids: string[] }
         Returns: {

@@ -66,6 +66,20 @@ export default function AmbassadorDashboard() {
     }
   }, [isAmbassador, isAdmin, roleLoading, user, navigate, toast]);
 
+  // Ensure referral_code is set on profile for VIP link
+  const firstName = profile?.full_name?.split(" ")[0]?.toLowerCase() || "ambassador";
+  const referralCode = user ? `${firstName}-${user.id.slice(0, 6)}` : "";
+
+  useEffect(() => {
+    if (user && profile && !(profile as any).referral_code && referralCode) {
+      supabase
+        .from("profiles")
+        .update({ referral_code: referralCode })
+        .eq("id", user.id)
+        .then(() => {});
+    }
+  }, [profile, referralCode, user]);
+
   useEffect(() => {
     if (profile?.faculty) setDepartment(profile.faculty);
   }, [profile]);
@@ -277,8 +291,7 @@ export default function AmbassadorDashboard() {
   if (!user || (!isAmbassador && !isAdmin)) return null;
 
   const walletBalance = profile ? (profile as any).wallet_balance || 0 : 0;
-  const firstName = profile?.full_name?.split(" ")[0]?.toLowerCase() || "ambassador";
-  const vipLink = `lcuprep.com/vip/${firstName}-${user.id.slice(0, 4)}`;
+  const vipLink = `lcuprep.lovable.app/vip/${referralCode}`;
   const completedUploads = uploads.filter(u => u.status === "complete").length;
 
   const handleCopyLink = () => {
@@ -289,7 +302,7 @@ export default function AmbassadorDashboard() {
   };
 
   const handleWhatsAppShare = () => {
-    const text = `🎓 Use my VIP link to get ₦500 off on LCU Prep past questions! 👇\nhttps://${vipLink}`;
+    const text = `Use my VIP link to get started on LCU Prep past questions!\nhttps://${vipLink}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
   };
 
@@ -319,6 +332,7 @@ export default function AmbassadorDashboard() {
           <motion.button
             whileHover={{ y: -1 }}
             whileTap={{ scale: 0.97 }}
+            onClick={() => navigate("/withdraw")}
             className="w-full mt-5 h-11 rounded-xl font-bold text-sm bg-background text-foreground flex items-center justify-center gap-2 btn-thud"
           >
             <Wallet className="w-4 h-4" />
