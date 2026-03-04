@@ -12,7 +12,7 @@ import { useRole } from "@/hooks/useRole";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { allDepartments } from "@/data/departments";
-import { Upload, FileText, Loader2, CheckCircle2, AlertCircle, Clock, Wallet, TrendingUp } from "lucide-react";
+import { Upload, FileText, Loader2, CheckCircle2, AlertCircle, Clock, Wallet, TrendingUp, X } from "lucide-react";
 
 interface UploadRecord {
   id: string;
@@ -36,7 +36,7 @@ export default function AmbassadorDashboard() {
   const [courseTitle, setCourseTitle] = useState("");
   const [department, setDepartment] = useState(profile?.faculty || "");
   const [level, setLevel] = useState("100L");
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploads, setUploads] = useState<UploadRecord[]>([]);
 
@@ -86,34 +86,54 @@ export default function AmbassadorDashboard() {
     return () => { supabase.removeChannel(channel); };
   }, [user]);
 
+  const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files;
+    if (!selected) return;
+    const newFiles = Array.from(selected).filter(f => {
+      if (!f.name.toLowerCase().endsWith(".pdf")) {
+        toast({ title: `${f.name} skipped`, description: "Only PDF files are accepted.", variant: "destructive" });
+        return false;
+      }
+      if (f.size > 20 * 1024 * 1024) {
+        toast({ title: `${f.name} skipped`, description: "File exceeds 20MB limit.", variant: "destructive" });
+        return false;
+      }
+      return true;
+    });
+    setFiles(prev => [...prev, ...newFiles]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const removeFile = (index: number) => {
+    setFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleUpload = async () => {
-    if (!file || !courseCode.trim() || !courseTitle.trim() || !department) {
-      toast({ title: "Missing fields", description: "Please fill in all fields and select a PDF.", variant: "destructive" });
-      return;
-    }
-    if (!file.name.toLowerCase().endsWith(".pdf")) {
-      toast({ title: "Invalid file", description: "Please upload a PDF file.", variant: "destructive" });
-      return;
-    }
-    if (file.size > 20 * 1024 * 1024) {
-      toast({ title: "File too large", description: "PDF must be under 20MB.", variant: "destructive" });
+    if (files.length === 0 || !courseCode.trim() || !courseTitle.trim() || !department) {
+      toast({ title: "Missing fields", description: "Please fill in all fields and add at least one PDF.", variant: "destructive" });
       return;
     }
 
     setIsUploading(true);
     try {
-      const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-      const filePath = `pdfs/${user!.id}/${fileName}`;
+      // Upload all PDFs to storage
+      const pdfUrls: string[] = [];
+      for (const file of files) {
+        const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+        const filePath = `pdfs/${user!.id}/${fileName}`;
 
-      const { data: fileData, error: uploadError } = await supabase.storage
-        .from("course_materials")
-        .upload(filePath, file);
+        const { data: fileData, error: uploadError } = await supabase.storage
+          .from("course_materials")
+          .upload(filePath, file);
 
-      if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
+        if (uploadError) throw new Error(`Upload failed for ${file.name}: ${uploadError.message}`);
 
-      const { data: urlData } = supabase.storage
-        .from("course_materials")
-        .getPublicUrl(fileData.path);
+        const { data: urlData } = supabase.storage
+          .from("course_materials")
+          .getPublicUrl(fileData.path);
+
+        pdfUrls.push(urlData.publicUrl);
+      }
 
       const { data: uploadRecord, error: insertError } = await supabase
         .from("course_uploads")
@@ -123,7 +143,7 @@ export default function AmbassadorDashboard() {
           course_title: courseTitle.trim(),
           department,
           level,
-          pdf_url: urlData.publicUrl,
+          pdf_url: pdfUrls[0],
           status: "pending",
         })
         .select()
@@ -137,7 +157,7 @@ export default function AmbassadorDashboard() {
           course_title: courseTitle.trim(),
           department,
           level,
-          pdf_url: urlData.publicUrl,
+          pdf_urls: pdfUrls,
           upload_id: uploadRecord.id,
         },
       });
@@ -147,10 +167,10 @@ export default function AmbassadorDashboard() {
       setUploads(prev => [uploadRecord as UploadRecord, ...prev]);
       setCourseCode("");
       setCourseTitle("");
-      setFile(null);
+      setFiles([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
 
-      toast({ title: "Processing started! 🚀", description: "AI is generating the course content. This takes about 3 minutes." });
+      toast({ title: "Processing started! 🚀", description: "AI is generating the course content. This takes about 5-10 minutes." });
     } catch (error) {
       console.error("Upload error:", error);
       toast({ title: "Upload failed", description: error instanceof Error ? error.message : "Something went wrong.", variant: "destructive" });
@@ -266,44 +286,50 @@ export default function AmbassadorDashboard() {
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs font-bold uppercase tracking-wider">Tutorial PDF</Label>
+            <Label className="text-xs font-bold uppercase tracking-wider">Tutorial PDFs</Label>
             <label
               htmlFor="pdfFile"
               className={`flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-2xl p-8 cursor-pointer transition-colors ${
-                file ? "border-primary/40 bg-primary/[0.03]" : "border-border hover:border-primary/30 hover:bg-muted/30"
+                files.length > 0 ? "border-primary/40 bg-primary/[0.03]" : "border-border hover:border-primary/30 hover:bg-muted/30"
               }`}
             >
-              {file ? (
-                <>
-                  <FileText className="w-8 h-8 text-primary" />
-                  <div className="text-center">
-                    <p className="text-sm font-semibold text-foreground">{file.name}</p>
-                    <p className="text-xs text-muted-foreground">{(file.size / (1024 * 1024)).toFixed(1)} MB</p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <Upload className="w-8 h-8 text-muted-foreground" />
-                  <div className="text-center">
-                    <p className="text-sm font-semibold text-foreground">Tap to upload PDF</p>
-                    <p className="text-xs text-muted-foreground">Max 20MB</p>
-                  </div>
-                </>
-              )}
+              <Upload className="w-8 h-8 text-muted-foreground" />
+              <div className="text-center">
+                <p className="text-sm font-semibold text-foreground">Tap to add PDFs</p>
+                <p className="text-xs text-muted-foreground">Max 20MB each · You can add multiple</p>
+              </div>
               <input
                 ref={fileInputRef}
                 id="pdfFile"
                 type="file"
                 accept=".pdf"
+                multiple
                 className="hidden"
-                onChange={e => setFile(e.target.files?.[0] || null)}
+                onChange={handleFilesSelected}
               />
             </label>
+
+            {files.length > 0 && (
+              <div className="space-y-2 mt-2">
+                {files.map((f, i) => (
+                  <div key={i} className="flex items-center justify-between bg-muted/30 rounded-xl px-3 py-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <FileText className="w-4 h-4 text-primary shrink-0" />
+                      <span className="text-xs font-medium truncate">{f.name}</span>
+                      <span className="text-xs text-muted-foreground shrink-0">{(f.size / (1024 * 1024)).toFixed(1)} MB</span>
+                    </div>
+                    <button onClick={() => removeFile(i)} className="p-1 hover:bg-muted rounded-lg">
+                      <X className="w-3.5 h-3.5 text-muted-foreground" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <Button
             onClick={handleUpload}
-            disabled={isUploading || !file || !courseCode || !courseTitle || !department}
+            disabled={isUploading || files.length === 0 || !courseCode || !courseTitle || !department}
             className="w-full h-12 rounded-xl font-bold text-sm"
           >
             {isUploading ? (
