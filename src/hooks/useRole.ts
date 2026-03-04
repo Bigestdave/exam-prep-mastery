@@ -18,11 +18,14 @@ function setCachedRoles(roles: AppRole[]) {
 }
 
 export function useRole() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [roles, setRoles] = useState<AppRole[]>(getCachedRoles);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Don't resolve loading until auth is done
+    if (authLoading) return;
+
     async function fetchRoles() {
       if (!user) {
         setRoles([]);
@@ -45,12 +48,12 @@ export function useRole() {
     }
 
     fetchRoles();
-  }, [user]);
+  }, [user, authLoading]);
 
   return {
     roles,
     isAdmin: roles.includes('admin'),
     isAmbassador: roles.includes('ambassador'),
-    isLoading,
+    isLoading: authLoading || isLoading,
   };
 }

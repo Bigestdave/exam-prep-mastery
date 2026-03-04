@@ -301,8 +301,8 @@ export default function AmbassadorDashboard() {
         {/* ─── TAB SWITCHER ─── */}
         <div className="bg-secondary rounded-2xl p-1 flex mb-8">
           {([
-            { key: "sell" as TabKey, label: "Sell", sublabel: "Referrals" },
-            { key: "bounties" as TabKey, label: "Bounties", sublabel: "Upload PDFs" },
+            { key: "sell" as TabKey, label: "Sell", sublabel: "Referrals", icon: <Link2 className="w-3.5 h-3.5" /> },
+            { key: "bounties" as TabKey, label: "Bounties", sublabel: "Upload PDFs", icon: <FileText className="w-3.5 h-3.5" /> },
           ]).map(tab => (
             <button
               key={tab.key}
@@ -313,7 +313,7 @@ export default function AmbassadorDashboard() {
                   : "text-muted-foreground hover:text-foreground/70"
               }`}
             >
-              <span className="block">{tab.label}</span>
+              <span className="flex items-center justify-center gap-1.5">{tab.icon} {tab.label}</span>
               <span className="block text-[10px] font-medium opacity-60 mt-0.5">{tab.sublabel}</span>
             </button>
           ))}
