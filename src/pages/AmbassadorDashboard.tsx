@@ -562,7 +562,7 @@ export default function AmbassadorDashboard() {
                 <div>
                   <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Recent Bounties</h2>
                   <div className="space-y-2">
-                    {uploads.slice(0, 3).map(u => (
+                    {uploads.slice(0, 2).map(u => (
                       <div key={u.id} className="bg-card rounded-2xl border border-border/50 p-4 flex items-center justify-between">
                         <div>
                           <p className="text-xs font-mono text-muted-foreground">{u.course_code}</p>
