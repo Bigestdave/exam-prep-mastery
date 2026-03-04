@@ -25,30 +25,49 @@ export interface QuizAttempt {
 }
 
 /**
- * Converts n8n's structured_content.quiz format to our QuizOption[] format.
- * n8n format: { question, options: {A,B,C,D}, correct_answer: "B", hint }
+ * Parses quiz data from content/structured_content JSONB.
+ * Supports two formats:
+ * 1. Edge Function format: { question, options: ["A","B","C","D"], correct_index: 0, explanation }
+ * 2. Legacy n8n format: { question, options: {A:"...",B:"...",C:"...",D:"..."}, correct_answer: "B", hint }
  */
-function parseN8nQuiz(structured: any): { question: string; options: QuizOption[]; hint?: string } | null {
+function parseQuiz(structured: any): { question: string; options: QuizOption[]; hint?: string } | null {
   try {
     const content = typeof structured === 'string' ? JSON.parse(structured) : structured;
     const quiz = content?.quiz;
-    if (!quiz?.options || !quiz?.correct_answer) return null;
+    if (!quiz) return null;
 
-    const letters = ['A', 'B', 'C', 'D'];
-    const options: QuizOption[] = letters
-      .filter(l => quiz.options[l])
-      .map(l => ({
-        text: quiz.options[l],
-        is_correct: quiz.correct_answer.toUpperCase() === l,
+    // Format 1: Edge Function (array options + correct_index)
+    if (Array.isArray(quiz.options) && typeof quiz.correct_index === 'number') {
+      const options: QuizOption[] = quiz.options.map((text: string, i: number) => ({
+        text,
+        is_correct: i === quiz.correct_index,
       }));
+      if (options.length < 2 || !options.some(o => o.is_correct)) return null;
+      return {
+        question: quiz.question || '',
+        options,
+        hint: quiz.explanation,
+      };
+    }
 
-    if (options.length < 2 || !options.some(o => o.is_correct)) return null;
+    // Format 2: Legacy n8n (object options + correct_answer letter)
+    if (quiz.options && quiz.correct_answer && !Array.isArray(quiz.options)) {
+      const letters = ['A', 'B', 'C', 'D'];
+      const options: QuizOption[] = letters
+        .filter(l => quiz.options[l])
+        .map(l => ({
+          text: quiz.options[l],
+          is_correct: quiz.correct_answer.toUpperCase() === l,
+        }));
+      if (options.length < 2 || !options.some(o => o.is_correct)) return null;
+      return {
+        question: quiz.question || '',
+        options,
+        hint: quiz.hint,
+      };
+    }
 
-    return {
-      question: quiz.question || '',
-      options,
-      hint: quiz.hint,
-    };
+    return null;
   } catch {
     return null;
   }
@@ -78,17 +97,17 @@ export function useQuizData(courseId: string | undefined) {
 
         for (const q of data) {
           // Priority 1: n8n content.quiz (new column)
-          const n8nQuiz = parseN8nQuiz(q.content) || parseN8nQuiz(q.structured_content);
-          if (n8nQuiz) {
+          const quizData = parseQuiz(q.content) || parseQuiz(q.structured_content);
+          if (quizData) {
             parsed.push({
               id: q.id,
               course_id: q.course_id,
               question_index: q.question_index,
               question_text: q.question_text,
-              quiz_question_text: n8nQuiz.question,
+              quiz_question_text: quizData.question,
               answer_text: q.answer_text,
-              quiz_options: n8nQuiz.options,
-              hint: n8nQuiz.hint,
+              quiz_options: quizData.options,
+              hint: quizData.hint,
             });
             continue;
           }
