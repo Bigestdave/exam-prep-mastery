@@ -217,8 +217,6 @@ async function processCourse(payload: ProcessPayload) {
         await updateUploadStatus(serviceClient, upload_id, "complete", {
           questions_generated: count,
         });
-        // Award ambassador
-        await awardAmbassador(serviceClient, ambassador_user_id);
         return;
       }
     } else {
@@ -296,9 +294,6 @@ async function processCourse(payload: ProcessPayload) {
       questions_generated: savedQuestions.length,
     });
 
-    // Step 8: Award ambassador ₦500
-    await awardAmbassador(serviceClient, ambassador_user_id);
-
     console.log(`✅ Course ${course_code} processed: ${savedQuestions.length} questions saved`);
   } catch (error) {
     console.error("Processing error:", error);
@@ -308,27 +303,6 @@ async function processCourse(payload: ProcessPayload) {
   }
 }
 
-async function awardAmbassador(
-  client: ReturnType<typeof createClient>,
-  userId: string
-) {
-  try {
-    const { data: profile } = await client
-      .from("profiles")
-      .select("wallet_balance")
-      .eq("id", userId)
-      .single();
-
-    if (profile) {
-      await client
-        .from("profiles")
-        .update({ wallet_balance: (profile.wallet_balance || 0) + 500 })
-        .eq("id", userId);
-    }
-  } catch (e) {
-    console.error("Failed to award ambassador:", e);
-  }
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
