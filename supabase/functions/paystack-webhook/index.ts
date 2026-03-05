@@ -6,28 +6,16 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-paystack-signature',
 };
 
-// Helper to create HMAC SHA512 signature
 async function createHmacSha512(key: string, data: string): Promise<string> {
   const encoder = new TextEncoder();
   const keyData = encoder.encode(key);
   const dataToSign = encoder.encode(data);
-  
-  const cryptoKey = await crypto.subtle.importKey(
-    'raw',
-    keyData,
-    { name: 'HMAC', hash: 'SHA-512' },
-    false,
-    ['sign']
-  );
-  
+  const cryptoKey = await crypto.subtle.importKey('raw', keyData, { name: 'HMAC', hash: 'SHA-512' }, false, ['sign']);
   const signature = await crypto.subtle.sign('HMAC', cryptoKey, dataToSign);
-  return Array.from(new Uint8Array(signature))
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
+  return Array.from(new Uint8Array(signature)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -39,14 +27,11 @@ serve(async (req) => {
       return new Response('Server configuration error', { status: 500 });
     }
 
-    // Get the raw body for signature verification
     const body = await req.text();
     const signature = req.headers.get('x-paystack-signature');
 
-    // Verify webhook signature
     if (signature) {
       const expectedSignature = await createHmacSha512(paystackSecretKey, body);
-
       if (signature !== expectedSignature) {
         console.error('Invalid webhook signature');
         return new Response('Invalid signature', { status: 401 });
@@ -56,7 +41,6 @@ serve(async (req) => {
     const payload = JSON.parse(body);
     console.log('Webhook event received:', payload.event);
 
-    // Only process successful charges
     if (payload.event !== 'charge.success') {
       console.log('Ignoring non-charge.success event:', payload.event);
       return new Response('OK', { status: 200, headers: corsHeaders });
@@ -82,40 +66,26 @@ serve(async (req) => {
       return new Response('Missing customer email', { status: 400, headers: corsHeaders });
     }
 
-    // Initialize Supabase admin client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Find user by email using paginated search
+    // Find user by email
     let user = null;
     let page = 1;
     const perPage = 100;
-    
     while (!user) {
-      const { data: usersPage, error: userError } = await supabase.auth.admin.listUsers({
-        page,
-        perPage,
-      });
-      
+      const { data: usersPage, error: userError } = await supabase.auth.admin.listUsers({ page, perPage });
       if (userError) {
         console.error('Failed to list users:', userError);
         return new Response('Failed to find user', { status: 500, headers: corsHeaders });
       }
-      
-      if (!usersPage.users || usersPage.users.length === 0) {
-        break;
-      }
-      
+      if (!usersPage.users || usersPage.users.length === 0) break;
       user = usersPage.users.find(u => u.email?.toLowerCase() === customerEmail.toLowerCase());
-      
-      if (usersPage.users.length < perPage) {
-        break;
-      }
-      
+      if (usersPage.users.length < perPage) break;
       page++;
     }
-    
+
     if (!user) {
       console.error('User not found for email:', customerEmail);
       return new Response('User not found', { status: 404, headers: corsHeaders });
@@ -123,7 +93,6 @@ serve(async (req) => {
 
     console.log('Found user:', user.id);
 
-    // Determine which course IDs to record
     const courseIdsToRecord: string[] = paymentType === 'bundle' && Array.isArray(bundleCourseIds) && bundleCourseIds.length > 0
       ? bundleCourseIds
       : [courseId];
@@ -131,9 +100,9 @@ serve(async (req) => {
     console.log('Recording purchases for courses:', courseIdsToRecord);
 
     let recordedCount = 0;
+    const departmentsAffected = new Set<string>();
 
     for (const cId of courseIdsToRecord) {
-      // Check if purchase already exists
       const { data: existingPurchase } = await supabase
         .from('purchases')
         .select('id')
@@ -146,13 +115,9 @@ serve(async (req) => {
         continue;
       }
 
-      // Insert the purchase
       const { data: purchase, error: insertError } = await supabase
         .from('purchases')
-        .insert({
-          user_id: user.id,
-          course_id: cId,
-        })
+        .insert({ user_id: user.id, course_id: cId })
         .select()
         .single();
 
@@ -161,11 +126,20 @@ serve(async (req) => {
       } else {
         console.log('Purchase recorded:', purchase.id, 'for course:', cId);
         recordedCount++;
+
+        // Track which department this course belongs to for milestone check
+        const { data: course } = await supabase
+          .from('courses')
+          .select('faculty')
+          .eq('id', cId)
+          .maybeSingle();
+        if (course?.faculty) {
+          departmentsAffected.add(course.faculty);
+        }
       }
     }
 
-    // ─── REFERRAL CREDIT ───
-    // Check if this buyer was referred by an ambassador
+    // ─── REFERRAL: Mark as converted (NO per-sale commission anymore) ───
     if (recordedCount > 0) {
       try {
         const { data: referral } = await supabase
@@ -176,30 +150,38 @@ serve(async (req) => {
           .maybeSingle();
 
         if (referral) {
-          // Credit the ambassador ₦500
-          const { error: walletError } = await supabase.rpc('credit_ambassador_wallet', {
-            ambassador_id: referral.referrer_id,
-            credit_amount: 500,
-          });
+          // Just mark as converted, no wallet credit
+          await supabase
+            .from('referrals')
+            .update({
+              status: 'converted',
+              credited_amount: 0,
+              converted_at: new Date().toISOString(),
+            })
+            .eq('id', referral.id);
 
-          if (!walletError) {
-            // Mark referral as converted
-            await supabase
-              .from('referrals')
-              .update({
-                status: 'credited',
-                credited_amount: 500,
-                converted_at: new Date().toISOString(),
-              })
-              .eq('id', referral.id);
-
-            console.log(`Ambassador ${referral.referrer_id} credited ₦500 for referral of user ${user.id}`);
-          } else {
-            console.error('Failed to credit ambassador wallet:', walletError);
-          }
+          console.log(`Referral for user ${user.id} marked as converted (no per-sale commission)`);
         }
       } catch (refErr) {
-        console.error('Referral credit error:', refErr);
+        console.error('Referral update error:', refErr);
+      }
+
+      // ─── CHECK DEPARTMENT MILESTONES ───
+      for (const dept of departmentsAffected) {
+        try {
+          const fnUrl = `${supabaseUrl}/functions/v1/check-milestones`;
+          await fetch(fnUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${supabaseServiceKey}`,
+            },
+            body: JSON.stringify({ department: dept }),
+          });
+          console.log(`Milestone check triggered for department: ${dept}`);
+        } catch (msErr) {
+          console.error('Milestone check error for', dept, msErr);
+        }
       }
     }
 
