@@ -226,7 +226,7 @@ export default function AmbassadorDashboard() {
       setUploads(prev => [uploadRecord as UploadRecord, ...prev]);
       setCourseCode(""); setCourseTitle(""); setFiles([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      toast({ title: "✨ Bounty Submitted!", description: "AI is generating the course content. You'll earn ₦500 when approved." });
+      toast({ title: "✨ Upload Submitted!", description: "AI is generating the course content. Thank you for representing your department!" });
     } catch (error) {
       console.error("Upload error:", error);
       toast({ title: "Upload failed", description: error instanceof Error ? error.message : "Something went wrong.", variant: "destructive" });
@@ -602,7 +602,7 @@ export default function AmbassadorDashboard() {
               <div className="mb-2">
                 <h2 className="text-lg font-display font-bold">Help Build The Dossier.</h2>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Upload verified tutorial PDFs. If our AI approves it, you earn <span className="font-bold text-accent">₦500 per course</span>.
+                  Upload verified tutorial PDFs — it's your duty as department rep.
                 </p>
               </div>
 

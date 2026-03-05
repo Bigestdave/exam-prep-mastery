@@ -121,7 +121,7 @@ export default function AmbassadorUpload() {
     setIsUploading(false);
     toast({
       title: "Your course is ready! 🎉",
-      description: `${questionsGenerated || 0} study guides created. You earned ₦500!`,
+      description: `${questionsGenerated || 0} study guides created. Your department is stronger!`,
     });
     // Clear active upload after a moment
     setTimeout(() => setActiveUpload(null), 5000);
