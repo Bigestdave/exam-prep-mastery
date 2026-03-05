@@ -44,9 +44,9 @@ interface MilestoneRecord {
 }
 
 const MILESTONES = [
-  { tier: 1, threshold: 20, bonus: 10000, label: "Activation" },
-  { tier: 2, threshold: 40, bonus: 25000, label: "Penetration" },
-  { tier: 3, threshold: 60, bonus: 50000, label: "Domination" },
+  { tier: 1, threshold: 40, bonus: 7500, label: "Activation" },
+  { tier: 2, threshold: 80, bonus: 15000, label: "Penetration" },
+  { tier: 3, threshold: 150, bonus: 30000, label: "Domination" },
 ];
 
 type TabKey = "department" | "sell" | "bounties";
@@ -276,13 +276,14 @@ export default function AmbassadorDashboard() {
   const vipLink = `lcuprep.vercel.app/vip/${referralCode}`;
   const completedUploads = uploads.filter(u => u.status === "complete").length;
 
-  // Milestone progress
+  // Milestone progress — based on total course unlocks, not unique buyers
   const uniqueBuyers = myDeptStats?.unique_buyers || 0;
-  const currentTier = MILESTONES.filter(m => uniqueBuyers >= m.threshold).length;
+  const totalUnlocks = myDeptStats?.total_unlocks || 0;
+  const currentTier = MILESTONES.filter(m => totalUnlocks >= m.threshold).length;
   const nextMilestone = MILESTONES[currentTier] || null;
   const prevThreshold = currentTier > 0 ? MILESTONES[currentTier - 1].threshold : 0;
   const progressToNext = nextMilestone
-    ? Math.min(100, ((uniqueBuyers - prevThreshold) / (nextMilestone.threshold - prevThreshold)) * 100)
+    ? Math.min(100, ((totalUnlocks - prevThreshold) / (nextMilestone.threshold - prevThreshold)) * 100)
     : 100;
 
   const handleCopyLink = () => {
@@ -438,11 +439,11 @@ export default function AmbassadorDashboard() {
                       <div className="space-y-2">
                         <div className="flex justify-between text-xs">
                           <span className="font-semibold">{nextMilestone.label} (Tier {nextMilestone.tier})</span>
-                          <span className="text-muted-foreground">{uniqueBuyers} / {nextMilestone.threshold} students</span>
+                          <span className="text-muted-foreground">{totalUnlocks} / {nextMilestone.threshold} unlocks</span>
                         </div>
                         <Progress value={progressToNext} className="h-3" />
                         <p className="text-xs text-muted-foreground">
-                          <span className="font-bold text-foreground">{nextMilestone.threshold - uniqueBuyers} more students</span> to unlock ₦{nextMilestone.bonus.toLocaleString()} bonus
+                          <span className="font-bold text-foreground">{nextMilestone.threshold - totalUnlocks} more unlocks</span> to earn ₦{nextMilestone.bonus.toLocaleString()} bonus
                         </p>
                       </div>
                     ) : (
@@ -477,7 +478,7 @@ export default function AmbassadorDashboard() {
                               </div>
                               <div>
                                 <p className="text-sm font-semibold">{m.label}</p>
-                                <p className="text-[10px] text-muted-foreground">{m.threshold} unique students</p>
+                                <p className="text-[10px] text-muted-foreground">{m.threshold} course unlocks</p>
                               </div>
                             </div>
                             <span className={`text-sm font-mono font-bold ${achieved ? "text-accent" : "text-muted-foreground"}`}>
@@ -580,9 +581,9 @@ export default function AmbassadorDashboard() {
               {myDeptStats && (
                 <div className="bg-card rounded-3xl card-float p-5">
                   <p className="text-xs text-muted-foreground text-center">
-                    Your department has <span className="font-bold text-foreground">{uniqueBuyers} students</span>.
+                    Your department has <span className="font-bold text-foreground">{totalUnlocks} course unlocks</span>.
                     {nextMilestone && (
-                      <> Get <span className="font-bold text-accent">{nextMilestone.threshold - uniqueBuyers} more</span> to unlock ₦{nextMilestone.bonus.toLocaleString()}!</>
+                      <> Get <span className="font-bold text-accent">{nextMilestone.threshold - totalUnlocks} more</span> to earn ₦{nextMilestone.bonus.toLocaleString()}!</>
                     )}
                   </p>
                 </div>
