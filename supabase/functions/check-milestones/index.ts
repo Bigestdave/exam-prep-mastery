@@ -8,9 +8,9 @@ const corsHeaders = {
 
 // Milestone tiers: unique buyers threshold → bonus amount
 const MILESTONES = [
-  { tier: 1, threshold: 20, bonus: 10000 },
-  { tier: 2, threshold: 40, bonus: 25000 },
-  { tier: 3, threshold: 60, bonus: 50000 },
+  { tier: 1, threshold: 40, bonus: 7500 },
+  { tier: 2, threshold: 80, bonus: 15000 },
+  { tier: 3, threshold: 150, bonus: 30000 },
 ];
 
 // Depth bonus: if department avg >= 3.0 courses per buyer
@@ -88,12 +88,13 @@ serve(async (req) => {
 
     const ambassadorId = ambassadorRoles[0].user_id;
     const uniqueBuyers = Number(deptStats.unique_buyers);
+    const totalUnlocks = Number(deptStats.total_unlocks);
     const avgPerBuyer = Number(deptStats.avg_per_buyer);
     const bonusesCredited: string[] = [];
 
     // Check each milestone tier
     for (const milestone of MILESTONES) {
-      if (uniqueBuyers >= milestone.threshold) {
+      if (totalUnlocks >= milestone.threshold) {
         // Check if already achieved
         const { data: existing } = await supabase
           .from('department_milestones')
