@@ -211,6 +211,44 @@ export type Database = {
         }
         Relationships: []
       }
+      department_milestones: {
+        Row: {
+          achieved_at: string
+          ambassador_id: string
+          bonus_amount: number
+          department: string
+          id: string
+          semester_id: string
+          tier: number
+        }
+        Insert: {
+          achieved_at?: string
+          ambassador_id: string
+          bonus_amount: number
+          department: string
+          id?: string
+          semester_id: string
+          tier: number
+        }
+        Update: {
+          achieved_at?: string
+          ambassador_id?: string
+          bonus_amount?: number
+          department?: string
+          id?: string
+          semester_id?: string
+          tier?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "department_milestones_semester_id_fkey"
+            columns: ["semester_id"]
+            isOneToOne: false
+            referencedRelation: "semester_config"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -331,6 +369,27 @@ export type Database = {
         }
         Relationships: []
       }
+      semester_config: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
       survey_responses: {
         Row: {
           created_at: string
@@ -438,6 +497,25 @@ export type Database = {
         Returns: {
           course_id: string
           question_count: number
+        }[]
+      }
+      get_department_leaderboard: {
+        Args: { p_since?: string }
+        Returns: {
+          avg_per_buyer: number
+          department: string
+          rank: number
+          total_unlocks: number
+          unique_buyers: number
+        }[]
+      }
+      get_department_stats: {
+        Args: { p_since?: string }
+        Returns: {
+          avg_per_buyer: number
+          department: string
+          total_unlocks: number
+          unique_buyers: number
         }[]
       }
       has_purchased_course: { Args: { course_id: string }; Returns: boolean }

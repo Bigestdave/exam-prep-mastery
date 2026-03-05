@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen, ClipboardList, DollarSign, TrendingUp, Users, ShoppingCart, Crown, Upload } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen, ClipboardList, DollarSign, TrendingUp, Users, ShoppingCart, Crown, Upload, Calendar, Target, RefreshCw } from "lucide-react";
 import { AmbassadorsTab } from "@/components/admin/AmbassadorsTab";
 import { UploadsTab } from "@/components/admin/UploadsTab";
 import { Badge } from "@/components/ui/badge";
@@ -398,6 +398,150 @@ function SalesTab() {
   );
 }
 
+// ═══════════════ SEMESTER & DEPARTMENT PERFORMANCE TAB ═══════════════
+function SemesterTab() {
+  const { toast } = useToast();
+  const [semesters, setSemesters] = useState<any[]>([]);
+  const [deptStats, setDeptStats] = useState<any[]>([]);
+  const [milestones, setMilestones] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newSemesterName, setNewSemesterName] = useState("");
+  const [creating, setCreating] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    const [{ data: sems }, { data: stats }, { data: ms }] = await Promise.all([
+      supabase.from("semester_config").select("*").order("created_at", { ascending: false }),
+      supabase.rpc("get_department_leaderboard"),
+      supabase.from("department_milestones").select("*").order("achieved_at", { ascending: false }),
+    ]);
+    setSemesters(sems || []);
+    setDeptStats(stats || []);
+    setMilestones(ms || []);
+    setLoading(false);
+  };
+
+  useEffect(() => { fetchData(); }, []);
+
+  const handleCreateSemester = async () => {
+    if (!newSemesterName.trim()) return;
+    setCreating(true);
+    // Deactivate all existing
+    await supabase.from("semester_config").update({ is_active: false }).eq("is_active", true);
+    // Create new active
+    const { error } = await supabase.from("semester_config").insert({ name: newSemesterName.trim(), is_active: true });
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "New semester created", description: "All milestone progress has been reset." });
+      setNewSemesterName("");
+    }
+    setCreating(false);
+    fetchData();
+  };
+
+  const activeSemester = semesters.find(s => s.is_active);
+
+  if (loading) return <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin" /></div>;
+
+  const TIERS: Record<number, string> = { 1: "Activation", 2: "Penetration", 3: "Domination" };
+
+  return (
+    <div className="space-y-6">
+      {/* Active Semester */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2"><Calendar className="w-4 h-4" /> Active Semester</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {activeSemester ? (
+            <div className="flex items-center justify-between bg-accent/5 rounded-xl p-4">
+              <div>
+                <p className="font-bold">{activeSemester.name}</p>
+                <p className="text-xs text-muted-foreground">Started {new Date(activeSemester.created_at).toLocaleDateString()}</p>
+              </div>
+              <Badge className="bg-accent text-accent-foreground">Active</Badge>
+            </div>
+          ) : (
+            <p className="text-muted-foreground">No active semester</p>
+          )}
+          <div className="flex gap-2">
+            <Input placeholder="e.g. 2025/2026 First Semester" value={newSemesterName} onChange={e => setNewSemesterName(e.target.value)} />
+            <Button onClick={handleCreateSemester} disabled={creating || !newSemesterName.trim()}>
+              {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <><RefreshCw className="w-4 h-4 mr-1" /> New Semester</>}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">⚠️ Creating a new semester resets all department milestones</p>
+        </CardContent>
+      </Card>
+
+      {/* Department Leaderboard */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2"><Target className="w-4 h-4" /> Department Performance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>#</TableHead>
+                <TableHead>Department</TableHead>
+                <TableHead className="text-right">Students</TableHead>
+                <TableHead className="text-right">Unlocks</TableHead>
+                <TableHead className="text-right">Avg/Buyer</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {deptStats.map((d: any) => (
+                <TableRow key={d.department}>
+                  <TableCell className="font-bold">{d.rank}</TableCell>
+                  <TableCell className="font-medium">{d.department}</TableCell>
+                  <TableCell className="text-right">{d.unique_buyers}</TableCell>
+                  <TableCell className="text-right">{d.total_unlocks}</TableCell>
+                  <TableCell className="text-right">{d.avg_per_buyer}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Achieved Milestones */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2"><Crown className="w-4 h-4" /> Achieved Milestones</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {milestones.length === 0 ? (
+            <p className="text-muted-foreground text-center py-4">No milestones achieved yet</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Department</TableHead>
+                  <TableHead>Tier</TableHead>
+                  <TableHead className="text-right">Bonus</TableHead>
+                  <TableHead className="text-right">Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {milestones.map((m: any) => (
+                  <TableRow key={m.id}>
+                    <TableCell className="font-medium">{m.department}</TableCell>
+                    <TableCell><Badge variant="outline">{TIERS[m.tier] || `Tier ${m.tier}`}</Badge></TableCell>
+                    <TableCell className="text-right">₦{m.bonus_amount?.toLocaleString()}</TableCell>
+                    <TableCell className="text-right text-xs">{new Date(m.achieved_at).toLocaleDateString()}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -620,6 +764,7 @@ export default function AdminDashboard() {
           <TabsList className="mb-6 flex-wrap">
             <TabsTrigger value="courses" className="gap-2"><BookOpen className="w-4 h-4" />Courses</TabsTrigger>
             <TabsTrigger value="sales" className="gap-2"><DollarSign className="w-4 h-4" />Sales</TabsTrigger>
+            <TabsTrigger value="semester" className="gap-2"><Target className="w-4 h-4" />Departments</TabsTrigger>
             <TabsTrigger value="uploads" className="gap-2"><Upload className="w-4 h-4" />Uploads</TabsTrigger>
             <TabsTrigger value="ambassadors" className="gap-2"><Crown className="w-4 h-4" />Ambassadors</TabsTrigger>
             <TabsTrigger value="survey" className="gap-2"><ClipboardList className="w-4 h-4" />Survey</TabsTrigger>
@@ -672,6 +817,10 @@ export default function AdminDashboard() {
 
           <TabsContent value="sales">
             <SalesTab />
+          </TabsContent>
+
+          <TabsContent value="semester">
+            <SemesterTab />
           </TabsContent>
 
           <TabsContent value="uploads">
