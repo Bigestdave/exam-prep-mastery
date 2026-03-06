@@ -87,22 +87,17 @@ export default function Profile() {
         </Link>
 
         {/* Profile Header Card */}
-        <div className="bg-card rounded-3xl border border-border shadow-card p-6 mb-6 flex flex-col items-center text-center">
+        <div className="bg-card rounded-3xl border border-border shadow-card p-8 mb-6 flex flex-col items-center text-center">
           <div className="w-20 h-20 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center mb-4">
             <span className="text-2xl font-display font-bold text-primary" style={{ letterSpacing: '-0.03em' }}>
               {getInitials(profile?.full_name)}
             </span>
           </div>
           <h1 className="text-xl font-display font-bold text-foreground mb-0.5">{profile?.full_name}</h1>
-          <p className="text-sm text-muted-foreground">{user?.email}</p>
-          <div className="flex items-center gap-2 mt-2">
-            <span className="text-xs font-mono tracking-wider uppercase text-muted-foreground bg-secondary px-3 py-1 rounded-full">
-              {profile?.faculty}
-            </span>
-            <span className="text-xs font-mono tracking-wider uppercase text-muted-foreground bg-secondary px-3 py-1 rounded-full">
-              {profile?.level}
-            </span>
-          </div>
+          <p className="text-sm text-muted-foreground mb-3">{user?.email}</p>
+          <p className="text-xs font-mono tracking-wider uppercase text-muted-foreground">
+            {profile?.faculty} · {profile?.level}
+          </p>
         </div>
 
         {/* Action Cards */}
