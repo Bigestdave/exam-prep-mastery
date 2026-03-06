@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { MobileBottomNav } from "@/components/MobileBottomNav";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -293,7 +293,6 @@ export default function AmbassadorDashboard() {
             <div className="h-16 w-full bg-secondary/40 rounded-2xl" />
           </div>
         </main>
-        <MobileBottomNav />
       </div>
     );
   }
@@ -733,7 +732,7 @@ export default function AmbassadorDashboard() {
         </AnimatePresence>
       </main>
 
-      <MobileBottomNav />
+      
     </div>
   );
 }

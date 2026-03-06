@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Header } from "@/components/Header";
-import { MobileBottomNav } from "@/components/MobileBottomNav";
+
 import {
   Form,
   FormControl,
@@ -128,7 +128,6 @@ export default function RequestCourse() {
             ))}
           </div>
         </main>
-        <MobileBottomNav />
       </div>
     );
   }
@@ -156,7 +155,6 @@ export default function RequestCourse() {
             </Button>
           </div>
         </main>
-        <MobileBottomNav />
       </div>
     );
   }
@@ -278,7 +276,7 @@ export default function RequestCourse() {
         </Form>
       </main>
 
-      <MobileBottomNav />
+      
     </div>
   );
 }

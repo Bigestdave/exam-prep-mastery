@@ -43,16 +43,6 @@ export function MobileBottomNav() {
   const currentPath = location.pathname;
   const { isAmbassador, isLoading: isRoleLoading } = useRole();
 
-  const getActiveState = () => {
-    if (currentPath === "/profile") return "account";
-    if (currentPath === "/library") return "library";
-    if (currentPath === "/ambassador") return "ambassador";
-    if (currentPath === "/dashboard" || currentPath.startsWith("/course/")) return "home";
-    return "home";
-  };
-
-  const activeState = getActiveState();
-
   // Cache ambassador status to prevent flicker
   const [cachedIsAmbassador, setCachedIsAmbassador] = useState(() => {
     try {
@@ -69,6 +59,21 @@ export function MobileBottomNav() {
     }
   }, [isAmbassador, isRoleLoading]);
 
+  // Hide on public/auth pages and quiz
+  const hiddenPaths = ["/", "/login", "/signup", "/forgot-password", "/reset-password", "/admin", "/survey"];
+  const isQuizRoute = currentPath.includes("/quiz");
+  const isVipRoute = currentPath.startsWith("/vip/");
+  if (hiddenPaths.includes(currentPath) || isQuizRoute || isVipRoute) return null;
+
+  const getActiveState = () => {
+    if (currentPath === "/profile") return "account";
+    if (currentPath === "/library") return "library";
+    if (currentPath === "/ambassador") return "ambassador";
+    if (currentPath === "/dashboard" || currentPath.startsWith("/course/")) return "home";
+    return "home";
+  };
+
+  const activeState = getActiveState();
   const showAmbassador = isRoleLoading ? cachedIsAmbassador : isAmbassador;
 
   return (

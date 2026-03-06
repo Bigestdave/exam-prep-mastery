@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { MobileBottomNav } from "@/components/MobileBottomNav";
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { supabase } from "@/integrations/supabase/client";
@@ -84,7 +84,6 @@ export default function Library() {
             ))}
           </div>
         </main>
-        <MobileBottomNav />
       </div>
     );
   }
@@ -152,7 +151,7 @@ export default function Library() {
         )}
       </main>
 
-      <MobileBottomNav />
+      
     </div>
   );
 }
