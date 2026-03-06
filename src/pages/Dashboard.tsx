@@ -123,11 +123,6 @@ export default function Dashboard() {
             {profile?.full_name?.split(' ')[0] || 'Student'}
           </h1>
           
-          {displayCourses.length > 0 && (
-            <p className="text-sm text-muted-foreground mt-2">
-              <span className="text-foreground font-bold">{ownedCount}</span>/{displayCourses.length} unlocked
-            </p>
-          )}
         </div>
 
         {displayCourses.length > 0 ? (

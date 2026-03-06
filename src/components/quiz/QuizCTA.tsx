@@ -61,7 +61,7 @@ export function QuizCTA({ courseId, courseCode }: QuizCTAProps) {
         </div>
 
         <div className="flex-1">
-          <h3 className="font-display font-bold text-foreground text-sm" style={{ letterSpacing: '-0.05em' }}>
+          <h3 className="font-display font-bold text-foreground text-base md:text-lg" style={{ letterSpacing: '-0.05em' }}>
             Exam Readiness: {percentage}%
           </h3>
           <p className="text-xs text-muted-foreground font-serif italic mt-0.5">
