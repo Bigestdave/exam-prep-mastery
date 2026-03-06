@@ -26,27 +26,34 @@ export default function Landing() {
       {/* Hero Section — The Manifesto */}
       <section className="relative">
         <div className="container py-16 md:py-24 px-4">
-          <div className="max-w-3xl mx-auto text-center">
+          <div className="max-w-3xl mx-auto text-left md:text-center">
             <div className="inline-flex items-center gap-2 glass-pill rounded-full text-muted-foreground px-5 py-2 text-xs font-mono font-semibold tracking-[0.15em] uppercase mb-8 opacity-0 animate-fade-in">
               <img src={sovereignKey} alt="" className="w-4 h-4 object-contain" style={{ filter: 'brightness(0) saturate(100%) invert(27%) sepia(89%) saturate(1220%) hue-rotate(117deg) brightness(96%) contrast(88%)' }} />
               Lead City University
             </div>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-[1.1] mb-6">
-              {["6 out of 15", "Tutorial Questions", "will appear in", "your exam,"].map((word, i) => (
+            <h1 className="text-foreground leading-[1.1] mb-6">
+              <motion.span
+                className="block text-7xl md:text-8xl lg:text-9xl font-display font-bold"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+              >
+                6 <span className="text-4xl md:text-5xl lg:text-6xl text-muted-foreground font-serif italic">of</span> 15
+              </motion.span>
+              {["Tutorial Questions", "will appear in", "your exam,"].map((line, i) => (
                 <motion.span
                   key={i}
-                  className="inline-block mr-[0.25em]"
+                  className="block text-3xl md:text-4xl lg:text-5xl font-display font-bold"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + i * 0.08, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  transition={{ delay: 0.2 + i * 0.08, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                 >
-                  {i === 0 ? <span className="text-5xl md:text-6xl lg:text-7xl">{word}</span> : word}
+                  {line}
                 </motion.span>
               ))}
-              <br />
               <motion.span
-                className="font-serif italic text-accent inline-block"
+                className="block text-3xl md:text-4xl lg:text-5xl font-serif italic text-accent mt-1"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
