@@ -34,17 +34,17 @@ export default function Landing() {
             
             <h1 className="text-foreground leading-[1.1] mb-6">
               <motion.span
-                className="block text-7xl md:text-8xl lg:text-9xl font-display font-bold"
+                className="block text-[80px] md:text-8xl lg:text-9xl font-display font-bold leading-[0.9]"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
               >
-                6 <span className="text-4xl md:text-5xl lg:text-6xl text-muted-foreground font-serif italic">of</span> 15
+                6 <span className="text-[50px] md:text-6xl lg:text-7xl text-muted-foreground font-serif italic">of</span> 15
               </motion.span>
               {["Tutorial Questions", "will appear in", "your exam,"].map((line, i) => (
                 <motion.span
                   key={i}
-                  className="block text-[28px] md:text-4xl lg:text-5xl font-display font-bold leading-[1.15]"
+                  className="block text-[40px] md:text-5xl lg:text-6xl font-display font-bold leading-[1.1]"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + i * 0.08, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -53,7 +53,7 @@ export default function Landing() {
                 </motion.span>
               ))}
               <motion.span
-                className="block text-[28px] md:text-4xl lg:text-5xl font-serif italic text-accent mt-1"
+                className="block text-[40px] md:text-5xl lg:text-6xl font-serif italic text-accent mt-1"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
