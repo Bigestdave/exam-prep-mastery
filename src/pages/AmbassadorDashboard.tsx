@@ -335,7 +335,7 @@ export default function AmbassadorDashboard() {
           {([
             { key: "department" as TabKey, label: "My Dept", sublabel: "Performance", icon: <Target className="w-3.5 h-3.5" /> },
             { key: "sell" as TabKey, label: "Sell", sublabel: "Referrals", icon: <Link2 className="w-3.5 h-3.5" /> },
-            { key: "bounties" as TabKey, label: "Bounties", sublabel: "Upload PDFs", icon: <FileText className="w-3.5 h-3.5" /> },
+            { key: "bounties" as TabKey, label: "AI Forge", sublabel: "Upload PDFs", icon: <FileText className="w-3.5 h-3.5" /> },
           ]).map(tab => (
             <button
               key={tab.key}
@@ -675,13 +675,13 @@ export default function AmbassadorDashboard() {
                   disabled={isUploading || files.length === 0 || !courseCode || !courseTitle || !department}
                   className="w-full h-12 rounded-xl font-bold text-sm bg-foreground text-background disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 btn-thud"
                 >
-                  {isUploading ? <><Loader2 className="w-4 h-4 animate-spin" /> ✨ Getting Your Course Ready...</> : <><Upload className="w-4 h-4" /> Submit Bounty</>}
+                  {isUploading ? <><Loader2 className="w-4 h-4 animate-spin" /> Getting Your Course Ready...</> : <><Upload className="w-4 h-4" /> Submit Course</>}
                 </motion.button>
               </div>
 
               {uploads.length > 0 && (
                 <div>
-                  <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Recent Bounties</h2>
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Recent Uploads</h2>
                   <div className="space-y-2">
                     {uploads.slice(0, 2).map(u => (
                       <div key={u.id} className="bg-card rounded-2xl border border-border/50 p-4 flex items-center justify-between">

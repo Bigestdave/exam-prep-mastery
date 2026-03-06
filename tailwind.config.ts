@@ -19,10 +19,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
-        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+        serif: ['"DM Serif Display"', 'Georgia', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",

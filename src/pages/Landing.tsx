@@ -26,27 +26,34 @@ export default function Landing() {
       {/* Hero Section — The Manifesto */}
       <section className="relative">
         <div className="container py-16 md:py-24 px-4">
-          <div className="max-w-3xl mx-auto text-center">
+          <div className="max-w-3xl mx-auto text-left md:text-center">
             <div className="inline-flex items-center gap-2 glass-pill rounded-full text-muted-foreground px-5 py-2 text-xs font-mono font-semibold tracking-[0.15em] uppercase mb-8 opacity-0 animate-fade-in">
               <img src={sovereignKey} alt="" className="w-4 h-4 object-contain" style={{ filter: 'brightness(0) saturate(100%) invert(27%) sepia(89%) saturate(1220%) hue-rotate(117deg) brightness(96%) contrast(88%)' }} />
               Lead City University
             </div>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-foreground leading-[1.1] mb-6">
-              {["6 out of 15", "Tutorial Questions", "will appear in", "your exam,"].map((word, i) => (
+            <h1 className="text-foreground leading-[1.1] mb-6">
+              <motion.span
+                className="block text-7xl md:text-8xl lg:text-9xl font-display font-bold"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+              >
+                6 <span className="text-4xl md:text-5xl lg:text-6xl text-muted-foreground font-serif italic">of</span> 15
+              </motion.span>
+              {["Tutorial Questions", "will appear in", "your exam,"].map((line, i) => (
                 <motion.span
                   key={i}
-                  className="inline-block mr-[0.25em]"
+                  className="block text-3xl md:text-4xl lg:text-5xl font-display font-bold"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + i * 0.08, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  transition={{ delay: 0.2 + i * 0.08, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                 >
-                  {i === 0 ? <span className="text-5xl md:text-6xl lg:text-7xl">{word}</span> : word}
+                  {line}
                 </motion.span>
               ))}
-              <br />
               <motion.span
-                className="font-serif italic text-accent inline-block"
+                className="block text-3xl md:text-4xl lg:text-5xl font-serif italic text-accent mt-1"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -94,15 +101,20 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Trust Bar — Editorial + Glass */}
+      {/* Trust Bar — Stats Strip */}
       <section className="border-y border-border glass">
         <div className="container px-4">
-          <div className="flex items-center justify-center gap-4 md:gap-8 py-5 trust-bar text-center flex-wrap">
-            <span>Verified Answers</span>
-            <span className="text-border">✦</span>
-            <span>LCU Standard</span>
-            <span className="text-border">✦</span>
-            <span>Instant Access</span>
+          <div className="grid grid-cols-3 divide-x divide-border py-5">
+            {[
+              { value: '2,400+', label: 'STUDENTS' },
+              { value: '98%', label: 'PASS RATE' },
+              { value: '₦1,000', label: 'PER COURSE' },
+            ].map((stat, i) => (
+              <div key={i} className="text-center">
+                <p className="text-lg md:text-xl font-display font-bold text-foreground">{stat.value}</p>
+                <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground mt-0.5">{stat.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -111,8 +123,8 @@ export default function Landing() {
       <section className="py-14 md:py-20">
         <div className="container px-4">
           <div className="max-w-2xl mx-auto text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-2">How It Works</h2>
-            <p className="text-muted-foreground text-sm">Three steps to exam confidence</p>
+            <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-2">How It Works</p>
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground">Three steps to<br/>exam certainty</h2>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
@@ -131,23 +143,31 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* How Pricing Works */}
+      {/* Pricing */}
       <section className="py-14 md:py-20 border-t border-border">
         <div className="container px-4">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-6 text-center">How Pricing Works</h2>
-            <div className="space-y-4">
-              {[
-                'Each course is unlocked separately',
-                'You only pay for the courses you are taking',
-                'One-time payment per course, per semester',
-                'Access is instant after payment',
-              ].map((item, i) => (
-                <div key={i} className="flex items-start gap-3 opacity-0 animate-fade-in" style={{ animationDelay: `${i * 50 + 100}ms` }}>
-                  <CheckCircle className="w-5 h-5 text-accent mt-0.5 flex-shrink-0" />
-                  <p className="text-muted-foreground">{item}</p>
-                </div>
-              ))}
+            <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-2">Pricing</p>
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-8">Simple &<br/>transparent</h2>
+            
+            <div className="bg-card rounded-3xl card-float p-6 md:p-8">
+              <div className="space-y-0">
+                {[
+                  'Each course unlocked separately',
+                  'Pay only for courses you\'re taking',
+                  'One-time payment per semester',
+                  'Instant access after payment',
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center justify-between py-4 border-b border-border/50 last:border-b-0">
+                    <p className="text-sm text-foreground">{item}</p>
+                    <CheckCircle className="w-5 h-5 text-accent flex-shrink-0" />
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center justify-between pt-6 mt-2 border-t border-border">
+                <p className="font-display font-bold text-lg">Per Course</p>
+                <p className="font-display font-bold text-2xl">₦1,000</p>
+              </div>
             </div>
           </div>
         </div>
@@ -157,7 +177,8 @@ export default function Landing() {
       <section className="py-14 md:py-20 border-t border-border">
         <div className="container px-4">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-6 text-center">Frequently Asked Questions</h2>
+            <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-2">Questions</p>
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-6">We anticipated<br/>your doubts</h2>
             <Accordion type="single" collapsible className="w-full">
               {[
                 { q: 'Is payment for all courses or one course?', a: 'Payment is per course. You unlock only the course you choose.' },
