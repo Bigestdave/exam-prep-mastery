@@ -49,10 +49,10 @@ function ProgressLine({ courseId, isOwned }: { courseId: string; isOwned: boolea
   const pct = best ? best.percentage : 0;
 
   return (
-    <div className="w-full h-1 rounded-full bg-secondary overflow-hidden">
+    <div className="w-full h-1 rounded-full overflow-hidden" style={{ backgroundColor: '#F5F5F4' }}>
       <div
-        className="h-full rounded-full bg-accent transition-all duration-500"
-        style={{ width: `${pct}%` }}
+        className="h-full rounded-full transition-all duration-500"
+        style={{ width: `${pct}%`, backgroundColor: 'hsl(var(--accent))' }}
       />
     </div>
   );
@@ -81,7 +81,7 @@ export function CourseCard({ id, code, title, isOwned = false, questionsCount = 
             )}
           </div>
           
-          <h3 className="font-display font-bold text-foreground text-base leading-snug group-hover:text-accent transition-colors line-clamp-2">
+          <h3 className="font-display font-bold text-foreground text-base leading-snug line-clamp-2">
             {title}
           </h3>
           
