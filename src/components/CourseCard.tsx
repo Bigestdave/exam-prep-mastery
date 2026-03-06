@@ -17,7 +17,7 @@ function MasteryBadge({ courseId, isOwned }: { courseId: string; isOwned: boolea
   const { best, isLoading } = useBestQuizAttempt(courseId, user?.id);
 
   if (!isOwned || isLoading) return null;
-  if (!best) return null; // No quiz attempt yet — don't show badge
+  if (!best) return null;
 
   const pct = best.percentage;
 
@@ -38,6 +38,24 @@ function MasteryBadge({ courseId, isOwned }: { courseId: string; isOwned: boolea
   }
 
   return null;
+}
+
+function ProgressLine({ courseId, isOwned }: { courseId: string; isOwned: boolean }) {
+  const { user } = useAuth();
+  const { best, isLoading } = useBestQuizAttempt(courseId, user?.id);
+
+  if (!isOwned || isLoading) return null;
+
+  const pct = best ? best.percentage : 0;
+
+  return (
+    <div className="w-full h-1 rounded-full bg-secondary overflow-hidden">
+      <div
+        className="h-full rounded-full bg-accent transition-all duration-500"
+        style={{ width: `${pct}%` }}
+      />
+    </div>
+  );
 }
 
 export function CourseCard({ id, code, title, isOwned = false, questionsCount = 15 }: CourseCardProps) {
@@ -67,7 +85,7 @@ export function CourseCard({ id, code, title, isOwned = false, questionsCount = 
             {title}
           </h3>
           
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between">
             <span className="text-[11px] font-mono text-muted-foreground/60">{questionsCount}Q</span>
             <MasteryBadge courseId={id} isOwned={isOwned} />
           </div>
