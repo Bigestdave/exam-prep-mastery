@@ -13,7 +13,20 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
   const courseIds = courses.map(c => c.id);
   const { readiness, totalPercentage, isLoading } = useSemesterReadiness(user?.id, courseIds);
 
-  if (isLoading) return null;
+  if (isLoading) {
+    return (
+      <div className="rounded-3xl p-6 md:p-8 mb-8 animate-pulse" style={{ background: "linear-gradient(135deg, hsl(20 14% 11%) 0%, hsl(20 12% 8%) 60%, hsl(25 10% 6%) 100%)" }}>
+        <div className="flex items-center gap-6">
+          <div className="w-32 h-32 rounded-full flex-shrink-0" style={{ border: "5px solid rgba(253,251,247,0.08)" }} />
+          <div className="flex-1 space-y-3">
+            <div className="h-5 w-40 rounded-lg" style={{ backgroundColor: "rgba(253,251,247,0.1)" }} />
+            <div className="h-3 w-56 rounded" style={{ backgroundColor: "rgba(253,251,247,0.06)" }} />
+          </div>
+        </div>
+        <div className="mt-6 h-11 w-full rounded-xl" style={{ backgroundColor: "rgba(253,251,247,0.08)" }} />
+      </div>
+    );
+  }
 
   const hasAnyAttempt = courseIds.some(id => (readiness.get(id) ?? 0) > 0);
   const readyCourses = courseIds.filter(id => (readiness.get(id) ?? 0) >= 80).length;
