@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { OfflineFallback } from "@/components/OfflineFallback";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -26,35 +28,47 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const AppContent = () => {
+  const isOnline = useOnlineStatus();
+
+  if (!isOnline) return <OfflineFallback />;
+
+  return (
+    <>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/course/:id" element={<CourseDetail />} />
+          <Route path="/course/:id/answer/:questionId" element={<AnswerView />} />
+          <Route path="/course/:id/quiz" element={<Quiz />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/request-course" element={<RequestCourse />} />
+          <Route path="/library" element={<Library />} />
+          <Route path="/survey" element={<Survey />} />
+          <Route path="/upload" element={<AmbassadorUpload />} />
+          <Route path="/ambassador" element={<AmbassadorDashboard />} />
+          <Route path="/withdraw" element={<Withdraw />} />
+          <Route path="/vip/:code" element={<VipRedirect />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/course/:id" element={<CourseDetail />} />
-            <Route path="/course/:id/answer/:questionId" element={<AnswerView />} />
-            <Route path="/course/:id/quiz" element={<Quiz />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/request-course" element={<RequestCourse />} />
-            <Route path="/library" element={<Library />} />
-            <Route path="/survey" element={<Survey />} />
-            <Route path="/upload" element={<AmbassadorUpload />} />
-            <Route path="/ambassador" element={<AmbassadorDashboard />} />
-            <Route path="/withdraw" element={<Withdraw />} />
-            <Route path="/vip/:code" element={<VipRedirect />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <AppContent />
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
