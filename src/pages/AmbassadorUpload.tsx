@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { MobileBottomNav } from "@/components/MobileBottomNav";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -560,7 +560,7 @@ export default function AmbassadorUpload() {
         })()}
       </main>
 
-      <MobileBottomNav />
+      
     </div>
   );
 }

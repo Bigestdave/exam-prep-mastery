@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { MobileBottomNav } from "@/components/MobileBottomNav";
+
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { BookPlus, BookOpen, LogOut, ArrowLeft, ChevronRight, User } from "lucide-react";
@@ -58,7 +58,6 @@ export default function Profile() {
             <div className="h-14 w-full bg-muted rounded-2xl animate-pulse"></div>
           </div>
         </main>
-        <MobileBottomNav />
       </div>
     );
   }
@@ -160,7 +159,7 @@ export default function Profile() {
         </div>
       </main>
 
-      <MobileBottomNav />
+      
     </div>
   );
 }
