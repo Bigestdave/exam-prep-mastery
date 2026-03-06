@@ -41,6 +41,7 @@ export function QuizCTA({ courseId, courseCode }: QuizCTAProps) {
               fill="none"
               stroke="hsl(var(--border))"
               strokeWidth="3"
+              {...(percentage === 0 ? { strokeDasharray: "3 5" } : {})}
             />
             {/* Progress arc */}
             <circle

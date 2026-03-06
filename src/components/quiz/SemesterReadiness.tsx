@@ -23,7 +23,8 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
 
   const firstOwnedCourse = courses.find(c => purchases.includes(c.id));
 
-  const circumference = 2 * Math.PI * 38;
+  const ringRadius = 50;
+  const circumference = 2 * Math.PI * ringRadius;
 
   return (
     <motion.div
@@ -35,17 +36,18 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
       }}
     >
       <div className="relative z-10 flex items-center gap-6">
-        {/* Ring — larger, cleaner */}
-        <div className="relative w-24 h-24 flex-shrink-0">
-          <svg viewBox="0 0 96 96" className="w-full h-full -rotate-90">
+        {/* Ring — 30% larger */}
+        <div className="relative w-32 h-32 flex-shrink-0">
+          <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
             <circle
-              cx="48" cy="48" r="38"
+              cx="60" cy="60" r={ringRadius}
               fill="none"
               stroke="rgba(255,255,255,0.08)"
               strokeWidth="5"
+              {...(pct === 0 ? { strokeDasharray: "4 6" } : {})}
             />
             <motion.circle
-              cx="48" cy="48" r="38"
+              cx="60" cy="60" r={ringRadius}
               fill="none"
               stroke="#4ADE80"
               strokeWidth="5"
@@ -57,7 +59,7 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-2xl font-display font-bold text-white">{pct}%</span>
+            <span className="text-3xl font-display font-bold text-white">{pct}%</span>
             <span className="text-[7px] uppercase tracking-[0.15em] text-white/40 font-bold mt-0.5">
               Secured
             </span>
@@ -67,24 +69,26 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
         {/* Content */}
         <div className="flex-1 min-w-0">
           <h2 className="text-lg font-display font-bold text-white leading-tight">
-            Semester{"\n"}Readiness
+            Semester Readiness
           </h2>
           <p className="text-xs text-white/50 mt-1 leading-relaxed">
             {hasAnyAttempt
               ? `${secured} of ${totalCourses} courses secured.${secured < totalCourses ? " Complete your dossier." : ""}`
               : `${totalCourses} courses to master. Take your first confidence check.`}
           </p>
-          {firstOwnedCourse && (
-            <motion.button
-              whileTap={{ scale: 0.96 }}
-              onClick={() => navigate(`/course/${firstOwnedCourse.id}`)}
-              className="mt-4 px-5 py-2.5 rounded-xl bg-[#4ADE80] text-[#0A0A0A] text-xs font-bold hover:bg-[#22C55E] transition-colors"
-            >
-              Continue →
-            </motion.button>
-          )}
         </div>
       </div>
+
+      {/* Full-width Continue button */}
+      {firstOwnedCourse && (
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          onClick={() => navigate(`/course/${firstOwnedCourse.id}`)}
+          className="mt-6 w-full py-3 rounded-xl bg-[#4ADE80] text-[#0A0A0A] text-sm font-bold hover:bg-[#22C55E] transition-colors relative z-10"
+        >
+          Continue →
+        </motion.button>
+      )}
 
       {/* Course segment bar */}
       {hasAnyAttempt && (

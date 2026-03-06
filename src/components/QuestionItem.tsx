@@ -1,4 +1,4 @@
-import { Lock, ChevronRight, Eye } from "lucide-react";
+import { Lock, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface QuestionItemProps {
@@ -20,13 +20,13 @@ export function QuestionItem({
 }: QuestionItemProps) {
   const content = (
     <div className="flex items-start gap-4 p-4 bg-card rounded-xl border border-border/50 hover:shadow-card transition-all duration-200 group cursor-pointer">
-      <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-sm font-bold ${
+      <span className={`flex-shrink-0 font-display font-bold text-lg ${
         isUnlocked || isFreePreview 
-          ? 'bg-primary/10 text-primary' 
-          : 'bg-secondary text-muted-foreground'
+          ? 'text-foreground' 
+          : 'text-muted-foreground/40'
       }`}>
-        {questionIndex + 1}
-      </div>
+        {String(questionIndex + 1).padStart(2, '0')}.
+      </span>
       <div className="flex-1 min-w-0">
         <p className={`text-sm leading-relaxed ${
           isUnlocked || isFreePreview ? 'text-foreground' : 'text-muted-foreground'
@@ -34,19 +34,18 @@ export function QuestionItem({
           {question}
         </p>
         {isFreePreview && (
-          <span className="inline-block mt-2 text-xs font-medium text-success bg-success-light px-2 py-0.5 rounded">
+          <span className="inline-block mt-2 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded"
+            style={{ backgroundColor: '#ECFDF5', color: '#065F46' }}
+          >
             Free Preview
           </span>
         )}
       </div>
       <div className="flex-shrink-0">
         {isUnlocked || isFreePreview ? (
-          <div className="flex items-center gap-1 text-primary">
-            <Eye className="w-4 h-4" />
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
         ) : (
-          <Lock className="w-4 h-4 text-muted-foreground" />
+          <Lock className="w-4 h-4 text-muted-foreground/40" />
         )}
       </div>
     </div>
