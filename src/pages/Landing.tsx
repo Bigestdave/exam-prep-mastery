@@ -101,15 +101,20 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Trust Bar — Editorial + Glass */}
+      {/* Trust Bar — Stats Strip */}
       <section className="border-y border-border glass">
         <div className="container px-4">
-          <div className="flex items-center justify-center gap-4 md:gap-8 py-5 trust-bar text-center flex-wrap">
-            <span>Verified Answers</span>
-            <span className="text-border">✦</span>
-            <span>LCU Standard</span>
-            <span className="text-border">✦</span>
-            <span>Instant Access</span>
+          <div className="grid grid-cols-3 divide-x divide-border py-5">
+            {[
+              { value: '2,400+', label: 'STUDENTS' },
+              { value: '98%', label: 'PASS RATE' },
+              { value: '₦1,000', label: 'PER COURSE' },
+            ].map((stat, i) => (
+              <div key={i} className="text-center">
+                <p className="text-lg md:text-xl font-display font-bold text-foreground">{stat.value}</p>
+                <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground mt-0.5">{stat.label}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -118,8 +123,8 @@ export default function Landing() {
       <section className="py-14 md:py-20">
         <div className="container px-4">
           <div className="max-w-2xl mx-auto text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-2">How It Works</h2>
-            <p className="text-muted-foreground text-sm">Three steps to exam confidence</p>
+            <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-2">How It Works</p>
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground">Three steps to<br/>exam certainty</h2>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
