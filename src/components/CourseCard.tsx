@@ -67,10 +67,13 @@ export function CourseCard({ id, code, title, isOwned = false, questionsCount = 
             {title}
           </h3>
           
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-mono text-muted-foreground/60">{questionsCount}Q</span>
             <MasteryBadge courseId={id} isOwned={isOwned} />
           </div>
+          
+          {/* Progress bar */}
+          <ProgressLine courseId={id} isOwned={isOwned} />
         </div>
       </Link>
     </motion.div>
