@@ -87,13 +87,15 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
           <p className="text-xs mt-1 leading-relaxed" style={{ color: "rgba(253,251,247,0.45)" }}>
             {hasAnyAttempt
               ? `${secured} of ${totalCourses} courses secured.${secured < totalCourses ? " Complete your dossier." : ""}`
-              : `${totalCourses} courses to master. Take your first confidence check.`}
+              : firstOwnedCourse
+                ? `${totalCourses} courses to master. Take your first confidence check.`
+                : `${totalCourses} courses available. Test your knowledge free.`}
           </p>
         </div>
       </div>
 
-      {/* Full-width Continue button */}
-      {firstOwnedCourse && (
+      {/* Full-width CTA button */}
+      {firstOwnedCourse ? (
         <motion.button
           whileTap={{ scale: 0.96 }}
           onClick={() => navigate(`/course/${firstOwnedCourse.id}`)}
@@ -104,6 +106,18 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
           }}
         >
           Continue →
+        </motion.button>
+      ) : courses.length > 0 && (
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          onClick={() => navigate(`/course/${courses[0].id}`)}
+          className="mt-6 w-full py-3 rounded-xl text-sm font-bold transition-colors relative z-10"
+          style={{
+            backgroundColor: "hsl(142 64% 24%)",
+            color: "#FDFBF7",
+          }}
+        >
+          Try a Free Diagnostic →
         </motion.button>
       )}
 
