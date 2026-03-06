@@ -356,7 +356,8 @@ export default function CourseDetail() {
               className="w-full h-12" 
               onClick={handlePayment}
             >
-              Pay ₦{activeAmount.toLocaleString()}
+              <Lock className="w-4 h-4" />
+              Unlock {displayCount} Answers + Quiz • ₦{activeAmount.toLocaleString()}
             </Button>
             
             <p className="text-xs text-center text-muted-foreground flex items-center justify-center gap-1">
