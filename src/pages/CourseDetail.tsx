@@ -272,7 +272,7 @@ export default function CourseDetail() {
             onClick={openPaymentModal}
           >
             <Lock className="w-4 h-4" />
-            Unlock Full Access • ₦{course.price.toLocaleString()}
+            Unlock {displayCount} Answers + Quiz • ₦{course.price.toLocaleString()}
           </Button>
         </div>
       )}
