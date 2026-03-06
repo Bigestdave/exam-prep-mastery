@@ -63,7 +63,8 @@ export function MobileBottomNav() {
   const hiddenPaths = ["/", "/login", "/signup", "/forgot-password", "/reset-password", "/admin", "/survey"];
   const isQuizRoute = currentPath.includes("/quiz");
   const isVipRoute = currentPath.startsWith("/vip/");
-  if (hiddenPaths.includes(currentPath) || isQuizRoute || isVipRoute) return null;
+  const isCourseDetail = currentPath.startsWith("/course/");
+  if (hiddenPaths.includes(currentPath) || isQuizRoute || isVipRoute || isCourseDetail) return null;
 
   const getActiveState = () => {
     if (currentPath === "/profile") return "account";
