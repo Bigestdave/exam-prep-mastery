@@ -117,7 +117,7 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
             color: "#FDFBF7",
           }}
         >
-          Try a Free Diagnostic →
+          Test Your Knowledge Free →
         </motion.button>
       )}
 
