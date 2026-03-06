@@ -32,24 +32,24 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
       animate={{ opacity: 1, y: 0 }}
       className="rounded-3xl p-6 md:p-8 mb-8 relative overflow-hidden"
       style={{
-        background: "linear-gradient(135deg, hsl(160 40% 12%) 0%, hsl(160 30% 8%) 50%, hsl(20 14% 9%) 100%)",
+        background: "linear-gradient(135deg, hsl(20 14% 11%) 0%, hsl(20 12% 8%) 60%, hsl(25 10% 6%) 100%)",
       }}
     >
       <div className="relative z-10 flex items-center gap-6">
-        {/* Ring — 30% larger */}
+        {/* Ring — warm espresso palette */}
         <div className="relative w-32 h-32 flex-shrink-0">
           <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
             <circle
               cx="60" cy="60" r={ringRadius}
               fill="none"
-              stroke="rgba(255,255,255,0.08)"
+              stroke="rgba(253,251,247,0.08)"
               strokeWidth="5"
               {...(pct === 0 ? { strokeDasharray: "4 6" } : {})}
             />
             <motion.circle
               cx="60" cy="60" r={ringRadius}
               fill="none"
-              stroke="#4ADE80"
+              stroke="hsl(142 64% 24%)"
               strokeWidth="5"
               strokeLinecap="round"
               strokeDasharray={circumference}
@@ -59,8 +59,8 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl font-display font-bold text-white">{pct}%</span>
-            <span className="text-[7px] uppercase tracking-[0.15em] text-white/40 font-bold mt-0.5">
+            <span className="text-3xl font-display font-bold" style={{ color: "#FDFBF7" }}>{pct}%</span>
+            <span className="text-[7px] uppercase tracking-[0.15em] font-bold mt-0.5" style={{ color: "rgba(253,251,247,0.35)" }}>
               Secured
             </span>
           </div>
@@ -68,10 +68,10 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <h2 className="text-lg font-display font-bold text-white leading-tight">
+          <h2 className="text-lg font-display font-bold leading-tight" style={{ color: "#FDFBF7" }}>
             Semester Readiness
           </h2>
-          <p className="text-xs text-white/50 mt-1 leading-relaxed">
+          <p className="text-xs mt-1 leading-relaxed" style={{ color: "rgba(253,251,247,0.45)" }}>
             {hasAnyAttempt
               ? `${secured} of ${totalCourses} courses secured.${secured < totalCourses ? " Complete your dossier." : ""}`
               : `${totalCourses} courses to master. Take your first confidence check.`}
@@ -84,7 +84,11 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
         <motion.button
           whileTap={{ scale: 0.96 }}
           onClick={() => navigate(`/course/${firstOwnedCourse.id}`)}
-          className="mt-6 w-full py-3 rounded-xl bg-[#4ADE80] text-[#0A0A0A] text-sm font-bold hover:bg-[#22C55E] transition-colors relative z-10"
+          className="mt-6 w-full py-3 rounded-xl text-sm font-bold transition-colors relative z-10"
+          style={{
+            backgroundColor: "hsl(142 64% 24%)",
+            color: "#FDFBF7",
+          }}
         >
           Continue →
         </motion.button>
@@ -102,10 +106,10 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
                 style={{
                   backgroundColor:
                     cpct >= 80
-                      ? "#4ADE80"
+                      ? "hsl(142 64% 24%)"
                       : cpct > 0
-                        ? "rgba(255,255,255,0.25)"
-                        : "rgba(255,255,255,0.06)",
+                        ? "rgba(253,251,247,0.2)"
+                        : "rgba(253,251,247,0.06)",
                 }}
                 title={`${c.code}: ${cpct}%`}
               />
@@ -114,9 +118,9 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
         </div>
       )}
 
-      {/* Ambient glow */}
-      <div className="absolute top-0 right-0 w-48 h-48 bg-[#4ADE80]/10 rounded-full blur-3xl -mr-16 -mt-16" />
-      <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#4ADE80]/5 rounded-full blur-2xl -ml-8 -mb-8" />
+      {/* Ambient glow — warm, not neon */}
+      <div className="absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl -mr-16 -mt-16" style={{ backgroundColor: "hsla(142,64%,24%,0.08)" }} />
+      <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full blur-2xl -ml-8 -mb-8" style={{ backgroundColor: "hsla(30,20%,30%,0.1)" }} />
     </motion.div>
   );
 }

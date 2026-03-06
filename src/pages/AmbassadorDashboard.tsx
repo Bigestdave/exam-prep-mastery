@@ -249,20 +249,48 @@ export default function AmbassadorDashboard() {
       <div className="min-h-screen bg-background pb-32 md:pb-0">
         <Header isLoggedIn userName="" />
         <main className="container py-8 px-4 md:px-6 max-w-2xl mx-auto">
-          <div className="bg-foreground rounded-3xl p-6 mb-6 relative overflow-hidden">
+          {/* Wallet skeleton */}
+          <div className="bg-foreground rounded-3xl p-6 mb-6 relative overflow-hidden animate-pulse">
             <div className="relative z-10 space-y-2">
-              <div className="h-3 w-28 bg-background/10 rounded animate-pulse" />
-              <div className="h-10 w-44 bg-background/10 rounded-lg animate-pulse" />
+              <div className="h-3 w-32 rounded" style={{ backgroundColor: "rgba(253,251,247,0.08)" }} />
+              <div className="h-10 w-48 rounded-lg" style={{ backgroundColor: "rgba(253,251,247,0.1)" }} />
+              <div className="h-3 w-56 rounded" style={{ backgroundColor: "rgba(253,251,247,0.05)" }} />
             </div>
-            <div className="mt-5 h-11 w-full bg-background/10 rounded-xl animate-pulse" />
+            <div className="mt-5 h-11 w-full rounded-xl" style={{ backgroundColor: "rgba(253,251,247,0.08)" }} />
           </div>
-          <div className="bg-secondary rounded-2xl p-1 flex mb-8">
-            <div className="flex-1 h-14 bg-background rounded-xl animate-pulse" />
-            <div className="flex-1 h-14" />
+
+          {/* Tab switcher skeleton */}
+          <div className="bg-secondary rounded-2xl p-1 flex gap-1 mb-8">
+            {[1, 2, 3].map(i => (
+              <div key={i} className={`flex-1 rounded-xl animate-pulse ${i === 1 ? 'bg-background h-14' : 'h-14'}`}>
+                {i === 1 && (
+                  <div className="flex flex-col items-center justify-center h-full gap-1">
+                    <div className="h-3 w-16 bg-muted rounded" />
+                    <div className="h-2 w-12 bg-muted/50 rounded" />
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
-          <div className="bg-card rounded-3xl p-6 space-y-4">
-            <div className="h-5 w-32 bg-muted rounded-lg animate-pulse" />
-            <div className="h-4 w-64 bg-muted rounded animate-pulse" />
+
+          {/* Content skeleton — stats card */}
+          <div className="bg-card rounded-3xl card-float p-6 space-y-5 animate-pulse">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <div className="h-5 w-40 bg-muted rounded-lg" />
+                <div className="h-3 w-52 bg-muted/50 rounded" />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="bg-secondary/60 rounded-2xl p-3 space-y-2">
+                  <div className="h-4 w-4 bg-muted rounded mx-auto" />
+                  <div className="h-6 w-10 bg-muted rounded mx-auto" />
+                  <div className="h-2 w-14 bg-muted/50 rounded mx-auto" />
+                </div>
+              ))}
+            </div>
+            <div className="h-16 w-full bg-secondary/40 rounded-2xl" />
           </div>
         </main>
         <MobileBottomNav />
