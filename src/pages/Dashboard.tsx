@@ -103,29 +103,31 @@ export default function Dashboard() {
       <main className="container py-8 px-4 md:px-6">
         {/* Greeting + Stats */}
         <div className="mb-8">
-          <p className="text-sm text-muted-foreground font-mono tracking-wider uppercase mb-1">
+          <p className="text-xs text-muted-foreground font-mono tracking-wider uppercase mb-1">
             {profile?.faculty} · {profile?.level}
           </p>
-          <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">
+          <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">
             {profile?.full_name?.split(' ')[0] || 'Student'}
           </h1>
           
           {displayCourses.length > 0 && (
-            <div className="flex items-center gap-4 mt-4">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-success" />
-                <span className="text-sm text-muted-foreground">
-                  <span className="text-foreground font-bold">{ownedCount}</span>/{displayCourses.length} unlocked
-                </span>
-              </div>
-            </div>
+            <p className="text-sm text-muted-foreground mt-2">
+              <span className="text-foreground font-bold">{ownedCount}</span>/{displayCourses.length} unlocked
+            </p>
           )}
         </div>
 
         {displayCourses.length > 0 ? (
           <>
-            {/* Semester Readiness (only appears after first quiz attempt) */}
+            {/* Semester Readiness */}
             <SemesterReadiness courses={displayCourses.map(c => ({ id: c.id, code: c.code, title: c.title }))} />
+
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-display font-bold text-foreground">Your Courses</h2>
+              <span className="text-sm text-muted-foreground">
+                <span className="font-bold text-foreground">{ownedCount}</span>/{displayCourses.length} unlocked
+              </span>
+            </div>
 
             <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-3">
               {displayCourses.map((course, i) => (

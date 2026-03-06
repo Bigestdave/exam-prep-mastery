@@ -81,7 +81,7 @@ export function CourseCard({ id, code, title, isOwned = false, questionsCount = 
             )}
           </div>
           
-          <h3 className="font-display font-bold text-foreground text-sm leading-snug group-hover:text-accent transition-colors line-clamp-2">
+          <h3 className="font-display font-bold text-foreground text-base leading-snug group-hover:text-accent transition-colors line-clamp-2">
             {title}
           </h3>
           
