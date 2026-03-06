@@ -22,16 +22,20 @@ export default function Profile() {
       <div className="min-h-screen bg-background pb-20 md:pb-0">
         <Header isLoggedIn userName="" />
         <main className="container py-8 max-w-xl px-4">
-          <TextShimmer className="text-lg font-display font-bold mb-6" duration={1.2}>Profile</TextShimmer>
+          {/* Back link skeleton */}
+          <div className="h-4 w-36 bg-muted rounded animate-pulse mb-6"></div>
+
           {/* Avatar header skeleton */}
-          <div className="bg-card rounded-3xl border border-border shadow-card p-6 mb-6 flex flex-col items-center">
+          <div className="bg-card rounded-3xl border border-border shadow-card p-8 mb-6 flex flex-col items-center">
             <div className="w-20 h-20 rounded-full bg-secondary animate-pulse mb-4"></div>
             <div className="h-6 w-40 bg-secondary rounded-lg animate-pulse mb-2"></div>
-            <div className="h-4 w-48 bg-muted rounded-lg animate-pulse mb-1"></div>
-            <div className="h-3 w-32 bg-muted rounded-lg animate-pulse"></div>
+            <div className="h-4 w-48 bg-muted rounded-lg animate-pulse mb-3"></div>
+            <div className="h-3 w-56 bg-muted rounded animate-pulse"></div>
           </div>
+
+          {/* Action cards skeleton */}
           <div className="space-y-3">
-            <div className="bg-card rounded-2xl border border-border p-5 shadow-card">
+            <div className="bg-card rounded-2xl border border-border p-5 shadow-card flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-secondary rounded-xl animate-pulse"></div>
                 <div className="space-y-2">
@@ -39,8 +43,9 @@ export default function Profile() {
                   <div className="h-3 w-48 bg-muted rounded animate-pulse"></div>
                 </div>
               </div>
+              <div className="w-5 h-5 bg-muted rounded animate-pulse"></div>
             </div>
-            <div className="bg-card rounded-2xl border border-border p-5 shadow-card">
+            <div className="bg-card rounded-2xl border border-border p-5 shadow-card flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-secondary rounded-xl animate-pulse"></div>
                 <div className="space-y-2">
@@ -48,7 +53,9 @@ export default function Profile() {
                   <div className="h-3 w-32 bg-muted rounded animate-pulse"></div>
                 </div>
               </div>
+              <div className="w-5 h-5 bg-muted rounded animate-pulse"></div>
             </div>
+            <div className="h-14 w-full bg-muted rounded-2xl animate-pulse"></div>
           </div>
         </main>
         <MobileBottomNav />
