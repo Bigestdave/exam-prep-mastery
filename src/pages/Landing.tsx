@@ -143,23 +143,31 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* How Pricing Works */}
+      {/* Pricing */}
       <section className="py-14 md:py-20 border-t border-border">
         <div className="container px-4">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-6 text-center">How Pricing Works</h2>
-            <div className="space-y-4">
-              {[
-                'Each course is unlocked separately',
-                'You only pay for the courses you are taking',
-                'One-time payment per course, per semester',
-                'Access is instant after payment',
-              ].map((item, i) => (
-                <div key={i} className="flex items-start gap-3 opacity-0 animate-fade-in" style={{ animationDelay: `${i * 50 + 100}ms` }}>
-                  <CheckCircle className="w-5 h-5 text-accent mt-0.5 flex-shrink-0" />
-                  <p className="text-muted-foreground">{item}</p>
-                </div>
-              ))}
+            <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-2">Pricing</p>
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-8">Simple &<br/>transparent</h2>
+            
+            <div className="bg-card rounded-3xl card-float p-6 md:p-8">
+              <div className="space-y-0">
+                {[
+                  'Each course unlocked separately',
+                  'Pay only for courses you\'re taking',
+                  'One-time payment per semester',
+                  'Instant access after payment',
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center justify-between py-4 border-b border-border/50 last:border-b-0">
+                    <p className="text-sm text-foreground">{item}</p>
+                    <CheckCircle className="w-5 h-5 text-accent flex-shrink-0" />
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center justify-between pt-6 mt-2 border-t border-border">
+                <p className="font-display font-bold text-lg">Per Course</p>
+                <p className="font-display font-bold text-2xl">₦1,000</p>
+              </div>
             </div>
           </div>
         </div>
@@ -169,7 +177,8 @@ export default function Landing() {
       <section className="py-14 md:py-20 border-t border-border">
         <div className="container px-4">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-6 text-center">Frequently Asked Questions</h2>
+            <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-2">Questions</p>
+            <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-6">We anticipated<br/>your doubts</h2>
             <Accordion type="single" collapsible className="w-full">
               {[
                 { q: 'Is payment for all courses or one course?', a: 'Payment is per course. You unlock only the course you choose.' },
