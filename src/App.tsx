@@ -25,6 +25,7 @@ import AmbassadorDashboard from "./pages/AmbassadorDashboard";
 import Quiz from "./pages/Quiz";
 import VipRedirect from "./pages/VipRedirect";
 import Withdraw from "./pages/Withdraw";
+import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ const AppContent = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/course/:id" element={<CourseDetail />} />

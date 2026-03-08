@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { GraduationCap, ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -97,6 +98,17 @@ export default function Login() {
             <p className="text-muted-foreground">
               Enter your credentials to access your account
             </p>
+          </div>
+
+          <GoogleSignInButton label="Sign in with Google" />
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-3 text-muted-foreground tracking-widest font-mono">or</span>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
