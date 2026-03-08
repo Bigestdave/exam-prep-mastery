@@ -31,8 +31,10 @@ export default function Dashboard() {
   useEffect(() => {
     if (!isLoading && !user) {
       navigate("/login");
+    } else if (!isLoading && user && profile && (!profile.faculty || !profile.level)) {
+      navigate("/onboarding", { replace: true });
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, profile, navigate]);
 
   useEffect(() => {
     const fetchQuestionCounts = async () => {
