@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { facultyCategories, allDepartments } from "@/data/departments";
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 
 export default function Signup() {
   const [formData, setFormData] = useState({
