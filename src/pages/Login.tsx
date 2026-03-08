@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { GraduationCap, ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 
 export default function Login() {
   const [email, setEmail] = useState("");
