@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -18,15 +18,23 @@ export default function Onboarding() {
   const [level, setLevel] = useState("");
   const [departmentOpen, setDepartmentOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { user, profile } = useAuth();
+  const { user, profile, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // If profile already has faculty and level, redirect
-  if (profile?.faculty && profile?.level) {
-    navigate("/dashboard", { replace: true });
-    return null;
-  }
+  // Redirect if profile already complete (use useEffect, not during render)
+  useEffect(() => {
+    if (!authLoading && profile?.faculty && profile?.level) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [authLoading, profile, navigate]);
+
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/login", { replace: true });
+    }
+  }, [authLoading, user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,9 +67,17 @@ export default function Onboarding() {
       return;
     }
 
-    // Force profile refresh by reloading
-    window.location.href = "/dashboard";
+    // Force full page reload to ensure AuthContext re-fetches the updated profile
+    window.location.replace("/dashboard");
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
