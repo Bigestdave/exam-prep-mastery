@@ -81,12 +81,12 @@ export function CourseCard({ id, code, title, isOwned = false, questionsCount = 
             )}
           </div>
           
-          <h3 className="font-display font-bold text-foreground text-base leading-snug line-clamp-2">
+          <h3 className="font-display font-extrabold text-foreground text-base leading-snug line-clamp-2">
             {title}
           </h3>
           
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-mono text-muted-foreground/60">{questionsCount}Q</span>
+            <span className="text-[11px] font-mono text-muted-foreground/60">{questionsCount} Questions</span>
             <MasteryBadge courseId={id} isOwned={isOwned} />
           </div>
           
