@@ -36,7 +36,6 @@ export default function Quiz() {
 
   const handleSelect = useCallback(async (optionIndex: number) => {
     if (isTransitioning) return;
-    if (answers.has(currentIndex)) return;
 
     setIsTransitioning(true);
 
@@ -45,28 +44,44 @@ export default function Quiz() {
     setAnswers(newAnswers);
 
     const isCorrect = options[optionIndex]?.is_correct;
-    const newScore = isCorrect ? score + 1 : score;
-    if (isCorrect) setScore(newScore);
 
     await new Promise(r => setTimeout(r, 600));
 
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(i => i + 1);
-    } else {
-      const percentage = Math.round((newScore / questions.length) * 100);
-      if (user && id) {
-        await supabase.from("quiz_attempts").insert({
-          user_id: user.id,
-          course_id: id,
-          score: newScore,
-          total_questions: questions.length,
-          percentage,
-        });
-      }
-      setShowResult(true);
     }
     setIsTransitioning(false);
-  }, [currentIndex, questions.length, score, user, id, answers, options, isTransitioning]);
+  }, [currentIndex, questions.length, answers, options, isTransitioning]);
+
+  const handleBack = useCallback(() => {
+    if (currentIndex > 0 && !isTransitioning) {
+      setCurrentIndex(i => i - 1);
+    }
+  }, [currentIndex, isTransitioning]);
+
+  const handleFinish = useCallback(async () => {
+    // Calculate score from all answers
+    let finalScore = 0;
+    answers.forEach((optionIndex, questionIndex) => {
+      const q = questions[questionIndex];
+      const opts = q?.quiz_options ?? [];
+      if (opts[optionIndex]?.is_correct) finalScore++;
+    });
+
+    setScore(finalScore);
+
+    const percentage = Math.round((finalScore / questions.length) * 100);
+    if (user && id) {
+      await supabase.from("quiz_attempts").insert({
+        user_id: user.id,
+        course_id: id,
+        score: finalScore,
+        total_questions: questions.length,
+        percentage,
+      });
+    }
+    setShowResult(true);
+  }, [answers, questions, user, id]);
 
   if (isLoading) {
     return (
