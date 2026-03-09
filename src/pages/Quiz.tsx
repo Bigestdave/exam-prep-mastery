@@ -183,11 +183,11 @@ export default function Quiz() {
               {options.map((option, i) => (
                 <motion.button
                   key={i}
-                  whileTap={selectedOption === null ? { scale: 0.97 } : {}}
+                  whileTap={{ scale: 0.97 }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   className={getOptionStyle(i)}
                   onClick={() => handleSelect(i)}
-                  disabled={selectedOption !== null || isTransitioning}
+                  disabled={isTransitioning}
                 >
                   <span className="text-sm font-medium text-foreground leading-relaxed">
                     {option.text}
@@ -195,6 +195,22 @@ export default function Quiz() {
                 </motion.button>
               ))}
             </div>
+
+            {/* Finish button — shows on last question when all answered */}
+            {isLastQuestion && allAnswered && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex justify-center"
+              >
+                <button
+                  onClick={handleFinish}
+                  className="px-8 py-3 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm shadow-card hover:shadow-card-hover hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+                >
+                  Finish Quiz
+                </button>
+              </motion.div>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
