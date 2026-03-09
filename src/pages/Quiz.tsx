@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useQuizData, QuizOption } from "@/hooks/useQuizData";
 import { supabase } from "@/integrations/supabase/client";
-import { X } from "lucide-react";
+import { X, ChevronLeft } from "lucide-react";
 import QuizResult from "@/components/quiz/QuizResult";
 
 export default function Quiz() {
