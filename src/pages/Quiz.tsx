@@ -108,6 +108,8 @@ export default function Quiz() {
   }
 
   const selectedOption = answers.get(currentIndex) ?? null;
+  const isLastQuestion = currentIndex === questions.length - 1;
+  const allAnswered = answers.size === questions.length;
 
   const getOptionStyle = (index: number) => {
     const base = "w-full text-left p-5 rounded-2xl transition-all duration-200";
