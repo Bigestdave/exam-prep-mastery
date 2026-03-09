@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useQuizData, QuizOption } from "@/hooks/useQuizData";
 import { supabase } from "@/integrations/supabase/client";
-import { X } from "lucide-react";
+import { X, ChevronLeft } from "lucide-react";
 import QuizResult from "@/components/quiz/QuizResult";
 
 export default function Quiz() {
@@ -36,7 +36,6 @@ export default function Quiz() {
 
   const handleSelect = useCallback(async (optionIndex: number) => {
     if (isTransitioning) return;
-    if (answers.has(currentIndex)) return;
 
     setIsTransitioning(true);
 
@@ -45,28 +44,44 @@ export default function Quiz() {
     setAnswers(newAnswers);
 
     const isCorrect = options[optionIndex]?.is_correct;
-    const newScore = isCorrect ? score + 1 : score;
-    if (isCorrect) setScore(newScore);
 
     await new Promise(r => setTimeout(r, 600));
 
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(i => i + 1);
-    } else {
-      const percentage = Math.round((newScore / questions.length) * 100);
-      if (user && id) {
-        await supabase.from("quiz_attempts").insert({
-          user_id: user.id,
-          course_id: id,
-          score: newScore,
-          total_questions: questions.length,
-          percentage,
-        });
-      }
-      setShowResult(true);
     }
     setIsTransitioning(false);
-  }, [currentIndex, questions.length, score, user, id, answers, options, isTransitioning]);
+  }, [currentIndex, questions.length, answers, options, isTransitioning]);
+
+  const handleBack = useCallback(() => {
+    if (currentIndex > 0 && !isTransitioning) {
+      setCurrentIndex(i => i - 1);
+    }
+  }, [currentIndex, isTransitioning]);
+
+  const handleFinish = useCallback(async () => {
+    // Calculate score from all answers
+    let finalScore = 0;
+    answers.forEach((optionIndex, questionIndex) => {
+      const q = questions[questionIndex];
+      const opts = q?.quiz_options ?? [];
+      if (opts[optionIndex]?.is_correct) finalScore++;
+    });
+
+    setScore(finalScore);
+
+    const percentage = Math.round((finalScore / questions.length) * 100);
+    if (user && id) {
+      await supabase.from("quiz_attempts").insert({
+        user_id: user.id,
+        course_id: id,
+        score: finalScore,
+        total_questions: questions.length,
+        percentage,
+      });
+    }
+    setShowResult(true);
+  }, [answers, questions, user, id]);
 
   if (isLoading) {
     return (
@@ -93,6 +108,8 @@ export default function Quiz() {
   }
 
   const selectedOption = answers.get(currentIndex) ?? null;
+  const isLastQuestion = currentIndex === questions.length - 1;
+  const allAnswered = answers.size === questions.length;
 
   const getOptionStyle = (index: number) => {
     const base = "w-full text-left p-5 rounded-2xl transition-all duration-200";
@@ -128,8 +145,16 @@ export default function Quiz() {
         </button>
       </div>
 
-      {/* Question counter */}
-      <div className="fixed top-4 left-5 z-50">
+      {/* Back button + Question counter */}
+      <div className="fixed top-4 left-5 z-50 flex items-center gap-3">
+        {currentIndex > 0 && (
+          <button
+            onClick={handleBack}
+            className="w-10 h-10 rounded-2xl bg-card border border-border flex items-center justify-center hover:bg-secondary transition-colors shadow-card"
+          >
+            <ChevronLeft className="w-5 h-5 text-muted-foreground" />
+          </button>
+        )}
         <span className="text-xs font-mono text-muted-foreground tracking-wider">
           {currentIndex + 1} of {questions.length}
         </span>
@@ -158,11 +183,11 @@ export default function Quiz() {
               {options.map((option, i) => (
                 <motion.button
                   key={i}
-                  whileTap={selectedOption === null ? { scale: 0.97 } : {}}
+                  whileTap={{ scale: 0.97 }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   className={getOptionStyle(i)}
                   onClick={() => handleSelect(i)}
-                  disabled={selectedOption !== null || isTransitioning}
+                  disabled={isTransitioning}
                 >
                   <span className="text-sm font-medium text-foreground leading-relaxed">
                     {option.text}
@@ -170,6 +195,22 @@ export default function Quiz() {
                 </motion.button>
               ))}
             </div>
+
+            {/* Finish button — shows on last question when all answered */}
+            {isLastQuestion && allAnswered && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex justify-center"
+              >
+                <button
+                  onClick={handleFinish}
+                  className="px-8 py-3 rounded-2xl bg-primary text-primary-foreground font-semibold text-sm shadow-card hover:shadow-card-hover hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200"
+                >
+                  Finish Quiz
+                </button>
+              </motion.div>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
