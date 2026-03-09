@@ -145,8 +145,16 @@ export default function Quiz() {
         </button>
       </div>
 
-      {/* Question counter */}
-      <div className="fixed top-4 left-5 z-50">
+      {/* Back button + Question counter */}
+      <div className="fixed top-4 left-5 z-50 flex items-center gap-3">
+        {currentIndex > 0 && (
+          <button
+            onClick={handleBack}
+            className="w-10 h-10 rounded-2xl bg-card border border-border flex items-center justify-center hover:bg-secondary transition-colors shadow-card"
+          >
+            <ChevronLeft className="w-5 h-5 text-muted-foreground" />
+          </button>
+        )}
         <span className="text-xs font-mono text-muted-foreground tracking-wider">
           {currentIndex + 1} of {questions.length}
         </span>
