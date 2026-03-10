@@ -180,11 +180,12 @@ Provide a 1-sentence summary that the student can easily memorize for the exam h
       };
     }
   } catch (e) {
-    console.error("Failed to parse study guide JSON:", e);
+    console.error("Failed to parse study guide JSON:", e, "Raw:", result.slice(0, 500));
   }
 
+  // Fallback: use the raw AI text as the answer instead of placeholder
   return {
-    answer_text: "Study guide content available.",
+    answer_text: result || "The AI could not generate a proper answer for this question. Please review manually.",
     content: { explanation: result, key_points: [], quiz: null },
   };
 }
