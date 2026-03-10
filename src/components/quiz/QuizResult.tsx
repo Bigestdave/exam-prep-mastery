@@ -158,6 +158,60 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
           </p>
         </div>
 
+        {/* Upsell for free preview quizzes */}
+        {isFreePreview && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-card border border-accent/20 rounded-3xl p-6 mb-6 shadow-card"
+          >
+            {percentage >= 70 ? (
+              <>
+                <p className="text-sm font-display font-bold text-foreground mb-1.5" style={{ letterSpacing: '-0.03em' }}>
+                  Impressive — but this was only {total} questions.
+                </p>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-4">
+                  {fullQuizCount > 0
+                    ? `The full version has ${fullQuizCount} questions covering every topic your lecturer can test. Can you keep ${percentage}% across all of them?`
+                    : `The full version covers every topic your lecturer can test. Think you can keep this score across all of them?`}
+                </p>
+              </>
+            ) : percentage >= 40 ? (
+              <>
+                <p className="text-sm font-display font-bold text-foreground mb-1.5" style={{ letterSpacing: '-0.03em' }}>
+                  You got caught on a few — and this was just {total} questions.
+                </p>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-4">
+                  {fullQuizCount > 0
+                    ? `There are ${fullQuizCount} questions in the full quiz covering topics you haven't seen yet. Those gaps could cost you marks.`
+                    : `The full quiz covers topics you haven't been tested on yet. Those blind spots could cost you marks in the real exam.`}
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm font-display font-bold text-foreground mb-1.5" style={{ letterSpacing: '-0.03em' }}>
+                  {score === 0 ? "Every answer missed" : "Most answers missed"} — and this was only {total} questions.
+                </p>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-4">
+                  {fullQuizCount > 0
+                    ? `Imagine ${fullQuizCount} questions from every angle your lecturer uses. The answers + full quiz show you exactly what to study.`
+                    : `The full course gives you all the answers plus a complete quiz to drill every weak point before the real exam.`}
+                </p>
+              </>
+            )}
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              onClick={() => navigate(`/course/${courseId}`)}
+              className="w-full h-12 bg-foreground text-background rounded-2xl font-display font-bold text-sm flex items-center justify-center gap-2 shadow-card"
+              style={{ letterSpacing: '-0.05em' }}
+            >
+              Unlock Full {courseCode} Quiz + Answers
+              <ArrowRight className="w-4 h-4" />
+            </motion.button>
+          </motion.div>
+        )}
+
         {/* Answer Review Toggle */}
         <button
           onClick={() => setShowReview(!showReview)}
