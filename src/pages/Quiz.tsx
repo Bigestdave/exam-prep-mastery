@@ -106,11 +106,11 @@ export default function Quiz() {
         courseCode={course.code}
         courseTitle={course.title}
         score={score}
-        total={questions.length}
-        questions={questions}
+        total={activeQuestions.length}
+        questions={activeQuestions}
         answers={answers}
-        isFreePreview={!isOwned}
-        fullQuizCount={questions.length}
+        isFreePreview={isFreePreview}
+        fullQuizCount={allQuestions.length}
       />
     );
   }
