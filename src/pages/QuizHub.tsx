@@ -52,8 +52,53 @@ export default function QuizHub() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" />
+      <div className="min-h-screen bg-background pb-32 md:pb-0">
+        {/* Header skeleton */}
+        <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border">
+          <div className="container flex items-center gap-3 px-4 py-3">
+            <div className="w-10 h-10 rounded-2xl bg-muted animate-pulse" />
+            <div className="space-y-1.5">
+              <div className="h-5 w-40 rounded-lg bg-muted animate-pulse" />
+              <div className="h-3 w-24 rounded bg-muted animate-pulse" />
+            </div>
+          </div>
+        </div>
+        <main className="container px-4 py-6 max-w-2xl mx-auto">
+          {/* Readiness card skeleton */}
+          <div className="rounded-3xl p-6 mb-6 relative overflow-hidden bg-gradient-to-br from-espresso via-espresso-deep to-espresso-ink">
+            <div className="flex items-center gap-5">
+              <div className="w-28 h-28 rounded-full flex-shrink-0 border-[5px] border-cream/[0.08]" />
+              <div className="flex-1 space-y-3">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="flex items-center gap-2">
+                    <div className="h-3 w-16 rounded bg-cream/10 animate-pulse" />
+                    <div className="h-3 w-12 rounded bg-cream/[0.06] animate-pulse ml-auto" />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 mt-5">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="flex-1 h-1.5 rounded-full bg-cream/[0.08] animate-pulse" />
+              ))}
+            </div>
+          </div>
+          {/* Course list skeleton */}
+          <div className="space-y-2">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="bg-card border border-border rounded-2xl p-4 animate-pulse">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-muted" />
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-4 w-24 rounded bg-muted" />
+                    <div className="h-3 w-40 rounded bg-muted" />
+                  </div>
+                  <div className="h-4 w-12 rounded bg-muted" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </main>
       </div>
     );
   }
