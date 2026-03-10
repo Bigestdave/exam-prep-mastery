@@ -561,7 +561,7 @@ export default function AmbassadorDashboard() {
                               </div>
                             </div>
                             <span className={`text-sm font-mono font-bold ${achieved ? "text-accent" : "text-muted-foreground"}`}>
-                              ₦{m.bonus.toLocaleString()}
+                              {m.tier === 1 ? "" : "+"}₦{m.bonus.toLocaleString()}
                             </span>
                           </div>
                         );
