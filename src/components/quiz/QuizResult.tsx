@@ -294,33 +294,35 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
 
             {/* Target List — Ledger style */}
             <div className="mb-5">
-              {ringSegments.map((seg, i) => (
-                <div
-                  key={seg.id}
-                  className={`flex items-center justify-between text-xs py-2.5 ${
-                    i < ringSegments.length - 1 ? "border-b border-dashed border-border" : ""
-                  }`}
-                >
-                  <span className={`font-mono ${seg.pct >= 80 ? "text-accent font-semibold" : seg.id === courseId ? "text-foreground font-semibold" : "text-muted-foreground"}`}>
-                    {seg.code} {seg.id === courseId ? "←" : ""}
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    {seg.pct >= 80 ? (
-                      <>
-                        <span className="font-bold text-accent">{seg.pct}%</span>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
-                      </>
-                    ) : seg.pct > 0 ? (
-                      <span className="font-bold text-amber-600">{seg.pct}%</span>
-                    ) : (
-                      <>
-                        <span className="text-muted-foreground/30">—</span>
-                        <Lock className="w-3 h-3 text-muted-foreground/30" />
-                      </>
-                    )}
+              {ringSegments.map((seg, i) => {
+                const segTier = getTier(seg.pct);
+                const contrib = courseContribution(seg.pct, departmentCourses.length);
+                return (
+                  <div
+                    key={seg.id}
+                    className={`flex items-center justify-between text-xs py-2.5 ${
+                      i < ringSegments.length - 1 ? "border-b border-dashed border-border" : ""
+                    }`}
+                  >
+                    <span className={`font-mono ${seg.id === courseId ? "text-foreground font-semibold" : "text-muted-foreground"}`}>
+                      {seg.code} {seg.id === courseId ? "←" : ""}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      {seg.pct > 0 ? (
+                        <>
+                          <span className="text-[10px] text-muted-foreground font-mono">+{contrib}%</span>
+                          <span className={`font-bold ${segTier.color}`}>{segTier.emoji} {seg.pct}%</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-muted-foreground/30">—</span>
+                          <Lock className="w-3 h-3 text-muted-foreground/30" />
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {nextUnowned && (
