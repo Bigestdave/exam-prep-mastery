@@ -15,6 +15,9 @@ interface AmbassadorRecord {
   email?: string;
   wallet_balance: number;
   upload_count: number;
+  bank_name: string | null;
+  account_number: string | null;
+  account_name: string | null;
 }
 
 export function AmbassadorsTab() {
