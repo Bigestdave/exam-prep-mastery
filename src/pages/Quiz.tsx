@@ -164,7 +164,7 @@ export default function Quiz() {
           </button>
         )}
         <span className="text-xs font-mono text-muted-foreground tracking-wider">
-          {currentIndex + 1} of {questions.length}
+          {currentIndex + 1} of {activeQuestions.length}
         </span>
       </div>
 
