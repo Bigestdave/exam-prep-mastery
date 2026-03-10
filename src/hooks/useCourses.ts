@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 export interface Course {
   id: string;
@@ -25,8 +26,15 @@ export function useCourses() {
       .select('id, code, title, faculty, level, price')
       .order('created_at', { ascending: true });
 
-    if (!error && data) {
-      setCourses(data);
+    if (error) {
+      console.error('Failed to load courses:', error);
+      toast({
+        title: "Couldn't load courses",
+        description: "Check your connection and try again.",
+        variant: "destructive",
+      });
+    } else {
+      setCourses(data ?? []);
     }
     setIsLoading(false);
   };
