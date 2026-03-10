@@ -161,10 +161,24 @@ Always end with:
 [1-2 sentence authoritative validation proving why this answer aligns with the course material.] %%%
 
 ### QUIZ RULES:
-1. The Question: Must test actual understanding of the most important concept in the answer.
+Generate 4-5 multiple-choice quiz questions per tutorial question. Convert the tutorial question ITSELF into MCQ format rather than inventing new questions.
+
+Strategy: Take each key concept, definition, or fact from the tutorial question and its answer, and rephrase it as an MCQ.
+
+Example - If the tutorial question is "Explain cultural diffusion":
+Quiz version: "Cultural diffusion refers to:"
+A) The movement of people between countries
+B) The spread of cultural ideas between societies
+C) The destruction of traditional cultures  
+D) Government control of culture
+
+For each quiz:
+1. The Question: Rephrase part of the tutorial question/answer as an MCQ stem.
 2. The Correct Answer: Must be 100% accurate based ONLY on the course notes.
-3. The Distractors: Generate 3 highly plausible wrong answers representing common student misconceptions. Do NOT make the correct answer obviously longer than the wrong answers.
+3. The Distractors: Generate 3 highly plausible wrong answers representing common student misconceptions. Keep all options similar in length.
 4. The Hint: A gentle nudge that helps think about the concept without giving it away.
+
+Quality > Volume. Only generate quizzes where the answer is clearly supported by the notes.
 
 The output MUST be valid JSON.`;
 
