@@ -214,14 +214,18 @@ export function useBestQuizAttempt(courseId: string | undefined, userId: string 
 export function useSemesterReadiness(userId: string | undefined, courseIds: string[]) {
   const [readiness, setReadiness] = useState<Map<string, number>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const refetch = () => setRefreshKey(k => k + 1);
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchData = async () => {
       if (!userId || courseIds.length === 0) {
         setIsLoading(false);
         return;
       }
 
+      setIsLoading(true);
       const { data, error } = await supabase
         .from('quiz_attempts')
         .select('course_id, percentage')
@@ -242,8 +246,8 @@ export function useSemesterReadiness(userId: string | undefined, courseIds: stri
       setIsLoading(false);
     };
 
-    fetch();
-  }, [userId, courseIds.join(',')]);
+    fetchData();
+  }, [userId, courseIds.join(','), refreshKey]);
 
   const totalPercentage = courseIds.length > 0
     ? Math.round(
@@ -251,5 +255,5 @@ export function useSemesterReadiness(userId: string | undefined, courseIds: stri
       )
     : 0;
 
-  return { readiness, totalPercentage, isLoading };
+  return { readiness, totalPercentage, isLoading, refetch };
 }
