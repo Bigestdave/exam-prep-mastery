@@ -55,6 +55,7 @@ const AppContent = () => {
           <Route path="/course/:id" element={<CourseDetail />} />
           <Route path="/course/:id/answer/:questionId" element={<AnswerView />} />
           <Route path="/course/:id/quiz" element={<Quiz />} />
+          <Route path="/quiz-hub" element={<QuizHub />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/request-course" element={<RequestCourse />} />
           <Route path="/library" element={<Library />} />
