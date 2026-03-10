@@ -522,7 +522,7 @@ export default function AmbassadorDashboard() {
                         </div>
                         <Progress value={progressToNext} className="h-3" />
                         <p className="text-xs text-muted-foreground">
-                          <span className="font-bold text-foreground">{nextMilestone.threshold - totalUnlocks} more unlocks</span> to earn ₦{nextMilestone.bonus.toLocaleString()} bonus
+                        <span className="font-bold text-foreground">{nextMilestone.threshold - totalUnlocks} more unlocks</span> to earn +₦{nextMilestone.bonus.toLocaleString()}
                         </p>
                       </div>
                     ) : (
