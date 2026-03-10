@@ -55,7 +55,7 @@ const LEADERBOARD_REWARDS = [
   { rank: 2, reward: 30000, emoji: "🥈" },
   { rank: 3, reward: 20000, emoji: "🥉" },
   { rank: 4, reward: 10000, emoji: "4th" },
-  { rank: 5, reward: 5000, emoji: "5th" },
+  { rank: 5, reward: 10000, emoji: "5th" },
 ];
 
 type TabKey = "department" | "sell" | "bounties";
