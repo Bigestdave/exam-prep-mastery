@@ -283,7 +283,6 @@ export default function QuizHub() {
             </h2>
             <div className="space-y-2">
               {lockedCourses.map((course, i) => {
-                const slotSize = Math.round(100 / quizEnabledCourses.length);
                 return (
                   <motion.button
                     key={course.id}
@@ -306,10 +305,7 @@ export default function QuizHub() {
                           </p>
                         </div>
                       </div>
-                      <div className="text-right flex-shrink-0">
-                        <p className="text-[10px] text-muted-foreground font-mono">Worth {slotSize}%</p>
-                        <p className="text-xs text-accent font-bold">Preview →</p>
-                      </div>
+                      <span className="text-xs text-accent font-display font-bold flex-shrink-0">Try Free Quiz →</span>
                     </div>
                   </motion.button>
                 );

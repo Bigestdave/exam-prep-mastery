@@ -24,15 +24,19 @@ export default function Quiz() {
   const [showResult, setShowResult] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
+  const isFreePreview = !isOwned;
+  const FREE_PREVIEW_LIMIT = 5;
+  const allQuestions = questions;
+  const activeQuestions = isFreePreview ? questions.slice(0, FREE_PREVIEW_LIMIT) : questions;
+
   useEffect(() => {
     if (!user) navigate("/login");
     if (!isLoading && !hasQuizData && id) navigate(`/course/${id}`);
-    if (!isLoading && !isOwned && id) navigate(`/course/${id}`);
-  }, [user, isLoading, hasQuizData, isOwned, id, navigate]);
+  }, [user, isLoading, hasQuizData, id, navigate]);
 
-  const currentQuestion = questions[currentIndex];
+  const currentQuestion = activeQuestions[currentIndex];
   const options = currentQuestion?.quiz_options ?? [];
-  const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
+  const progress = activeQuestions.length > 0 ? ((currentIndex + 1) / activeQuestions.length) * 100 : 0;
 
   const handleSelect = useCallback(async (optionIndex: number) => {
     if (isTransitioning) return;
@@ -47,11 +51,11 @@ export default function Quiz() {
 
     await new Promise(r => setTimeout(r, 600));
 
-    if (currentIndex < questions.length - 1) {
+    if (currentIndex < activeQuestions.length - 1) {
       setCurrentIndex(i => i + 1);
     }
     setIsTransitioning(false);
-  }, [currentIndex, questions.length, answers, options, isTransitioning]);
+  }, [currentIndex, activeQuestions.length, answers, options, isTransitioning]);
 
   const handleBack = useCallback(() => {
     if (currentIndex > 0 && !isTransitioning) {
@@ -63,26 +67,27 @@ export default function Quiz() {
     // Calculate score from all answers
     let finalScore = 0;
     answers.forEach((optionIndex, questionIndex) => {
-      const q = questions[questionIndex];
+      const q = activeQuestions[questionIndex];
       const opts = q?.quiz_options ?? [];
       if (opts[optionIndex]?.is_correct) finalScore++;
     });
 
     setScore(finalScore);
 
-    if (user && id) {
+    // Only save to DB for owned courses (full quiz)
+    if (user && id && !isFreePreview) {
       const { error } = await supabase.from("quiz_attempts").insert({
         user_id: user.id,
         course_id: id,
         score: finalScore,
-        total_questions: questions.length,
+        total_questions: activeQuestions.length,
       });
       if (error) {
         console.error("Failed to save quiz attempt:", error);
       }
     }
     setShowResult(true);
-  }, [answers, questions, user, id]);
+  }, [answers, activeQuestions, user, id, isFreePreview]);
 
   if (isLoading) {
     return (
@@ -101,16 +106,18 @@ export default function Quiz() {
         courseCode={course.code}
         courseTitle={course.title}
         score={score}
-        total={questions.length}
-        questions={questions}
+        total={activeQuestions.length}
+        questions={activeQuestions}
         answers={answers}
+        isFreePreview={isFreePreview}
+        fullQuizCount={allQuestions.length}
       />
     );
   }
 
   const selectedOption = answers.get(currentIndex) ?? null;
-  const isLastQuestion = currentIndex === questions.length - 1;
-  const allAnswered = answers.size === questions.length;
+  const isLastQuestion = currentIndex === activeQuestions.length - 1;
+  const allAnswered = answers.size === activeQuestions.length;
 
   const getOptionStyle = (index: number) => {
     const base = "w-full text-left p-5 rounded-2xl transition-all duration-200";
@@ -157,7 +164,7 @@ export default function Quiz() {
           </button>
         )}
         <span className="text-xs font-mono text-muted-foreground tracking-wider">
-          {currentIndex + 1} of {questions.length}
+          {currentIndex + 1} of {activeQuestions.length}
         </span>
       </div>
 
