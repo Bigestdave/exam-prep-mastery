@@ -283,7 +283,6 @@ export default function QuizHub() {
             </h2>
             <div className="space-y-2">
               {lockedCourses.map((course, i) => {
-                const slotSize = Math.round(100 / quizEnabledCourses.length);
                 return (
                   <motion.button
                     key={course.id}
