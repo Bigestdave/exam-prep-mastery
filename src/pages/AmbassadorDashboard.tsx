@@ -23,6 +23,7 @@ interface UploadRecord {
   course_code: string;
   course_title: string;
   department: string;
+  pdf_url: string | null;
   status: string;
   created_at: string;
   questions_generated: number | null;
@@ -151,14 +152,13 @@ export default function AmbassadorDashboard() {
 
   // Fetch uploads
   useEffect(() => {
-    if (!user) return;
+    if (!user || !department) return;
     const fetchUploads = async () => {
       const { data } = await supabase
         .from("course_uploads")
         .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(20);
+        .eq("department", department)
+        .order("course_code", { ascending: true });
       if (data) setUploads(data as UploadRecord[]);
     };
     fetchUploads();
@@ -203,6 +203,17 @@ export default function AmbassadorDashboard() {
     }
     setIsUploading(true);
     try {
+      const normalizedCode = courseCode.trim().toUpperCase();
+
+      // Check if course already exists for this department
+      const existing = uploads.find(u => u.course_code === normalizedCode && u.department === department);
+      
+      if (existing && files.length === 0) {
+        toast({ title: "Course already registered", description: `${normalizedCode} is already in your department's list.`, variant: "destructive" });
+        setIsUploading(false);
+        return;
+      }
+
       let pdfUrl: string | null = null;
 
       // Upload files if any were added
@@ -219,31 +230,47 @@ export default function AmbassadorDashboard() {
         pdfUrl = pdfUrls[0];
       }
 
-      const { data: uploadRecord, error: insertError } = await supabase
-        .from("course_uploads")
-        .insert({
-          user_id: user!.id,
-          course_code: courseCode.trim().toUpperCase(),
-          course_title: courseTitle.trim(),
-          department,
-          level,
-          pdf_url: pdfUrl,
-          status: "pending",
-        })
-        .select().single();
-      if (insertError) throw new Error(`Record creation failed: ${insertError.message}`);
+      if (existing && files.length > 0) {
+        // Add materials to existing course
+        const { error: updateError } = await supabase
+          .from("course_uploads")
+          .update({ pdf_url: pdfUrl, status: "pending" })
+          .eq("id", existing.id);
+        if (updateError) throw new Error(`Update failed: ${updateError.message}`);
+        setUploads(prev => prev.map(u => u.id === existing.id ? { ...u, pdf_url: pdfUrl || u.pdf_url, status: "pending" } as any : u));
+        toast({ title: "✨ Materials added!", description: `Materials uploaded for ${normalizedCode}. Our team will review them soon.` });
+      } else {
+        const { data: uploadRecord, error: insertError } = await supabase
+          .from("course_uploads")
+          .insert({
+            user_id: user!.id,
+            course_code: normalizedCode,
+            course_title: courseTitle.trim(),
+            department,
+            level,
+            pdf_url: pdfUrl,
+            status: "pending",
+          })
+          .select().single();
+        if (insertError) {
+          if (insertError.message.includes("duplicate") || insertError.message.includes("unique")) {
+            toast({ title: "Course already exists", description: `${normalizedCode} is already registered for ${department}.`, variant: "destructive" });
+            setIsUploading(false);
+            return;
+          }
+          throw new Error(`Record creation failed: ${insertError.message}`);
+        }
+        setUploads(prev => [uploadRecord as UploadRecord, ...prev]);
+        toast({
+          title: files.length > 0 ? "✨ Course Submitted!" : "✅ Course Registered!",
+          description: files.length > 0
+            ? "Materials uploaded. Our team will prepare the content and it'll be live soon!"
+            : "Course saved. You can upload materials later.",
+        });
+      }
 
-      // No auto AI processing - goes to content queue for manual review
-
-      setUploads(prev => [uploadRecord as UploadRecord, ...prev]);
       setCourseCode(""); setCourseTitle(""); setFiles([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      toast({
-        title: files.length > 0 ? "✨ Course Submitted!" : "✅ Course Registered!",
-        description: files.length > 0
-          ? "Materials uploaded. Our team will prepare the content and it'll be live soon!"
-          : "Course saved. You can upload materials later.",
-      });
     } catch (error) {
       console.error("Upload error:", error);
       toast({ title: "Upload failed", description: error instanceof Error ? error.message : "Something went wrong.", variant: "destructive" });
@@ -379,7 +406,7 @@ export default function AmbassadorDashboard() {
           {([
             { key: "department" as TabKey, label: "My Dept", sublabel: "Performance", icon: <Target className="w-3.5 h-3.5" /> },
             { key: "sell" as TabKey, label: "Sell", sublabel: "Referrals", icon: <Link2 className="w-3.5 h-3.5" /> },
-            { key: "bounties" as TabKey, label: "AI Forge", sublabel: "Upload PDFs", icon: <FileText className="w-3.5 h-3.5" /> },
+            { key: "bounties" as TabKey, label: "Courses", sublabel: "Upload", icon: <FileText className="w-3.5 h-3.5" /> },
           ]).map(tab => (
             <button
               key={tab.key}
@@ -725,18 +752,20 @@ export default function AmbassadorDashboard() {
 
               {uploads.length > 0 && (
                 <div>
-                  <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Recent Uploads</h2>
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">
+                    Your Department Courses ({uploads.length})
+                  </h2>
                   <div className="space-y-2">
-                    {uploads.slice(0, 2).map(u => (
+                    {uploads.map(u => (
                       <div key={u.id} className="bg-card rounded-2xl border border-border/50 p-4 flex items-center justify-between">
                         <div>
                           <p className="text-xs font-mono text-muted-foreground">{u.course_code}</p>
                           <p className="text-sm font-semibold">{u.course_title}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">{u.department} · {new Date(u.created_at).toLocaleDateString()}</p>
-                          {u.error_message && <p className="text-xs text-destructive mt-1">{u.error_message}</p>}
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {u.pdf_url ? "📎 Materials uploaded" : "No materials yet"}
+                          </p>
                         </div>
                         <div className="flex items-center gap-2">
-                          {u.questions_generated && u.questions_generated > 0 && <span className="text-xs text-muted-foreground">{u.questions_generated} Qs</span>}
                           {statusIcon(u.status)}
                         </div>
                       </div>

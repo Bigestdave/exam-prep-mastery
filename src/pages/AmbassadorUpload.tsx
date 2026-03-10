@@ -351,7 +351,7 @@ export default function AmbassadorUpload() {
           <p className="text-xs font-mono uppercase tracking-[0.2em] text-muted-foreground mb-1">Ambassador</p>
           <h1 className="text-2xl md:text-3xl font-display font-bold">Upload Course Material</h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Upload tutorial PDFs and we'll build the full study guide, explanations, and quizzes for your students.
+            Upload tutorial PDFs and our team will build the study guides for your students.
           </p>
         </div>
 
