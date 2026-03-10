@@ -365,7 +365,7 @@ export default function AmbassadorDashboard() {
   };
 
   const handleWhatsAppShare = () => {
-    const text = `Use my VIP link to get started on LCU Prep past questions!\nhttps://${vipLink}`;
+    const text = `Use my VIP link to get started on LCU Prep past questions!\n${vipLink}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
   };
 
