@@ -200,6 +200,9 @@ export function useBestQuizAttempt(courseId: string | undefined, userId: string 
         .limit(1)
         .maybeSingle();
 
+      if (error) {
+        console.error('Failed to load quiz attempt:', error);
+      }
       if (!error && data) {
         setBest({
           course_id: data.course_id,
