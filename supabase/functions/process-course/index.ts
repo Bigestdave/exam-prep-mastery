@@ -162,7 +162,7 @@ Provide a 1-sentence summary that the student can easily memorize for the exam h
 - NEVER use phrases like "According to the notes," or "The document states." Just answer directly.
 - The output MUST be valid JSON.`;
 
-  const userPrompt = `Course: ${courseTitle}\n\n[Specific Question]: ${question}\n\n[Course Notes]:\n${pdfContext.slice(0, 8000)}`;
+  const userPrompt = `Course: ${courseTitle}\n\n[Specific Question]: ${question}\n\n[Course Notes]:\n${pdfContext.slice(0, 25000)}`;
 
   const result = await callAI(apiKey, systemPrompt, userPrompt);
 
