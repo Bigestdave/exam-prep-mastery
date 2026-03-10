@@ -121,6 +121,11 @@ export function useQuizData(courseId: string | undefined) {
         .eq('course_id', courseId)
         .order('question_index', { ascending: true });
 
+      if (error) {
+        console.error('Failed to load quiz data:', error);
+        toast({ title: "Couldn't load quiz", description: "Check your connection.", variant: "destructive" });
+      }
+
       if (!error && data) {
         const parsed: QuizQuestion[] = [];
 
