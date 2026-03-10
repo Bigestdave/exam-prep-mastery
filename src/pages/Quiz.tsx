@@ -24,15 +24,19 @@ export default function Quiz() {
   const [showResult, setShowResult] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
+  const isFreePreview = !isOwned;
+  const FREE_PREVIEW_LIMIT = 5;
+  const allQuestions = questions;
+  const activeQuestions = isFreePreview ? questions.slice(0, FREE_PREVIEW_LIMIT) : questions;
+
   useEffect(() => {
     if (!user) navigate("/login");
     if (!isLoading && !hasQuizData && id) navigate(`/course/${id}`);
-    if (!isLoading && !isOwned && id) navigate(`/course/${id}`);
-  }, [user, isLoading, hasQuizData, isOwned, id, navigate]);
+  }, [user, isLoading, hasQuizData, id, navigate]);
 
-  const currentQuestion = questions[currentIndex];
+  const currentQuestion = activeQuestions[currentIndex];
   const options = currentQuestion?.quiz_options ?? [];
-  const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
+  const progress = activeQuestions.length > 0 ? ((currentIndex + 1) / activeQuestions.length) * 100 : 0;
 
   const handleSelect = useCallback(async (optionIndex: number) => {
     if (isTransitioning) return;
