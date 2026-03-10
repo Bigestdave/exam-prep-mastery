@@ -197,36 +197,53 @@ export default function AmbassadorDashboard() {
   const removeFile = (index: number) => setFiles(prev => prev.filter((_, i) => i !== index));
 
   const handleUpload = async () => {
-    if (files.length === 0 || !courseCode.trim() || !courseTitle.trim() || !department) {
-      toast({ title: "Missing fields", description: "Please fill in all fields and add at least one PDF.", variant: "destructive" });
+    if (!courseCode.trim() || !courseTitle.trim() || !department) {
+      toast({ title: "Missing fields", description: "Please fill in course code, title, and department.", variant: "destructive" });
       return;
     }
     setIsUploading(true);
     try {
-      const pdfUrls: string[] = [];
-      for (const file of files) {
-        const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-        const filePath = `pdfs/${user!.id}/${fileName}`;
-        const { data: fileData, error: uploadError } = await supabase.storage.from("course_materials").upload(filePath, file);
-        if (uploadError) throw new Error(`Upload failed for ${file.name}: ${uploadError.message}`);
-        const { data: urlData } = supabase.storage.from("course_materials").getPublicUrl(fileData.path);
-        pdfUrls.push(urlData.publicUrl);
+      let pdfUrl: string | null = null;
+
+      // Upload files if any were added
+      if (files.length > 0) {
+        const pdfUrls: string[] = [];
+        for (const file of files) {
+          const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+          const filePath = `pdfs/${user!.id}/${fileName}`;
+          const { data: fileData, error: uploadError } = await supabase.storage.from("course_materials").upload(filePath, file);
+          if (uploadError) throw new Error(`Upload failed for ${file.name}: ${uploadError.message}`);
+          const { data: urlData } = supabase.storage.from("course_materials").getPublicUrl(fileData.path);
+          pdfUrls.push(urlData.publicUrl);
+        }
+        pdfUrl = pdfUrls[0];
       }
 
       const { data: uploadRecord, error: insertError } = await supabase
         .from("course_uploads")
-        .insert({ user_id: user!.id, course_code: courseCode.trim().toUpperCase(), course_title: courseTitle.trim(), department, level, pdf_url: pdfUrls[0], status: "pending" })
+        .insert({
+          user_id: user!.id,
+          course_code: courseCode.trim().toUpperCase(),
+          course_title: courseTitle.trim(),
+          department,
+          level,
+          pdf_url: pdfUrl,
+          status: "pending",
+        })
         .select().single();
       if (insertError) throw new Error(`Record creation failed: ${insertError.message}`);
 
-      await supabase.functions.invoke("trigger-processing", {
-        body: { course_code: courseCode.trim().toUpperCase(), course_title: courseTitle.trim(), department, level, pdf_urls: pdfUrls, upload_id: uploadRecord.id },
-      });
+      // No auto AI processing - goes to content queue for manual review
 
       setUploads(prev => [uploadRecord as UploadRecord, ...prev]);
       setCourseCode(""); setCourseTitle(""); setFiles([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      toast({ title: "✨ Upload Submitted!", description: "AI is generating the course content. Thank you for representing your department!" });
+      toast({
+        title: files.length > 0 ? "✨ Course Submitted!" : "✅ Course Registered!",
+        description: files.length > 0
+          ? "Materials uploaded. Our team will prepare the content and it'll be live soon!"
+          : "Course saved. You can upload materials later.",
+      });
     } catch (error) {
       console.error("Upload error:", error);
       toast({ title: "Upload failed", description: error instanceof Error ? error.message : "Something went wrong.", variant: "destructive" });
