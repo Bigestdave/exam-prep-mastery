@@ -773,3 +773,12 @@ export default function AmbassadorDashboard() {
                   </div>
                 </div>
               )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+
+      
+    </div>
+  );
+}
