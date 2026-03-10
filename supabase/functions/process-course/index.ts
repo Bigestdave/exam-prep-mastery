@@ -139,13 +139,22 @@ You MUST return a JSON object with EXACTLY this schema:
 {
   "answer_text": "The fully formatted markdown answer",
   "key_points": ["Key point 1", "Key point 2", "Key point 3"],
-  "quiz": {
-    "question": "A diagnostic MCQ testing actual understanding of the core concept",
-    "options": ["First plausible option", "Second plausible option", "Third plausible option", "Fourth plausible option"],
-    "correct_index": 0,
-    "hint": "A gentle nudge without giving the answer away",
-    "explanation": "Why the correct answer is right and the others are wrong"
-  }
+  "quizzes": [
+    {
+      "question": "Rephrase of the tutorial question as an MCQ stem",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correct_index": 0,
+      "hint": "A gentle nudge without giving the answer away",
+      "explanation": "Why the correct answer is right"
+    },
+    {
+      "question": "Another MCQ covering a different aspect of the same tutorial question",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correct_index": 2,
+      "hint": "Another hint",
+      "explanation": "Why this is correct"
+    }
+  ]
 }
 
 ### ANSWER STRUCTURE:
