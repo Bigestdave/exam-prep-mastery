@@ -358,7 +358,7 @@ export default function AmbassadorDashboard() {
     : 100;
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(`https://${vipLink}`);
+    navigator.clipboard.writeText(vipLink);
     setCopied(true);
     toast({ title: "Link copied!", description: "Share it with your coursemates." });
     setTimeout(() => setCopied(false), 2000);
