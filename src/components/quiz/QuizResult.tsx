@@ -51,7 +51,7 @@ function getScoringTier(percentage: number) {
   };
 }
 
-export default function QuizResult({ courseId, courseCode, courseTitle, score, total, questions, answers }: QuizResultProps) {
+export default function QuizResult({ courseId, courseCode, courseTitle, score, total, questions, answers, isFreePreview = false, fullQuizCount = 0 }: QuizResultProps) {
   const navigate = useNavigate();
   const { user, profile, purchases } = useAuth();
   const { courses } = useCourses();
