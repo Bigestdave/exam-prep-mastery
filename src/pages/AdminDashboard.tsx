@@ -13,9 +13,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen, ClipboardList, DollarSign, TrendingUp, Users, ShoppingCart, Crown, Upload, Calendar, Target, RefreshCw } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen, ClipboardList, DollarSign, TrendingUp, Users, ShoppingCart, Crown, Upload, Calendar, Target, RefreshCw, Eye } from "lucide-react";
 import { AmbassadorsTab } from "@/components/admin/AmbassadorsTab";
 import { UploadsTab } from "@/components/admin/UploadsTab";
+import { ContentReviewTab } from "@/components/admin/ContentReviewTab";
 import { Badge } from "@/components/ui/badge";
 import { facultyCategories, allDepartments } from "@/data/departments";
 
@@ -763,6 +764,7 @@ export default function AdminDashboard() {
         <Tabs defaultValue="courses">
           <TabsList className="mb-6 flex-wrap">
             <TabsTrigger value="courses" className="gap-2"><BookOpen className="w-4 h-4" />Courses</TabsTrigger>
+            <TabsTrigger value="review" className="gap-2"><Eye className="w-4 h-4" />Review</TabsTrigger>
             <TabsTrigger value="sales" className="gap-2"><DollarSign className="w-4 h-4" />Sales</TabsTrigger>
             <TabsTrigger value="semester" className="gap-2"><Target className="w-4 h-4" />Departments</TabsTrigger>
             <TabsTrigger value="uploads" className="gap-2"><Upload className="w-4 h-4" />Uploads</TabsTrigger>
@@ -815,8 +817,11 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="review">
+            <ContentReviewTab />
+          </TabsContent>
+
           <TabsContent value="sales">
-            <SalesTab />
           </TabsContent>
 
           <TabsContent value="semester">

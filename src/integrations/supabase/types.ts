@@ -54,6 +54,7 @@ export type Database = {
           question_index: number
           question_text: string
           quiz_options: Json | null
+          status: string
           structured_content: Json | null
           updated_at: string | null
         }
@@ -66,6 +67,7 @@ export type Database = {
           question_index: number
           question_text: string
           quiz_options?: Json | null
+          status?: string
           structured_content?: Json | null
           updated_at?: string | null
         }
@@ -78,6 +80,7 @@ export type Database = {
           question_index?: number
           question_text?: string
           quiz_options?: Json | null
+          status?: string
           structured_content?: Json | null
           updated_at?: string | null
         }
