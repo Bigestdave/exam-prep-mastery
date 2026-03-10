@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 export interface CourseQuestion {
   id: string;
@@ -34,6 +35,12 @@ export function useCourseQuestions(courseId: string | undefined) {
     if (fetchError) {
       setError(fetchError.message);
       setQuestions([]);
+      console.error('Failed to load questions:', fetchError);
+      toast({
+        title: "Couldn't load questions",
+        description: "Pull down to refresh or check your connection.",
+        variant: "destructive",
+      });
     } else {
       setQuestions(data || []);
     }

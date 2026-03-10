@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 export interface QuizOption {
   text: string;
@@ -120,6 +121,11 @@ export function useQuizData(courseId: string | undefined) {
         .eq('course_id', courseId)
         .order('question_index', { ascending: true });
 
+      if (error) {
+        console.error('Failed to load quiz data:', error);
+        toast({ title: "Couldn't load quiz", description: "Check your connection.", variant: "destructive" });
+      }
+
       if (!error && data) {
         const parsed: QuizQuestion[] = [];
 
@@ -194,6 +200,9 @@ export function useBestQuizAttempt(courseId: string | undefined, userId: string 
         .limit(1)
         .maybeSingle();
 
+      if (error) {
+        console.error('Failed to load quiz attempt:', error);
+      }
       if (!error && data) {
         setBest({
           course_id: data.course_id,
@@ -233,6 +242,10 @@ export function useSemesterReadiness(userId: string | undefined, courseIds: stri
         .in('course_id', courseIds)
         .order('percentage', { ascending: false });
 
+      if (error) {
+        console.error('Failed to load readiness data:', error);
+        toast({ title: "Couldn't load readiness", description: "Your progress may be outdated.", variant: "destructive" });
+      }
       if (!error && data) {
         const bestPerCourse = new Map<string, number>();
         data.forEach(row => {
