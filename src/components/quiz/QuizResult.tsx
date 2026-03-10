@@ -253,44 +253,12 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
             )}
 
             <div className="flex items-center justify-center my-4">
-              <div className="relative w-28 h-28">
-                <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-                  {ringSegments.map((seg, i) => {
-                    const totalSegs = ringSegments.length;
-                    const gapDeg = 4;
-                    const segDeg = (360 - gapDeg * totalSegs) / totalSegs;
-                    const startAngle = i * (segDeg + gapDeg);
-                    const circumference = 2 * Math.PI * 42;
-                    const segLength = (segDeg / 360) * circumference;
-
-                    return (
-                      <circle
-                        key={seg.id}
-                        cx="50" cy="50" r="42"
-                        fill="none"
-                        strokeWidth="5"
-                        strokeLinecap="round"
-                        stroke={
-                          seg.pct >= 80
-                            ? "hsl(var(--accent))"
-                            : seg.pct > 0
-                              ? "hsl(30, 70%, 60%)"
-                              : "hsl(var(--border))"
-                        }
-                        strokeDasharray={`${segLength} ${circumference - segLength}`}
-                        strokeDashoffset={-(startAngle / 360) * circumference}
-                        className="transition-all duration-700"
-                      />
-                    );
-                  })}
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <span className="text-xl font-display font-bold text-foreground">{correctedTotalPercentage}%</span>
-                    <p className="text-[8px] font-mono text-muted-foreground uppercase tracking-wider">Readiness</p>
-                  </div>
-                </div>
-              </div>
+              <ReadinessRing
+                percentage={correctedTotalPercentage}
+                variant="segmented"
+                sizeClass="w-28 h-28"
+                segments={ringSegments.map(seg => ({ id: seg.id, pct: seg.pct }))}
+              />
             </div>
 
             {/* Target List — Ledger style */}
