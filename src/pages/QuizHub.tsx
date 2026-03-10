@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useSemesterReadiness } from "@/hooks/useQuizData";
 import { calcSemesterReadiness, getTier, courseContribution } from "@/lib/readinessTiers";
+import { ReadinessRing } from "@/components/quiz/ReadinessRing";
 import { ChevronLeft, Lock, CheckCircle2, Zap } from "lucide-react";
 
 export default function QuizHub() {
@@ -41,9 +42,6 @@ export default function QuizHub() {
   const ownedCourses = departmentCourses.filter(c => purchases.includes(c.id));
   const lockedCourses = departmentCourses.filter(c => !purchases.includes(c.id));
 
-  const ringRadius = 50;
-  const circumference = 2 * Math.PI * ringRadius;
-
   return (
     <div className="min-h-screen bg-background pb-32 md:pb-0">
       {/* Header */}
@@ -74,35 +72,7 @@ export default function QuizHub() {
           className="rounded-3xl p-6 mb-6 relative overflow-hidden bg-gradient-to-br from-espresso via-espresso-deep to-espresso-ink"
         >
           <div className="relative z-10 flex items-center gap-5">
-            {/* Ring */}
-            <div className="relative w-28 h-28 flex-shrink-0">
-              <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
-                <circle
-                  cx="60" cy="60" r={ringRadius}
-                  fill="none"
-                  stroke="hsl(var(--cream) / 0.08)"
-                  strokeWidth="5"
-                  {...(totalReadiness === 0 ? { strokeDasharray: "4 6" } : {})}
-                />
-                <motion.circle
-                  cx="60" cy="60" r={ringRadius}
-                  fill="none"
-                  stroke="hsl(var(--academic-green))"
-                  strokeWidth="5"
-                  strokeLinecap="round"
-                  strokeDasharray={circumference}
-                  initial={{ strokeDashoffset: circumference }}
-                  animate={{ strokeDashoffset: circumference * (1 - totalReadiness / 100) }}
-                  transition={{ type: "spring", stiffness: 40, damping: 15, delay: 0.3 }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-3xl font-display font-bold text-cream">{totalReadiness}%</span>
-                <span className="text-[7px] uppercase tracking-[0.15em] font-bold mt-0.5 text-cream/35">
-                  Readiness
-                </span>
-              </div>
-            </div>
+            <ReadinessRing percentage={totalReadiness} variant="dark" sizeClass="w-28 h-28" />
 
             {/* Legend */}
             <div className="flex-1 min-w-0 space-y-1.5">

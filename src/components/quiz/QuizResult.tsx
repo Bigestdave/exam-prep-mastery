@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useSemesterReadiness, QuizQuestion } from "@/hooks/useQuizData";
 import { calcSemesterReadiness, getTier, courseContribution } from "@/lib/readinessTiers";
+import { ReadinessRing } from "@/components/quiz/ReadinessRing";
 import { ArrowRight, RotateCcw, CheckCircle2, XCircle, Lock } from "lucide-react";
 
 interface QuizResultProps {
