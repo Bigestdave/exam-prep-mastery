@@ -26,6 +26,7 @@ import Quiz from "./pages/Quiz";
 import VipRedirect from "./pages/VipRedirect";
 import Withdraw from "./pages/Withdraw";
 import Onboarding from "./pages/Onboarding";
+import ModifierDashboard from "./pages/ModifierDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
