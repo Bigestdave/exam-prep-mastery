@@ -231,6 +231,16 @@ export function AmbassadorsTab() {
                   <TableRow key={a.user_id}>
                     <TableCell className="font-medium">{a.full_name || 'Unknown'}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{a.faculty || '—'}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {a.bank_name ? (
+                        <div className="space-y-0.5">
+                          <p className="font-medium text-foreground">{a.account_name}</p>
+                          <p>{a.bank_name} · {a.account_number}</p>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground/50">No bank info</span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Badge variant="outline" className="gap-1">
                         <Upload className="w-3 h-3" /> {a.upload_count}
