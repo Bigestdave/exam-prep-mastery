@@ -16,6 +16,8 @@ interface QuizResultProps {
   total: number;
   questions: QuizQuestion[];
   answers: Map<number, number>;
+  isFreePreview?: boolean;
+  fullQuizCount?: number;
 }
 
 function getScoringTier(percentage: number) {
