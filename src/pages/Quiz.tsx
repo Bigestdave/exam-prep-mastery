@@ -67,26 +67,27 @@ export default function Quiz() {
     // Calculate score from all answers
     let finalScore = 0;
     answers.forEach((optionIndex, questionIndex) => {
-      const q = questions[questionIndex];
+      const q = activeQuestions[questionIndex];
       const opts = q?.quiz_options ?? [];
       if (opts[optionIndex]?.is_correct) finalScore++;
     });
 
     setScore(finalScore);
 
-    if (user && id) {
+    // Only save to DB for owned courses (full quiz)
+    if (user && id && !isFreePreview) {
       const { error } = await supabase.from("quiz_attempts").insert({
         user_id: user.id,
         course_id: id,
         score: finalScore,
-        total_questions: questions.length,
+        total_questions: activeQuestions.length,
       });
       if (error) {
         console.error("Failed to save quiz attempt:", error);
       }
     }
     setShowResult(true);
-  }, [answers, questions, user, id]);
+  }, [answers, activeQuestions, user, id, isFreePreview]);
 
   if (isLoading) {
     return (
