@@ -104,6 +104,8 @@ export default function Quiz() {
         total={questions.length}
         questions={questions}
         answers={answers}
+        isFreePreview={!isOwned}
+        fullQuizCount={questions.length}
       />
     );
   }
