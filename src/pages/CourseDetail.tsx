@@ -163,12 +163,11 @@ export default function CourseDetail() {
   const onSuccess = async (response: { reference: string }) => {
     console.log('Payment completed, reference:', response.reference);
     
-    if (paymentOption === 'bundle') {
-      const courseIds = unownedCourses.map(c => c.id);
-      await addPurchases(courseIds);
+    if (isMultiBuy) {
+      await addPurchases(allSelectedIds);
       toast({
-        title: "Semester Bundle unlocked! 🎉",
-        description: `You now have access to all ${courseIds.length} courses.`,
+        title: "All courses unlocked! 🎉",
+        description: `You now have access to ${allSelectedIds.length} courses.`,
       });
     } else {
       addPurchase(course.id);
@@ -178,6 +177,7 @@ export default function CourseDetail() {
       });
     }
     setShowPaymentModal(false);
+    setExtraCourseIds([]);
   };
 
   const onClose = () => {
