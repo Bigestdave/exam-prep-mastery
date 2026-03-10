@@ -752,18 +752,20 @@ export default function AmbassadorDashboard() {
 
               {uploads.length > 0 && (
                 <div>
-                  <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Recent Uploads</h2>
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">
+                    Your Department Courses ({uploads.length})
+                  </h2>
                   <div className="space-y-2">
-                    {uploads.slice(0, 2).map(u => (
+                    {uploads.map(u => (
                       <div key={u.id} className="bg-card rounded-2xl border border-border/50 p-4 flex items-center justify-between">
                         <div>
                           <p className="text-xs font-mono text-muted-foreground">{u.course_code}</p>
                           <p className="text-sm font-semibold">{u.course_title}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">{u.department} · {new Date(u.created_at).toLocaleDateString()}</p>
-                          {u.error_message && <p className="text-xs text-destructive mt-1">{u.error_message}</p>}
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {u.pdf_url ? "📎 Materials uploaded" : "No materials yet"}
+                          </p>
                         </div>
                         <div className="flex items-center gap-2">
-                          {u.questions_generated && u.questions_generated > 0 && <span className="text-xs text-muted-foreground">{u.questions_generated} Qs</span>}
                           {statusIcon(u.status)}
                         </div>
                       </div>
@@ -771,12 +773,3 @@ export default function AmbassadorDashboard() {
                   </div>
                 </div>
               )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
-
-      
-    </div>
-  );
-}
