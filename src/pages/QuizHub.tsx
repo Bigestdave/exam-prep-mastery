@@ -87,7 +87,7 @@ export default function QuizHub() {
                     <span>{t.emoji}</span>
                     <span className="font-mono">{t.label}</span>
                     <span className={`ml-auto font-bold ${count > 0 ? "text-cream" : "text-cream/25"}`}>
-                      {count}
+                      {count} {count === 1 ? "course" : "courses"}
                     </span>
                   </div>
                 );
