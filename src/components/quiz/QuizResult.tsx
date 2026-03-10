@@ -72,12 +72,11 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
     pct: c.id === courseId ? percentage : (readiness.get(c.id) ?? 0),
   }));
 
-  // Calculate CORRECT totalPercentage including current attempt
-  const correctedTotalPercentage = departmentCourses.length > 0
-    ? Math.round(
-        ringSegments.reduce((sum, seg) => sum + seg.pct, 0) / departmentCourses.length
-      )
-    : 0;
+  // Build a corrected scores map including the current attempt
+  const correctedScores = new Map(readiness);
+  correctedScores.set(courseId, Math.max(percentage, readiness.get(courseId) ?? 0));
+  const correctedTotalPercentage = calcSemesterReadiness(departmentCourseIds, correctedScores);
+  const myContribution = courseContribution(percentage, departmentCourses.length);
 
   const exposedCount = ringSegments.filter(s => s.pct < 80 && s.id !== courseId).length;
 
