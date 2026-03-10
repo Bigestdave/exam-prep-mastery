@@ -61,12 +61,29 @@ export function AmbassadorsTab() {
       uploadCounts.set(u.user_id, (uploadCounts.get(u.user_id) || 0) + 1);
     });
 
+    // Fetch latest bank details from withdrawal_requests
+    const { data: withdrawals } = await supabase
+      .from('withdrawal_requests')
+      .select('user_id, bank_name, account_number, account_name')
+      .in('user_id', userIds)
+      .order('created_at', { ascending: false });
+
+    const bankDetails = new Map<string, { bank_name: string; account_number: string; account_name: string }>();
+    withdrawals?.forEach(w => {
+      if (!bankDetails.has(w.user_id)) {
+        bankDetails.set(w.user_id, { bank_name: w.bank_name, account_number: w.account_number, account_name: w.account_name });
+      }
+    });
+
     const records: AmbassadorRecord[] = (profiles || []).map(p => ({
       user_id: p.id,
       full_name: p.full_name,
       faculty: p.faculty,
       wallet_balance: p.wallet_balance,
       upload_count: uploadCounts.get(p.id) || 0,
+      bank_name: bankDetails.get(p.id)?.bank_name || null,
+      account_number: bankDetails.get(p.id)?.account_number || null,
+      account_name: bankDetails.get(p.id)?.account_name || null,
     }));
 
     setAmbassadors(records);
