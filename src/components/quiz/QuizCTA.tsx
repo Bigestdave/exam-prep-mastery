@@ -15,7 +15,22 @@ export function QuizCTA({ courseId, courseCode }: QuizCTAProps) {
   const { hasQuizData, isLoading: quizLoading } = useQuizData(courseId);
   const { best, isLoading: attemptLoading } = useBestQuizAttempt(courseId, user?.id);
 
-  if (quizLoading || attemptLoading || !hasQuizData) return null;
+  if (quizLoading || attemptLoading) {
+    return (
+      <div className="bg-card border border-border rounded-3xl p-5 mb-6 shadow-card animate-pulse">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-14 h-14 rounded-full bg-muted flex-shrink-0" />
+          <div className="flex-1 space-y-2">
+            <div className="h-5 w-40 bg-muted rounded-lg" />
+            <div className="h-3 w-56 bg-muted rounded-lg" />
+          </div>
+        </div>
+        <div className="h-12 w-full bg-muted rounded-2xl" />
+      </div>
+    );
+  }
+
+  if (!hasQuizData) return null;
 
   const percentage = best?.percentage ?? 0;
   const hasAttempted = best !== null;
