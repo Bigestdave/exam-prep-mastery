@@ -17,6 +17,7 @@ import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen, ClipboardList, Doll
 import { AmbassadorsTab } from "@/components/admin/AmbassadorsTab";
 import { UploadsTab } from "@/components/admin/UploadsTab";
 import { ContentReviewTab } from "@/components/admin/ContentReviewTab";
+import { ContentQueueTab } from "@/components/admin/ContentQueueTab";
 import { Badge } from "@/components/ui/badge";
 import { facultyCategories, allDepartments } from "@/data/departments";
 
