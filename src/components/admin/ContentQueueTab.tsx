@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Download, FileText, Clock, CheckCircle2, AlertCircle, ExternalLink } from "lucide-react";
+import { Loader2, Download, FileText, Clock, CheckCircle2, AlertCircle, Package, FolderOpen } from "lucide-react";
 import { allDepartments } from "@/data/departments";
 
 interface QueueItem {
@@ -21,6 +21,15 @@ interface QueueItem {
   user_name?: string;
 }
 
+interface DeptSummary {
+  name: string;
+  total: number;
+  withMaterials: number;
+  noMaterials: number;
+  complete: number;
+  pending: number;
+}
+
 export function ContentQueueTab() {
   const { toast } = useToast();
   const [items, setItems] = useState<QueueItem[]>([]);
@@ -29,16 +38,10 @@ export function ContentQueueTab() {
 
   const fetchQueue = useCallback(async () => {
     setLoading(true);
-    let query = supabase
+    const { data } = await supabase
       .from("course_uploads")
       .select("*")
       .order("created_at", { ascending: false });
-
-    if (activeDept !== "all") {
-      query = query.eq("department", activeDept);
-    }
-
-    const { data } = await query;
 
     if (data) {
       const userIds = [...new Set(data.map(d => d.user_id))];
@@ -55,20 +58,35 @@ export function ContentQueueTab() {
       })));
     }
     setLoading(false);
-  }, [activeDept]);
+  }, []);
 
   useEffect(() => { fetchQueue(); }, [fetchQueue]);
 
-  // Get departments that have submissions
-  const deptCounts = items.reduce<Record<string, number>>((acc, item) => {
-    acc[item.department] = (acc[item.department] || 0) + 1;
-    return acc;
-  }, {});
+  // Build department summaries
+  const deptMap = new Map<string, DeptSummary>();
+  items.forEach(item => {
+    const existing = deptMap.get(item.department) || {
+      name: item.department,
+      total: 0,
+      withMaterials: 0,
+      noMaterials: 0,
+      complete: 0,
+      pending: 0,
+    };
+    existing.total++;
+    if (item.pdf_url) existing.withMaterials++;
+    else existing.noMaterials++;
+    if (item.status === "complete") existing.complete++;
+    if (item.pdf_url && item.status === "pending") existing.pending++;
+    deptMap.set(item.department, existing);
+  });
 
-  // Only show departments that have at least one submission
-  const activeDepts = allDepartments.filter(d => deptCounts[d]);
-
+  const deptSummaries = Array.from(deptMap.values()).sort((a, b) => b.total - a.total);
   const filteredItems = activeDept === "all" ? items : items.filter(i => i.department === activeDept);
+
+  const pendingCount = items.filter(i => i.pdf_url && i.status === "pending").length;
+  const noMaterialsCount = items.filter(i => !i.pdf_url).length;
+  const completeCount = items.filter(i => i.status === "complete").length;
 
   const statusBadge = (item: QueueItem) => {
     if (!item.pdf_url) {
@@ -86,24 +104,26 @@ export function ContentQueueTab() {
     }
   };
 
-  const pendingCount = items.filter(i => i.pdf_url && i.status === "pending").length;
-  const noMaterialsCount = items.filter(i => !i.pdf_url).length;
-  const completeCount = items.filter(i => i.status === "complete").length;
-
   return (
     <div className="space-y-4">
-      {/* Summary */}
-      <div className="grid gap-3 grid-cols-3">
+      {/* Summary Stats */}
+      <div className="grid gap-3 grid-cols-4">
+        <Card>
+          <CardContent className="pt-4 pb-4 text-center">
+            <p className="text-2xl font-bold text-foreground">{items.length}</p>
+            <p className="text-xs text-muted-foreground">Total Courses</p>
+          </CardContent>
+        </Card>
         <Card>
           <CardContent className="pt-4 pb-4 text-center">
             <p className="text-2xl font-bold text-blue-600">{pendingCount}</p>
-            <p className="text-xs text-muted-foreground">Ready for Review</p>
+            <p className="text-xs text-muted-foreground">Ready to Review</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-4 pb-4 text-center">
             <p className="text-2xl font-bold text-amber-600">{noMaterialsCount}</p>
-            <p className="text-xs text-muted-foreground">No Materials Yet</p>
+            <p className="text-xs text-muted-foreground">No Materials</p>
           </CardContent>
         </Card>
         <Card>
@@ -113,6 +133,48 @@ export function ContentQueueTab() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Department Breakdown */}
+      {activeDept === "all" && deptSummaries.length > 0 && (
+        <Card>
+          <CardContent className="py-4 px-4">
+            <div className="flex items-center gap-2 mb-3">
+              <FolderOpen className="w-4 h-4 text-muted-foreground" />
+              <h3 className="text-sm font-bold">Departments ({deptSummaries.length})</h3>
+            </div>
+            <div className="space-y-2">
+              {deptSummaries.map(dept => (
+                <button
+                  key={dept.name}
+                  onClick={() => setActiveDept(dept.name)}
+                  className="w-full flex items-center justify-between rounded-xl px-3 py-2.5 hover:bg-secondary/60 transition-colors text-left"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold truncate">{dept.name}</p>
+                    <div className="flex gap-3 mt-0.5">
+                      <span className="text-xs text-muted-foreground">{dept.total} courses</span>
+                      {dept.withMaterials > 0 && (
+                        <span className="text-xs text-blue-600">📎 {dept.withMaterials} with materials</span>
+                      )}
+                      {dept.noMaterials > 0 && (
+                        <span className="text-xs text-amber-600">⏳ {dept.noMaterials} awaiting</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {dept.pending > 0 && (
+                      <Badge variant="outline" className="text-blue-600 border-blue-200 text-[10px]">{dept.pending} to review</Badge>
+                    )}
+                    {dept.complete > 0 && (
+                      <Badge variant="outline" className="text-emerald-600 border-emerald-200 text-[10px]">{dept.complete} done</Badge>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Department Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-2">
@@ -124,15 +186,15 @@ export function ContentQueueTab() {
         >
           All ({items.length})
         </Button>
-        {activeDepts.map(dept => (
+        {deptSummaries.map(dept => (
           <Button
-            key={dept}
+            key={dept.name}
             size="sm"
-            variant={activeDept === dept ? "default" : "outline"}
-            onClick={() => setActiveDept(dept)}
+            variant={activeDept === dept.name ? "default" : "outline"}
+            onClick={() => setActiveDept(dept.name)}
             className="shrink-0 text-xs"
           >
-            {dept} ({deptCounts[dept]})
+            {dept.name} ({dept.total})
           </Button>
         ))}
       </div>
@@ -158,7 +220,7 @@ export function ContentQueueTab() {
                       {statusBadge(item)}
                     </div>
                     <p className="text-sm text-foreground">{item.course_title}</p>
-                    <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground flex-wrap">
                       <span>{item.department}</span>
                       <span>·</span>
                       <span>{item.level}</span>

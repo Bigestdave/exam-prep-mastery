@@ -757,17 +757,58 @@ export default function AmbassadorDashboard() {
                   </h2>
                   <div className="space-y-2">
                     {uploads.map(u => (
-                      <div key={u.id} className="bg-card rounded-2xl border border-border/50 p-4 flex items-center justify-between">
-                        <div>
-                          <p className="text-xs font-mono text-muted-foreground">{u.course_code}</p>
-                          <p className="text-sm font-semibold">{u.course_title}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">
-                            {u.pdf_url ? "📎 Materials uploaded" : "No materials yet"}
-                          </p>
+                      <div key={u.id} className="bg-card rounded-2xl border border-border/50 p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-mono text-muted-foreground">{u.course_code}</p>
+                            <p className="text-sm font-semibold">{u.course_title}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {u.pdf_url ? "📎 Materials uploaded" : "No materials yet"}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            {statusIcon(u.status)}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          {statusIcon(u.status)}
-                        </div>
+                        {!u.pdf_url && (
+                          <label
+                            htmlFor={`add-material-${u.id}`}
+                            className="mt-3 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border-2 border-dashed border-border hover:border-accent/40 hover:bg-accent/[0.04] cursor-pointer transition-all text-sm font-semibold text-muted-foreground hover:text-foreground"
+                          >
+                            <Upload className="w-4 h-4" /> Add Materials
+                            <input
+                              id={`add-material-${u.id}`}
+                              type="file"
+                              accept=".pdf"
+                              className="hidden"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                if (!file.name.toLowerCase().endsWith(".pdf")) {
+                                  toast({ title: "Only PDFs accepted", variant: "destructive" });
+                                  return;
+                                }
+                                if (file.size > 20 * 1024 * 1024) {
+                                  toast({ title: "File too large", description: "Max 20MB", variant: "destructive" });
+                                  return;
+                                }
+                                try {
+                                  const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+                                  const filePath = `pdfs/${user!.id}/${fileName}`;
+                                  const { data: fileData, error: uploadError } = await supabase.storage.from("course_materials").upload(filePath, file);
+                                  if (uploadError) throw uploadError;
+                                  const { data: urlData } = supabase.storage.from("course_materials").getPublicUrl(fileData.path);
+                                  await supabase.from("course_uploads").update({ pdf_url: urlData.publicUrl, status: "pending" }).eq("id", u.id);
+                                  setUploads(prev => prev.map(x => x.id === u.id ? { ...x, pdf_url: urlData.publicUrl, status: "pending" } : x));
+                                  toast({ title: "✨ Materials added!", description: `Uploaded for ${u.course_code}` });
+                                } catch (err) {
+                                  toast({ title: "Upload failed", description: err instanceof Error ? err.message : "Something went wrong", variant: "destructive" });
+                                }
+                                e.target.value = "";
+                              }}
+                            />
+                          </label>
+                        )}
                       </div>
                     ))}
                   </div>
