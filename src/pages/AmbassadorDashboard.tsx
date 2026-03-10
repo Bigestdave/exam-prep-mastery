@@ -716,10 +716,10 @@ export default function AmbassadorDashboard() {
                 <motion.button
                   whileHover={{ y: -1 }} whileTap={{ scale: 0.97 }}
                   onClick={handleUpload}
-                  disabled={isUploading || files.length === 0 || !courseCode || !courseTitle || !department}
+                  disabled={isUploading || !courseCode || !courseTitle || !department}
                   className="w-full h-12 rounded-xl font-bold text-sm bg-foreground text-background disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 btn-thud"
                 >
-                  {isUploading ? <><Loader2 className="w-4 h-4 animate-spin" /> Getting Your Course Ready...</> : <><Upload className="w-4 h-4" /> Submit Course</>}
+                  {isUploading ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</> : files.length > 0 ? <><Upload className="w-4 h-4" /> Submit Course & Materials</> : <><FileText className="w-4 h-4" /> Save Course</>}
                 </motion.button>
               </div>
 
