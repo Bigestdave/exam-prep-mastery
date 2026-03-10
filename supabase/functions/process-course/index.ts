@@ -307,6 +307,7 @@ async function processCourse(payload: ProcessPayload) {
           question_text: batch[j],
           answer_text: results[j].answer_text,
           content: results[j].content,
+          status: "draft",
         });
       }
     }
