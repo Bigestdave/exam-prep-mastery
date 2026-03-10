@@ -212,34 +212,39 @@ export default function AmbassadorUpload() {
   };
 
   const handleUpload = async () => {
-    if (files.length === 0 || !courseCode.trim() || !courseTitle.trim() || !department) {
-      toast({ title: "Missing fields", description: "Please fill in all fields and add at least one PDF.", variant: "destructive" });
+    if (!courseCode.trim() || !courseTitle.trim() || !department) {
+      toast({ title: "Missing fields", description: "Please fill in course code, title, and department.", variant: "destructive" });
       return;
     }
 
     setIsUploading(true);
 
     try {
-      // 1. Upload ALL PDFs to storage
-      const pdfUrls: string[] = [];
-      for (const file of files) {
-        const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-        const filePath = `pdfs/${user!.id}/${fileName}`;
+      let pdfUrl: string | null = null;
 
-        const { data: fileData, error: uploadError } = await supabase.storage
-          .from("course_materials")
-          .upload(filePath, file);
+      // Upload files if any
+      if (files.length > 0) {
+        const pdfUrls: string[] = [];
+        for (const file of files) {
+          const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+          const filePath = `pdfs/${user!.id}/${fileName}`;
 
-        if (uploadError) throw new Error(`Upload failed for ${file.name}: ${uploadError.message}`);
+          const { data: fileData, error: uploadError } = await supabase.storage
+            .from("course_materials")
+            .upload(filePath, file);
 
-        const { data: urlData } = supabase.storage
-          .from("course_materials")
-          .getPublicUrl(fileData.path);
+          if (uploadError) throw new Error(`Upload failed for ${file.name}: ${uploadError.message}`);
 
-        pdfUrls.push(urlData.publicUrl);
+          const { data: urlData } = supabase.storage
+            .from("course_materials")
+            .getPublicUrl(fileData.path);
+
+          pdfUrls.push(urlData.publicUrl);
+        }
+        pdfUrl = pdfUrls[0];
       }
 
-      // 2. Create upload record
+      // Create upload record (no auto processing)
       const { data: uploadRecord, error: insertError } = await supabase
         .from("course_uploads")
         .insert({
@@ -248,7 +253,7 @@ export default function AmbassadorUpload() {
           course_title: courseTitle.trim(),
           department,
           level,
-          pdf_url: pdfUrls[0],
+          pdf_url: pdfUrl,
           status: "pending",
         })
         .select()
@@ -256,24 +261,7 @@ export default function AmbassadorUpload() {
 
       if (insertError) throw new Error(`Record creation failed: ${insertError.message}`);
 
-      // 3. Trigger processing (fire-and-forget edge function)
-      const { error: fnError } = await supabase.functions.invoke("trigger-processing", {
-        body: {
-          course_code: courseCode.trim().toUpperCase(),
-          course_title: courseTitle.trim(),
-          department,
-          level,
-          pdf_urls: pdfUrls,
-          upload_id: uploadRecord.id,
-        },
-      });
-
-      if (fnError) throw new Error(`Processing trigger failed: ${fnError.message}`);
-
       setUploads(prev => [uploadRecord as UploadRecord, ...prev]);
-
-      // 4. Start polling for status updates
-      startPolling(uploadRecord.id);
 
       // Reset form
       setCourseCode("");
@@ -281,8 +269,10 @@ export default function AmbassadorUpload() {
       setFiles([]);
 
       toast({
-        title: "Processing started! 🚀",
-        description: "AI is generating study guides. This takes 5-10 minutes.",
+        title: files.length > 0 ? "✨ Course Submitted!" : "✅ Course Registered!",
+        description: files.length > 0
+          ? "Materials uploaded. Our team will prepare the content and it'll be live soon!"
+          : "Course saved. You can upload materials later.",
       });
     } catch (error) {
       console.error("Upload error:", error);
@@ -293,6 +283,7 @@ export default function AmbassadorUpload() {
         variant: "destructive",
       });
     }
+    setIsUploading(false);
   };
 
   const handleRetry = async (upload: UploadRecord) => {

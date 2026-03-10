@@ -145,7 +145,7 @@ export type Database = {
           error_message: string | null
           id: string
           level: string
-          pdf_url: string
+          pdf_url: string | null
           questions_generated: number | null
           status: string
           updated_at: string
@@ -159,7 +159,7 @@ export type Database = {
           error_message?: string | null
           id?: string
           level?: string
-          pdf_url: string
+          pdf_url?: string | null
           questions_generated?: number | null
           status?: string
           updated_at?: string
@@ -173,7 +173,7 @@ export type Database = {
           error_message?: string | null
           id?: string
           level?: string
-          pdf_url?: string
+          pdf_url?: string | null
           questions_generated?: number | null
           status?: string
           updated_at?: string
@@ -531,7 +531,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user" | "ambassador"
+      app_role: "admin" | "user" | "ambassador" | "modifier"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -659,7 +659,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user", "ambassador"],
+      app_role: ["admin", "user", "ambassador", "modifier"],
     },
   },
 } as const

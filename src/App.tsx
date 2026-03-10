@@ -26,6 +26,7 @@ import Quiz from "./pages/Quiz";
 import VipRedirect from "./pages/VipRedirect";
 import Withdraw from "./pages/Withdraw";
 import Onboarding from "./pages/Onboarding";
+import ModifierDashboard from "./pages/ModifierDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -59,6 +60,7 @@ const AppContent = () => {
           <Route path="/upload" element={<AmbassadorUpload />} />
           <Route path="/ambassador" element={<AmbassadorDashboard />} />
           <Route path="/withdraw" element={<Withdraw />} />
+          <Route path="/modifier" element={<ModifierDashboard />} />
           <Route path="/vip/:code" element={<VipRedirect />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

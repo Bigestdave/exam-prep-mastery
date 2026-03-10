@@ -197,36 +197,53 @@ export default function AmbassadorDashboard() {
   const removeFile = (index: number) => setFiles(prev => prev.filter((_, i) => i !== index));
 
   const handleUpload = async () => {
-    if (files.length === 0 || !courseCode.trim() || !courseTitle.trim() || !department) {
-      toast({ title: "Missing fields", description: "Please fill in all fields and add at least one PDF.", variant: "destructive" });
+    if (!courseCode.trim() || !courseTitle.trim() || !department) {
+      toast({ title: "Missing fields", description: "Please fill in course code, title, and department.", variant: "destructive" });
       return;
     }
     setIsUploading(true);
     try {
-      const pdfUrls: string[] = [];
-      for (const file of files) {
-        const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-        const filePath = `pdfs/${user!.id}/${fileName}`;
-        const { data: fileData, error: uploadError } = await supabase.storage.from("course_materials").upload(filePath, file);
-        if (uploadError) throw new Error(`Upload failed for ${file.name}: ${uploadError.message}`);
-        const { data: urlData } = supabase.storage.from("course_materials").getPublicUrl(fileData.path);
-        pdfUrls.push(urlData.publicUrl);
+      let pdfUrl: string | null = null;
+
+      // Upload files if any were added
+      if (files.length > 0) {
+        const pdfUrls: string[] = [];
+        for (const file of files) {
+          const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+          const filePath = `pdfs/${user!.id}/${fileName}`;
+          const { data: fileData, error: uploadError } = await supabase.storage.from("course_materials").upload(filePath, file);
+          if (uploadError) throw new Error(`Upload failed for ${file.name}: ${uploadError.message}`);
+          const { data: urlData } = supabase.storage.from("course_materials").getPublicUrl(fileData.path);
+          pdfUrls.push(urlData.publicUrl);
+        }
+        pdfUrl = pdfUrls[0];
       }
 
       const { data: uploadRecord, error: insertError } = await supabase
         .from("course_uploads")
-        .insert({ user_id: user!.id, course_code: courseCode.trim().toUpperCase(), course_title: courseTitle.trim(), department, level, pdf_url: pdfUrls[0], status: "pending" })
+        .insert({
+          user_id: user!.id,
+          course_code: courseCode.trim().toUpperCase(),
+          course_title: courseTitle.trim(),
+          department,
+          level,
+          pdf_url: pdfUrl,
+          status: "pending",
+        })
         .select().single();
       if (insertError) throw new Error(`Record creation failed: ${insertError.message}`);
 
-      await supabase.functions.invoke("trigger-processing", {
-        body: { course_code: courseCode.trim().toUpperCase(), course_title: courseTitle.trim(), department, level, pdf_urls: pdfUrls, upload_id: uploadRecord.id },
-      });
+      // No auto AI processing - goes to content queue for manual review
 
       setUploads(prev => [uploadRecord as UploadRecord, ...prev]);
       setCourseCode(""); setCourseTitle(""); setFiles([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      toast({ title: "✨ Upload Submitted!", description: "AI is generating the course content. Thank you for representing your department!" });
+      toast({
+        title: files.length > 0 ? "✨ Course Submitted!" : "✅ Course Registered!",
+        description: files.length > 0
+          ? "Materials uploaded. Our team will prepare the content and it'll be live soon!"
+          : "Course saved. You can upload materials later.",
+      });
     } catch (error) {
       console.error("Upload error:", error);
       toast({ title: "Upload failed", description: error instanceof Error ? error.message : "Something went wrong.", variant: "destructive" });
@@ -627,9 +644,9 @@ export default function AmbassadorDashboard() {
               className="space-y-6"
             >
               <div className="mb-2">
-                <h2 className="text-lg font-display font-bold">Help Build The Dossier.</h2>
+                <h2 className="text-lg font-display font-bold">Register Your Courses</h2>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Upload verified tutorial PDFs — it's your duty as department rep.
+                  List all your department's courses. Upload materials if you have them, or save and add later.
                 </p>
               </div>
 
@@ -666,7 +683,7 @@ export default function AmbassadorDashboard() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase tracking-wider">Tutorial PDFs</Label>
+                  <Label className="text-xs font-bold uppercase tracking-wider">Materials (Optional)</Label>
                   <label
                     htmlFor="pdfFile"
                     className={`flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-2xl p-8 cursor-pointer transition-all ${
@@ -675,8 +692,8 @@ export default function AmbassadorDashboard() {
                   >
                     <Upload className="w-8 h-8 text-muted-foreground" />
                     <div className="text-center">
-                      <p className="text-sm font-semibold text-foreground">Tap to add PDFs</p>
-                      <p className="text-xs text-muted-foreground">Max 20MB each · You can add multiple</p>
+                      <p className="text-sm font-semibold text-foreground">Tap to add PDFs (optional)</p>
+                      <p className="text-xs text-muted-foreground">Max 20MB each · Tutorial questions, notes, etc.</p>
                     </div>
                     <input ref={fileInputRef} id="pdfFile" type="file" accept=".pdf" multiple className="hidden" onChange={handleFilesSelected} />
                   </label>
@@ -699,10 +716,10 @@ export default function AmbassadorDashboard() {
                 <motion.button
                   whileHover={{ y: -1 }} whileTap={{ scale: 0.97 }}
                   onClick={handleUpload}
-                  disabled={isUploading || files.length === 0 || !courseCode || !courseTitle || !department}
+                  disabled={isUploading || !courseCode || !courseTitle || !department}
                   className="w-full h-12 rounded-xl font-bold text-sm bg-foreground text-background disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2 btn-thud"
                 >
-                  {isUploading ? <><Loader2 className="w-4 h-4 animate-spin" /> Getting Your Course Ready...</> : <><Upload className="w-4 h-4" /> Submit Course</>}
+                  {isUploading ? <><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</> : files.length > 0 ? <><Upload className="w-4 h-4" /> Submit Course & Materials</> : <><FileText className="w-4 h-4" /> Save Course</>}
                 </motion.button>
               </div>
 

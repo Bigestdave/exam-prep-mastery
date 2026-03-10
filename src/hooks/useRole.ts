@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
-type AppRole = 'admin' | 'ambassador' | 'user';
+type AppRole = 'admin' | 'ambassador' | 'modifier' | 'user';
 
 const CACHE_KEY = 'cached_user_roles';
 
@@ -54,6 +54,7 @@ export function useRole() {
     roles,
     isAdmin: roles.includes('admin'),
     isAmbassador: roles.includes('ambassador'),
+    isModifier: roles.includes('modifier'),
     isLoading: authLoading || isLoading,
   };
 }
