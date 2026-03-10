@@ -124,19 +124,26 @@ export function useQuizData(courseId: string | undefined) {
         const parsed: QuizQuestion[] = [];
 
         for (const q of data) {
-          // Priority 1: n8n content.quiz (new column)
-          const quizData = parseQuiz(q.content) || parseQuiz(q.structured_content);
-          if (quizData) {
-            parsed.push({
-              id: q.id,
-              course_id: q.course_id,
-              question_index: q.question_index,
-              question_text: q.question_text,
-              quiz_question_text: quizData.question,
-              answer_text: q.answer_text,
-              quiz_options: quizData.options,
-              hint: quizData.hint,
-            });
+          // Priority 1: Multi-quiz from content/structured_content
+          const quizzes = [
+            ...parseQuiz(q.content),
+            ...(parseQuiz(q.content).length === 0 ? parseQuiz(q.structured_content) : []),
+          ];
+          
+          if (quizzes.length > 0) {
+            for (let qi = 0; qi < quizzes.length; qi++) {
+              const quizData = quizzes[qi];
+              parsed.push({
+                id: `${q.id}-${qi}`,
+                course_id: q.course_id,
+                question_index: q.question_index,
+                question_text: q.question_text,
+                quiz_question_text: quizData.question,
+                answer_text: q.answer_text,
+                quiz_options: quizData.options,
+                hint: quizData.hint,
+              });
+            }
             continue;
           }
 
