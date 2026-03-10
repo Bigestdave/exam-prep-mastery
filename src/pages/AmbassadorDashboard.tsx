@@ -644,9 +644,9 @@ export default function AmbassadorDashboard() {
               className="space-y-6"
             >
               <div className="mb-2">
-                <h2 className="text-lg font-display font-bold">Help Build The Dossier.</h2>
+                <h2 className="text-lg font-display font-bold">Register Your Courses</h2>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Upload verified tutorial PDFs — it's your duty as department rep.
+                  List all your department's courses. Upload materials if you have them, or save and add later.
                 </p>
               </div>
 
