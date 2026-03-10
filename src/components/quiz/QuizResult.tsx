@@ -286,7 +286,7 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
                     <span className="text-xl font-display font-bold text-foreground">{correctedTotalPercentage}%</span>
-                    <p className="text-[8px] font-mono text-muted-foreground uppercase tracking-wider">Average</p>
+                    <p className="text-[8px] font-mono text-muted-foreground uppercase tracking-wider">Readiness</p>
                   </div>
                 </div>
               </div>
