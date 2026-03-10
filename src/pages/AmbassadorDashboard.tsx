@@ -296,11 +296,11 @@ export default function AmbassadorDashboard() {
           {/* Wallet skeleton */}
           <div className="bg-foreground rounded-3xl p-6 mb-6 relative overflow-hidden animate-pulse">
             <div className="relative z-10 space-y-2">
-              <div className="h-3 w-32 rounded" style={{ backgroundColor: "rgba(253,251,247,0.08)" }} />
-              <div className="h-10 w-48 rounded-lg" style={{ backgroundColor: "rgba(253,251,247,0.1)" }} />
-              <div className="h-3 w-56 rounded" style={{ backgroundColor: "rgba(253,251,247,0.05)" }} />
+              <div className="h-3 w-32 rounded bg-cream/[0.08]" />
+              <div className="h-10 w-48 rounded-lg bg-cream/10" />
+              <div className="h-3 w-56 rounded bg-cream/[0.05]" />
             </div>
-            <div className="mt-5 h-11 w-full rounded-xl" style={{ backgroundColor: "rgba(253,251,247,0.08)" }} />
+            <div className="mt-5 h-11 w-full rounded-xl bg-cream/[0.08]" />
           </div>
 
           {/* Tab switcher skeleton */}

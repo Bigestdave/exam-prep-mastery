@@ -58,14 +58,23 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        success: {
-          DEFAULT: "hsl(var(--success))",
-          light: "hsl(var(--success-light))",
+        // Semantic palette
+        espresso: {
+          DEFAULT: "hsl(var(--espresso))",
+          deep: "hsl(var(--espresso-deep))",
+          ink: "hsl(var(--espresso-ink))",
         },
-        alert: {
-          DEFAULT: "hsl(var(--alert))",
-          light: "hsl(var(--alert-light))",
+        cream: {
+          DEFAULT: "hsl(var(--cream))",
+          muted: "hsl(var(--cream-muted))",
         },
+        "academic-green": "hsl(var(--academic-green))",
+        "tier-silver": "hsl(var(--tier-silver))",
+        "badge-free": {
+          bg: "hsl(var(--badge-free-bg))",
+          text: "hsl(var(--badge-free-text))",
+        },
+        "progress-track": "hsl(var(--progress-track))",
       },
       borderRadius: {
         lg: "var(--radius)",
