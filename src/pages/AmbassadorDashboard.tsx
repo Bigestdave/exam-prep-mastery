@@ -46,8 +46,16 @@ interface MilestoneRecord {
 
 const MILESTONES = [
   { tier: 1, threshold: 40, bonus: 7500, label: "Activation" },
-  { tier: 2, threshold: 80, bonus: 15000, label: "Penetration" },
-  { tier: 3, threshold: 150, bonus: 30000, label: "Domination" },
+  { tier: 2, threshold: 80, bonus: 7500, label: "Penetration" },
+  { tier: 3, threshold: 150, bonus: 15000, label: "Domination" },
+];
+
+const LEADERBOARD_REWARDS = [
+  { rank: 1, reward: 50000, emoji: "🥇" },
+  { rank: 2, reward: 30000, emoji: "🥈" },
+  { rank: 3, reward: 20000, emoji: "🥉" },
+  { rank: 4, reward: 10000, emoji: "4th" },
+  { rank: 5, reward: 5000, emoji: "5th" },
 ];
 
 type TabKey = "department" | "sell" | "bounties";
