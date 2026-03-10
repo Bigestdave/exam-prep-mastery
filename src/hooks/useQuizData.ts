@@ -39,47 +39,66 @@ function shuffleArray<T>(arr: T[]): T[] {
   return shuffled;
 }
 
-function parseQuiz(structured: any): { question: string; options: QuizOption[]; hint?: string } | null {
+function parseQuiz(structured: any): { question: string; options: QuizOption[]; hint?: string }[] {
   try {
     const content = typeof structured === 'string' ? JSON.parse(structured) : structured;
-    const quiz = content?.quiz;
-    if (!quiz) return null;
+    const results: { question: string; options: QuizOption[]; hint?: string }[] = [];
 
-    // Format 1: Edge Function (array options + correct_index)
-    if (Array.isArray(quiz.options) && typeof quiz.correct_index === 'number') {
-      const options: QuizOption[] = quiz.options.map((text: string, i: number) => ({
-        text,
-        is_correct: i === quiz.correct_index,
-      }));
-      if (options.length < 2 || !options.some(o => o.is_correct)) return null;
-      return {
-        question: quiz.question || '',
-        options: shuffleArray(options),
-        hint: quiz.explanation,
-      };
+    // Format 1: New multi-quiz format (quizzes array)
+    if (Array.isArray(content?.quizzes)) {
+      for (const quiz of content.quizzes) {
+        const parsed = parseSingleQuiz(quiz);
+        if (parsed) results.push(parsed);
+      }
     }
 
-    // Format 2: Legacy n8n (object options + correct_answer letter)
-    if (quiz.options && quiz.correct_answer && !Array.isArray(quiz.options)) {
-      const letters = ['A', 'B', 'C', 'D'];
-      const options: QuizOption[] = letters
-        .filter(l => quiz.options[l])
-        .map(l => ({
-          text: quiz.options[l],
-          is_correct: quiz.correct_answer.toUpperCase() === l,
-        }));
-      if (options.length < 2 || !options.some(o => o.is_correct)) return null;
-      return {
-        question: quiz.question || '',
-        options: shuffleArray(options),
-        hint: quiz.hint,
-      };
+    // Format 2: Single quiz field (legacy)
+    if (results.length === 0 && content?.quiz) {
+      const parsed = parseSingleQuiz(content.quiz);
+      if (parsed) results.push(parsed);
     }
 
-    return null;
+    return results;
   } catch {
-    return null;
+    return [];
   }
+}
+
+function parseSingleQuiz(quiz: any): { question: string; options: QuizOption[]; hint?: string } | null {
+  if (!quiz) return null;
+
+  // Edge Function format (array options + correct_index)
+  if (Array.isArray(quiz.options) && typeof quiz.correct_index === 'number') {
+    const options: QuizOption[] = quiz.options.map((text: string, i: number) => ({
+      text,
+      is_correct: i === quiz.correct_index,
+    }));
+    if (options.length < 2 || !options.some(o => o.is_correct)) return null;
+    return {
+      question: quiz.question || '',
+      options: shuffleArray(options),
+      hint: quiz.explanation || quiz.hint,
+    };
+  }
+
+  // Legacy n8n format (object options + correct_answer letter)
+  if (quiz.options && quiz.correct_answer && !Array.isArray(quiz.options)) {
+    const letters = ['A', 'B', 'C', 'D'];
+    const options: QuizOption[] = letters
+      .filter(l => quiz.options[l])
+      .map(l => ({
+        text: quiz.options[l],
+        is_correct: quiz.correct_answer.toUpperCase() === l,
+      }));
+    if (options.length < 2 || !options.some(o => o.is_correct)) return null;
+    return {
+      question: quiz.question || '',
+      options: shuffleArray(options),
+      hint: quiz.hint,
+    };
+  }
+
+  return null;
 }
 
 export function useQuizData(courseId: string | undefined) {
@@ -105,19 +124,26 @@ export function useQuizData(courseId: string | undefined) {
         const parsed: QuizQuestion[] = [];
 
         for (const q of data) {
-          // Priority 1: n8n content.quiz (new column)
-          const quizData = parseQuiz(q.content) || parseQuiz(q.structured_content);
-          if (quizData) {
-            parsed.push({
-              id: q.id,
-              course_id: q.course_id,
-              question_index: q.question_index,
-              question_text: q.question_text,
-              quiz_question_text: quizData.question,
-              answer_text: q.answer_text,
-              quiz_options: quizData.options,
-              hint: quizData.hint,
-            });
+          // Priority 1: Multi-quiz from content/structured_content
+          const quizzes = [
+            ...parseQuiz(q.content),
+            ...(parseQuiz(q.content).length === 0 ? parseQuiz(q.structured_content) : []),
+          ];
+          
+          if (quizzes.length > 0) {
+            for (let qi = 0; qi < quizzes.length; qi++) {
+              const quizData = quizzes[qi];
+              parsed.push({
+                id: `${q.id}-${qi}`,
+                course_id: q.course_id,
+                question_index: q.question_index,
+                question_text: q.question_text,
+                quiz_question_text: quizData.question,
+                answer_text: q.answer_text,
+                quiz_options: quizData.options,
+                hint: quizData.hint,
+              });
+            }
             continue;
           }
 

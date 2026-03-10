@@ -141,33 +141,41 @@ serve(async (req) => {
           await new Promise(r => setTimeout(r, 2000));
         }
 
-        // STRATEGY 2: Use AI to generate quiz from the tutorial CONTENT (not header)
-        // Send more content (up to 4000 chars) for better context
+        // STRATEGY 2: Use AI to generate multiple MCQs from the tutorial question itself
         const contentSnippet = q.answer_text.substring(0, 4000);
         
-        const prompt = `You are an expert Educational Psychologist creating a diagnostic quiz for a Nigerian university exam prep app called LCU Prep.
+        const prompt = `You are an expert Educational Psychologist creating diagnostic quizzes for a Nigerian university exam prep app called LCU Prep.
 
-Below is the SIMPLIFIED STUDY ANSWER for a specific module. Your task is to generate ONE multiple-choice question that tests the student's actual understanding of the core concept - not just their ability to memorize words.
+Below is a TUTORIAL QUESTION and its STUDY ANSWER. Your task is to convert this tutorial question into 3-5 multiple-choice questions that test the student's understanding.
 
---- STUDY ANSWER START ---
+--- TUTORIAL QUESTION ---
+${q.question_text}
+
+--- STUDY ANSWER ---
 ${contentSnippet}
---- STUDY ANSWER END ---
+--- END ---
 
-Module Title (for context only): ${q.question_text}
+### STRATEGY:
+Convert the tutorial question itself into MCQ format. Take each key concept, definition, or fact from the question/answer and rephrase it as an MCQ.
 
-### RULES FOR THE QUIZ:
-1. The Question: Must be clear, concise, and focused on the most important takeaway from the text.
-2. The Correct Answer: Must be 100% accurate based ONLY on the provided text.
-3. The Distractors (Wrong Answers): You must generate 3 highly plausible wrong answers. They should represent common student misconceptions. Do NOT make the correct answer obviously longer or more detailed than the wrong answers.
-4. Keep each option under 20 words. Be concise.
-5. Randomize which position (0-3) is the correct answer.
+Example - If the tutorial question is "Explain cultural diffusion":
+Quiz: "Cultural diffusion refers to:"
+A) The movement of people between countries
+B) The spread of cultural ideas between societies
+C) The destruction of traditional cultures
+D) Government control of culture
 
-Respond with ONLY a valid JSON array. No markdown, no backticks, no explanation:
+### RULES:
+1. Each question must test a DIFFERENT aspect/concept from the answer.
+2. The Correct Answer must be 100% accurate based on the study answer.
+3. Generate 3 highly plausible wrong answers (common student misconceptions).
+4. Keep each option under 20 words. All options should be similar in length.
+5. Quality > Volume. Only create questions where the answer is clearly supported.
+
+Respond with ONLY a valid JSON array of quiz objects. No markdown, no backticks:
 [
-  {"text": "Option text here", "is_correct": false},
-  {"text": "Correct option text here", "is_correct": true},
-  {"text": "Option text here", "is_correct": false},
-  {"text": "Option text here", "is_correct": false}
+  {"question": "MCQ stem here?", "options": ["A", "B", "C", "D"], "correct_index": 1, "hint": "A gentle nudge"},
+  ...
 ]`;
 
         const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -197,31 +205,37 @@ Respond with ONLY a valid JSON array. No markdown, no backticks, no explanation:
         // Clean markdown if present
         content = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
 
-        const quizOptions = JSON.parse(content);
+        const quizArray = JSON.parse(content);
 
-        // Validate format
-        if (!Array.isArray(quizOptions) || quizOptions.length !== 4) {
+        // Validate: expect array of quiz objects with question/options/correct_index
+        if (!Array.isArray(quizArray) || quizArray.length === 0) {
           console.error(`Invalid format for q${q.question_index}`);
           continue;
         }
 
-        const hasCorrect = quizOptions.some((o: { is_correct: boolean }) => o.is_correct);
-        if (!hasCorrect) {
-          console.error(`No correct answer for q${q.question_index}`);
+        // Validate each quiz has a correct answer
+        const validQuizzes = quizArray.filter((quiz: any) => {
+          if (!quiz.question || !Array.isArray(quiz.options) || quiz.options.length !== 4) return false;
+          if (typeof quiz.correct_index !== 'number' || quiz.correct_index < 0 || quiz.correct_index > 3) return false;
+          return true;
+        });
+
+        if (validQuizzes.length === 0) {
+          console.error(`No valid quizzes for q${q.question_index}`);
           continue;
         }
 
-        // Update the question
+        // Store in content JSONB as quizzes array (new format)
         const { error: updateError } = await supabase
           .from("course_questions")
-          .update({ quiz_options: quizOptions })
+          .update({ content: { quizzes: validQuizzes } })
           .eq("id", q.id);
 
         if (updateError) {
           console.error(`Update error for q${q.question_index}:`, updateError);
         } else {
           processed++;
-          console.log(`q${q.question_index}: AI-generated quiz from content`);
+          console.log(`q${q.question_index}: Generated ${validQuizzes.length} MCQs from tutorial question`);
         }
       } catch (e) {
         console.error(`Error processing q${q.question_index}:`, e);
