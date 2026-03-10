@@ -23,6 +23,7 @@ import Survey from "./pages/Survey";
 import AmbassadorUpload from "./pages/AmbassadorUpload";
 import AmbassadorDashboard from "./pages/AmbassadorDashboard";
 import Quiz from "./pages/Quiz";
+import QuizHub from "./pages/QuizHub";
 import VipRedirect from "./pages/VipRedirect";
 import Withdraw from "./pages/Withdraw";
 import Onboarding from "./pages/Onboarding";
