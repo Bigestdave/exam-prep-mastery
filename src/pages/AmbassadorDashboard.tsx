@@ -203,6 +203,17 @@ export default function AmbassadorDashboard() {
     }
     setIsUploading(true);
     try {
+      const normalizedCode = courseCode.trim().toUpperCase();
+
+      // Check if course already exists for this department
+      const existing = uploads.find(u => u.course_code === normalizedCode && u.department === department);
+      
+      if (existing && files.length === 0) {
+        toast({ title: "Course already registered", description: `${normalizedCode} is already in your department's list.`, variant: "destructive" });
+        setIsUploading(false);
+        return;
+      }
+
       let pdfUrl: string | null = null;
 
       // Upload files if any were added
@@ -219,31 +230,47 @@ export default function AmbassadorDashboard() {
         pdfUrl = pdfUrls[0];
       }
 
-      const { data: uploadRecord, error: insertError } = await supabase
-        .from("course_uploads")
-        .insert({
-          user_id: user!.id,
-          course_code: courseCode.trim().toUpperCase(),
-          course_title: courseTitle.trim(),
-          department,
-          level,
-          pdf_url: pdfUrl,
-          status: "pending",
-        })
-        .select().single();
-      if (insertError) throw new Error(`Record creation failed: ${insertError.message}`);
+      if (existing && files.length > 0) {
+        // Add materials to existing course
+        const { error: updateError } = await supabase
+          .from("course_uploads")
+          .update({ pdf_url: pdfUrl, status: "pending" })
+          .eq("id", existing.id);
+        if (updateError) throw new Error(`Update failed: ${updateError.message}`);
+        setUploads(prev => prev.map(u => u.id === existing.id ? { ...u, pdf_url: pdfUrl || u.pdf_url, status: "pending" } as any : u));
+        toast({ title: "✨ Materials added!", description: `Materials uploaded for ${normalizedCode}. Our team will review them soon.` });
+      } else {
+        const { data: uploadRecord, error: insertError } = await supabase
+          .from("course_uploads")
+          .insert({
+            user_id: user!.id,
+            course_code: normalizedCode,
+            course_title: courseTitle.trim(),
+            department,
+            level,
+            pdf_url: pdfUrl,
+            status: "pending",
+          })
+          .select().single();
+        if (insertError) {
+          if (insertError.message.includes("duplicate") || insertError.message.includes("unique")) {
+            toast({ title: "Course already exists", description: `${normalizedCode} is already registered for ${department}.`, variant: "destructive" });
+            setIsUploading(false);
+            return;
+          }
+          throw new Error(`Record creation failed: ${insertError.message}`);
+        }
+        setUploads(prev => [uploadRecord as UploadRecord, ...prev]);
+        toast({
+          title: files.length > 0 ? "✨ Course Submitted!" : "✅ Course Registered!",
+          description: files.length > 0
+            ? "Materials uploaded. Our team will prepare the content and it'll be live soon!"
+            : "Course saved. You can upload materials later.",
+        });
+      }
 
-      // No auto AI processing - goes to content queue for manual review
-
-      setUploads(prev => [uploadRecord as UploadRecord, ...prev]);
       setCourseCode(""); setCourseTitle(""); setFiles([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      toast({
-        title: files.length > 0 ? "✨ Course Submitted!" : "✅ Course Registered!",
-        description: files.length > 0
-          ? "Materials uploaded. Our team will prepare the content and it'll be live soon!"
-          : "Course saved. You can upload materials later.",
-      });
     } catch (error) {
       console.error("Upload error:", error);
       toast({ title: "Upload failed", description: error instanceof Error ? error.message : "Something went wrong.", variant: "destructive" });
