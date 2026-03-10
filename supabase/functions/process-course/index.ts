@@ -204,7 +204,7 @@ The output MUST be valid JSON.`;
         content: {
           explanation: parsed.explanation || "",
           key_points: parsed.key_points || [],
-          quiz: parsed.quiz || null,
+          quizzes: parsed.quizzes || (parsed.quiz ? [parsed.quiz] : []),
         },
       };
     }
