@@ -205,31 +205,37 @@ Respond with ONLY a valid JSON array of quiz objects. No markdown, no backticks:
         // Clean markdown if present
         content = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
 
-        const quizOptions = JSON.parse(content);
+        const quizArray = JSON.parse(content);
 
-        // Validate format
-        if (!Array.isArray(quizOptions) || quizOptions.length !== 4) {
+        // Validate: expect array of quiz objects with question/options/correct_index
+        if (!Array.isArray(quizArray) || quizArray.length === 0) {
           console.error(`Invalid format for q${q.question_index}`);
           continue;
         }
 
-        const hasCorrect = quizOptions.some((o: { is_correct: boolean }) => o.is_correct);
-        if (!hasCorrect) {
-          console.error(`No correct answer for q${q.question_index}`);
+        // Validate each quiz has a correct answer
+        const validQuizzes = quizArray.filter((quiz: any) => {
+          if (!quiz.question || !Array.isArray(quiz.options) || quiz.options.length !== 4) return false;
+          if (typeof quiz.correct_index !== 'number' || quiz.correct_index < 0 || quiz.correct_index > 3) return false;
+          return true;
+        });
+
+        if (validQuizzes.length === 0) {
+          console.error(`No valid quizzes for q${q.question_index}`);
           continue;
         }
 
-        // Update the question
+        // Store in content JSONB as quizzes array (new format)
         const { error: updateError } = await supabase
           .from("course_questions")
-          .update({ quiz_options: quizOptions })
+          .update({ content: { quizzes: validQuizzes } })
           .eq("id", q.id);
 
         if (updateError) {
           console.error(`Update error for q${q.question_index}:`, updateError);
         } else {
           processed++;
-          console.log(`q${q.question_index}: AI-generated quiz from content`);
+          console.log(`q${q.question_index}: Generated ${validQuizzes.length} MCQs from tutorial question`);
         }
       } catch (e) {
         console.error(`Error processing q${q.question_index}:`, e);
