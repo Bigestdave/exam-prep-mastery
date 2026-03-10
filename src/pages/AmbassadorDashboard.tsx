@@ -379,7 +379,7 @@ export default function AmbassadorDashboard() {
           {([
             { key: "department" as TabKey, label: "My Dept", sublabel: "Performance", icon: <Target className="w-3.5 h-3.5" /> },
             { key: "sell" as TabKey, label: "Sell", sublabel: "Referrals", icon: <Link2 className="w-3.5 h-3.5" /> },
-            { key: "bounties" as TabKey, label: "AI Forge", sublabel: "Upload PDFs", icon: <FileText className="w-3.5 h-3.5" /> },
+            { key: "bounties" as TabKey, label: "Courses", sublabel: "Upload", icon: <FileText className="w-3.5 h-3.5" /> },
           ]).map(tab => (
             <button
               key={tab.key}
