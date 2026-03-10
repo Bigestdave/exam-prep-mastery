@@ -28,6 +28,7 @@ export function useCourseQuestions(courseId: string | undefined) {
       .from('course_questions')
       .select('*')
       .eq('course_id', courseId)
+      .eq('status', 'published')
       .order('question_index', { ascending: true });
 
     if (fetchError) {
