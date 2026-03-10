@@ -179,7 +179,7 @@ Respond with ONLY a valid JSON array. No markdown, no backticks, no explanation:
           body: JSON.stringify({
             model: "google/gemini-3-flash-preview",
             messages: [
-              { role: "system", content: "You are a quiz generator. Output ONLY valid JSON arrays. No markdown, no backticks, no explanation." },
+              { role: "system", content: "You are an expert Educational Psychologist. Output ONLY valid JSON arrays. No markdown, no backticks, no explanation." },
               { role: "user", content: prompt },
             ],
             temperature: 0.3,
