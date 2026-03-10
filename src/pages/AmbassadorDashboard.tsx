@@ -569,6 +569,40 @@ export default function AmbassadorDashboard() {
                     </div>
                   </div>
 
+                  {/* ─── LEADERBOARD REWARDS ─── */}
+                  <div className="bg-card rounded-3xl card-float p-6 space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Crown className="w-4 h-4 text-amber-500" />
+                      <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Campaign Leaderboard Prizes</h2>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      At the end of the campaign, the top 5 departments win bonus rewards. Total: ₦115,000.
+                    </p>
+                    <div className="space-y-1.5">
+                      {LEADERBOARD_REWARDS.map(lr => {
+                        const isMyRank = myDeptStats?.rank === lr.rank;
+                        return (
+                          <div
+                            key={lr.rank}
+                            className={`flex items-center justify-between rounded-xl px-4 py-2.5 ${
+                              isMyRank ? "bg-accent/10 border border-accent/30" : "bg-secondary/40"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-base w-7 text-center">{lr.emoji}</span>
+                              <span className={`text-sm font-semibold ${isMyRank ? "text-accent" : ""}`}>
+                                {isMyRank ? "You!" : `${lr.rank}${lr.rank === 1 ? "st" : lr.rank === 2 ? "nd" : lr.rank === 3 ? "rd" : "th"} Place`}
+                              </span>
+                            </div>
+                            <span className={`text-sm font-mono font-bold ${isMyRank ? "text-accent" : "text-muted-foreground"}`}>
+                              ₦{lr.reward.toLocaleString()}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   {/* ─── UNIVERSITY LEADERBOARD ─── */}
                   <div className="bg-card rounded-3xl card-float p-6">
                     <div className="flex items-center gap-2 mb-5">
@@ -582,6 +616,7 @@ export default function AmbassadorDashboard() {
                       <div className="space-y-0">
                         {leaderboard.map((entry, i) => {
                           const isMyDept = entry.department === profile?.faculty;
+                          const prize = LEADERBOARD_REWARDS.find(lr => lr.rank === i + 1);
                           return (
                             <div
                               key={entry.department}
@@ -604,6 +639,7 @@ export default function AmbassadorDashboard() {
                                   </span>
                                   <span className="text-[10px] text-muted-foreground">
                                     {entry.unique_buyers} students · avg {entry.avg_per_buyer}
+                                    {prize && ` · 🏆 ₦${prize.reward.toLocaleString()}`}
                                   </span>
                                 </div>
                               </div>
