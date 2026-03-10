@@ -23,6 +23,7 @@ import Survey from "./pages/Survey";
 import AmbassadorUpload from "./pages/AmbassadorUpload";
 import AmbassadorDashboard from "./pages/AmbassadorDashboard";
 import Quiz from "./pages/Quiz";
+import QuizHub from "./pages/QuizHub";
 import VipRedirect from "./pages/VipRedirect";
 import Withdraw from "./pages/Withdraw";
 import Onboarding from "./pages/Onboarding";
@@ -54,6 +55,7 @@ const AppContent = () => {
           <Route path="/course/:id" element={<CourseDetail />} />
           <Route path="/course/:id/answer/:questionId" element={<AnswerView />} />
           <Route path="/course/:id/quiz" element={<Quiz />} />
+          <Route path="/quiz-hub" element={<QuizHub />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/request-course" element={<RequestCourse />} />
           <Route path="/library" element={<Library />} />
