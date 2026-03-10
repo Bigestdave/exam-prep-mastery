@@ -1,8 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useSemesterReadiness } from "@/hooks/useQuizData";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface SemesterReadinessProps {
   courses: Array<{ id: string; code: string; title: string }>;
@@ -11,10 +11,16 @@ interface SemesterReadinessProps {
 export function SemesterReadiness({ courses }: SemesterReadinessProps) {
   const { user, purchases } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const courseIds = courses.map(c => c.id);
   const { readiness, totalPercentage, isLoading, refetch } = useSemesterReadiness(user?.id, courseIds);
 
-  // Refetch when user returns to this page (e.g., after quiz)
+  // Refetch every time this component mounts or user navigates to dashboard
+  useEffect(() => {
+    refetch();
+  }, [location.key]);
+
+  // Also refetch on window focus (tab switch back)
   useEffect(() => {
     const handleFocus = () => refetch();
     window.addEventListener('focus', handleFocus);

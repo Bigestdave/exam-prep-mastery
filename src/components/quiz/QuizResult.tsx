@@ -221,13 +221,38 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
         {/* Semester Ring — The Zeigarnik Trap */}
         {departmentCourses.length > 1 && (
           <div className="bg-card border border-border rounded-3xl p-6 mb-6 shadow-card">
-            <h3 className="font-display font-bold text-foreground text-sm mb-1" style={{ letterSpacing: '-0.05em' }}>
-              {courseCode} is {percentage >= 80 ? "locked in" : "improving"}.
-              {exposedCount > 0 && ` But you are exposed in ${exposedCount} other course${exposedCount > 1 ? 's' : ''}.`}
-            </h3>
+            {/* Course Score — prominent */}
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-0.5">Your Score</p>
+                <h3 className="font-display font-bold text-2xl text-foreground" style={{ letterSpacing: '-0.05em' }}>
+                  {courseCode}: {percentage}%
+                </h3>
+              </div>
+              <div className={`px-3 py-1.5 rounded-xl text-xs font-bold ${
+                percentage >= 80 ? "bg-accent/10 text-accent" : percentage >= 40 ? "bg-amber-50 text-amber-700" : "bg-secondary text-muted-foreground"
+              }`}>
+                {percentage >= 80 ? "Secured ✓" : percentage >= 40 ? "Building" : "Needs Work"}
+              </div>
+            </div>
 
-            <div className="flex items-center justify-center my-6">
-              <div className="relative w-32 h-32">
+            {/* Separator */}
+            <div className="border-t border-dashed border-border my-4" />
+
+            {/* Semester Average — clearly labeled as average */}
+            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">
+              Semester Overview · {departmentCourses.length} courses
+            </p>
+            
+            {exposedCount > 0 && (
+              <p className="text-xs text-muted-foreground mb-4">
+                {percentage >= 80 ? `${courseCode} is locked in.` : `${courseCode} is improving.`}
+                {` You are exposed in ${exposedCount} other course${exposedCount > 1 ? 's' : ''}.`}
+              </p>
+            )}
+
+            <div className="flex items-center justify-center my-4">
+              <div className="relative w-28 h-28">
                 <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
                   {ringSegments.map((seg, i) => {
                     const totalSegs = ringSegments.length;
@@ -260,8 +285,8 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
-                    <span className="text-2xl font-display font-bold text-foreground">{correctedTotalPercentage}%</span>
-                    <p className="text-[9px] font-mono text-muted-foreground uppercase tracking-wider">Semester</p>
+                    <span className="text-xl font-display font-bold text-foreground">{correctedTotalPercentage}%</span>
+                    <p className="text-[8px] font-mono text-muted-foreground uppercase tracking-wider">Average</p>
                   </div>
                 </div>
               </div>
@@ -276,8 +301,8 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
                     i < ringSegments.length - 1 ? "border-b border-dashed border-border" : ""
                   }`}
                 >
-                  <span className={`font-mono ${seg.pct >= 80 ? "text-accent font-semibold" : "text-muted-foreground"}`}>
-                    {seg.code}
+                  <span className={`font-mono ${seg.pct >= 80 ? "text-accent font-semibold" : seg.id === courseId ? "text-foreground font-semibold" : "text-muted-foreground"}`}>
+                    {seg.code} {seg.id === courseId ? "←" : ""}
                   </span>
                   <div className="flex items-center gap-1.5">
                     {seg.pct >= 80 ? (
