@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useSemesterReadiness, QuizQuestion } from "@/hooks/useQuizData";
+import { calcSemesterReadiness, getTier, courseContribution } from "@/lib/readinessTiers";
 import { ArrowRight, RotateCcw, CheckCircle2, XCircle, Lock } from "lucide-react";
 
 interface QuizResultProps {
