@@ -15,6 +15,9 @@ interface AmbassadorRecord {
   email?: string;
   wallet_balance: number;
   upload_count: number;
+  bank_name: string | null;
+  account_number: string | null;
+  account_name: string | null;
 }
 
 export function AmbassadorsTab() {
@@ -58,12 +61,29 @@ export function AmbassadorsTab() {
       uploadCounts.set(u.user_id, (uploadCounts.get(u.user_id) || 0) + 1);
     });
 
+    // Fetch latest bank details from withdrawal_requests
+    const { data: withdrawals } = await supabase
+      .from('withdrawal_requests')
+      .select('user_id, bank_name, account_number, account_name')
+      .in('user_id', userIds)
+      .order('created_at', { ascending: false });
+
+    const bankDetails = new Map<string, { bank_name: string; account_number: string; account_name: string }>();
+    withdrawals?.forEach(w => {
+      if (!bankDetails.has(w.user_id)) {
+        bankDetails.set(w.user_id, { bank_name: w.bank_name, account_number: w.account_number, account_name: w.account_name });
+      }
+    });
+
     const records: AmbassadorRecord[] = (profiles || []).map(p => ({
       user_id: p.id,
       full_name: p.full_name,
       faculty: p.faculty,
       wallet_balance: p.wallet_balance,
       upload_count: uploadCounts.get(p.id) || 0,
+      bank_name: bankDetails.get(p.id)?.bank_name || null,
+      account_number: bankDetails.get(p.id)?.account_number || null,
+      account_name: bankDetails.get(p.id)?.account_name || null,
     }));
 
     setAmbassadors(records);
@@ -199,8 +219,10 @@ export function AmbassadorsTab() {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Department</TableHead>
+                  <TableHead>Bank Details</TableHead>
                   <TableHead className="text-right">Uploads</TableHead>
                   <TableHead className="text-right">Wallet</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -209,6 +231,16 @@ export function AmbassadorsTab() {
                   <TableRow key={a.user_id}>
                     <TableCell className="font-medium">{a.full_name || 'Unknown'}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">{a.faculty || '—'}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {a.bank_name ? (
+                        <div className="space-y-0.5">
+                          <p className="font-medium text-foreground">{a.account_name}</p>
+                          <p>{a.bank_name} · {a.account_number}</p>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground/50">No bank info</span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Badge variant="outline" className="gap-1">
                         <Upload className="w-3 h-3" /> {a.upload_count}

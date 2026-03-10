@@ -7,10 +7,12 @@ const corsHeaders = {
 };
 
 // Milestone tiers: unique buyers threshold → bonus amount
+// Incremental rewards: each tier pays its own bonus, not cumulative
 const MILESTONES = [
-  { tier: 1, threshold: 40, bonus: 7500 },
-  { tier: 2, threshold: 80, bonus: 15000 },
-  { tier: 3, threshold: 150, bonus: 30000 },
+  { tier: 1, threshold: 40, bonus: 7500 },   // 40 unlocks → ₦7,500
+  { tier: 2, threshold: 80, bonus: 7500 },   // 80 unlocks → +₦7,500
+  { tier: 3, threshold: 150, bonus: 15000 }, // 150 unlocks → +₦15,000
+  // Total possible: ₦30,000
 ];
 
 // Depth bonus: if department avg >= 3.0 courses per buyer
