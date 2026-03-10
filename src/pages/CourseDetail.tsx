@@ -35,21 +35,35 @@ export default function CourseDetail() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentOption, setPaymentOption] = useState<'single' | 'bundle'>('single');
   const [questionCount, setQuestionCount] = useState(0);
+  const [extraCourseIds, setExtraCourseIds] = useState<string[]>([]);
+  const [showMoreCourses, setShowMoreCourses] = useState(false);
 
   const course = id ? getCourseById(id) : undefined;
   const isOwned = id ? purchases.includes(id) : false;
 
-  // Bundle logic - find unowned courses in same faculty & level
+  // Other unowned courses in same faculty & level (for multi-buy)
+  const otherUnownedCourses = courses.filter(c => 
+    c.faculty === course?.faculty && 
+    c.level === course?.level && 
+    c.id !== course?.id &&
+    !purchases.includes(c.id)
+  );
+
+  // Bundle upsell logic (kept behind flag)
   const unownedCourses = ENABLE_BUNDLE_UPSELL ? courses.filter(c => 
     c.faculty === course?.faculty && 
     c.level === course?.level && 
     !purchases.includes(c.id)
   ) : [];
   const singlePrice = course?.price || 1000;
+  const extraTotal = extraCourseIds.reduce((sum, cId) => {
+    const c = courses.find(x => x.id === cId);
+    return sum + (c?.price || 1000);
+  }, 0);
   const bundleTotal = unownedCourses.reduce((sum, c) => sum + c.price, 0);
   const bundleDiscounted = Math.floor(bundleTotal * 0.8);
   const bundleSavings = bundleTotal - bundleDiscounted;
-  const activeAmount = paymentOption === 'single' ? singlePrice : bundleDiscounted;
+  const activeAmount = paymentOption === 'single' ? (singlePrice + extraTotal) : bundleDiscounted;
 
   // Fetch total question count for display (admin can see all)
   useEffect(() => {
