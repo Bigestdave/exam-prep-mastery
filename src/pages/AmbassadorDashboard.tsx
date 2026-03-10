@@ -683,7 +683,7 @@ export default function AmbassadorDashboard() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase tracking-wider">Tutorial PDFs</Label>
+                  <Label className="text-xs font-bold uppercase tracking-wider">Materials (Optional)</Label>
                   <label
                     htmlFor="pdfFile"
                     className={`flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-2xl p-8 cursor-pointer transition-all ${
