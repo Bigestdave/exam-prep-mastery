@@ -86,8 +86,8 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
           </h2>
           <p className="text-xs mt-1 leading-relaxed text-cream/45">
             {hasAnyAttempt
-              ? `${goldCount} of ${quizCourses.length} courses at Gold.${goldCount < quizCourses.length ? " Tap to view all." : " Well done!"}`
-              : `${quizCourses.length} courses to master. Tap to begin.`}
+              ? `${goldCount} of ${quizCourses.length} courses mastered.${goldCount < quizCourses.length ? " Test yourself →" : " Well done!"}`
+              : `${quizCourses.length} quizzes waiting. Prove you're exam ready →`}
           </p>
         </div>
       </div>
