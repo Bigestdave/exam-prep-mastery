@@ -89,6 +89,11 @@ export default function CourseDetail() {
     }
   }, [id, isOwned, questions.length]);
 
+  const allSelectedIds = extraCourseIds.length > 0 
+    ? [course?.id || "", ...extraCourseIds] 
+    : (paymentOption === 'bundle' ? unownedCourses.map(c => c.id) : []);
+  const isMultiBuy = extraCourseIds.length > 0 || paymentOption === 'bundle';
+
   const config = {
     reference: `${course?.id}_${Date.now()}`,
     email: user?.email || "",
@@ -97,14 +102,14 @@ export default function CourseDetail() {
     metadata: {
       course_id: course?.id || "",
       course_code: course?.code || "",
-      payment_type: paymentOption,
-      bundle_course_ids: paymentOption === 'bundle' ? unownedCourses.map(c => c.id) : undefined,
+      payment_type: isMultiBuy ? 'bundle' : 'single',
+      bundle_course_ids: isMultiBuy ? allSelectedIds : undefined,
       custom_fields: [
         {
           display_name: "Course",
           variable_name: "course",
-          value: paymentOption === 'bundle' 
-            ? `Semester Bundle (${unownedCourses.length} courses)` 
+          value: isMultiBuy
+            ? `${allSelectedIds.length} courses`
             : (course?.title || ""),
         },
       ],
