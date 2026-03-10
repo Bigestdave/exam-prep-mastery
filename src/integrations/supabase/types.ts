@@ -502,6 +502,12 @@ export type Database = {
           question_count: number
         }[]
       }
+      get_courses_with_quizzes: {
+        Args: { p_course_ids: string[] }
+        Returns: {
+          course_id: string
+        }[]
+      }
       get_department_leaderboard: {
         Args: { p_since?: string }
         Returns: {

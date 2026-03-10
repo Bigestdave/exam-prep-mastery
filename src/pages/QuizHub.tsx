@@ -25,21 +25,22 @@ export default function QuizHub() {
     c => c.faculty === profile?.faculty && c.level === profile?.level
   );
 
-  // Fetch which courses actually have questions (quiz data)
+  // Fetch which courses actually have quiz data (not just tutorial answers)
   useEffect(() => {
-    const fetchCounts = async () => {
+    const fetchQuizCourses = async () => {
+      if (coursesLoading || authLoading) return; // Don't run until deps are ready
       if (departmentCourses.length === 0) { setCountsLoading(false); return; }
       const ids = departmentCourses.map(c => c.id);
-      const { data } = await supabase.rpc('get_course_question_counts', { p_course_ids: ids });
+      const { data } = await supabase.rpc('get_courses_with_quizzes' as any, { p_course_ids: ids });
       const withQuiz = new Set<string>();
-      data?.forEach((row: { course_id: string; question_count: number }) => {
-        if (row.question_count > 0) withQuiz.add(row.course_id);
+      (data as any[])?.forEach((row: { course_id: string }) => {
+        withQuiz.add(row.course_id);
       });
       setQuizCourseIds(withQuiz);
       setCountsLoading(false);
     };
-    fetchCounts();
-  }, [courses, profile?.faculty, profile?.level]);
+    fetchQuizCourses();
+  }, [coursesLoading, authLoading, courses, profile?.faculty, profile?.level]);
 
   // Only include courses that have quiz data
   const quizEnabledCourses = departmentCourses.filter(c => quizCourseIds.has(c.id));
