@@ -692,8 +692,8 @@ export default function AmbassadorDashboard() {
                   >
                     <Upload className="w-8 h-8 text-muted-foreground" />
                     <div className="text-center">
-                      <p className="text-sm font-semibold text-foreground">Tap to add PDFs</p>
-                      <p className="text-xs text-muted-foreground">Max 20MB each · You can add multiple</p>
+                      <p className="text-sm font-semibold text-foreground">Tap to add PDFs (optional)</p>
+                      <p className="text-xs text-muted-foreground">Max 20MB each · Tutorial questions, notes, etc.</p>
                     </div>
                     <input ref={fileInputRef} id="pdfFile" type="file" accept=".pdf" multiple className="hidden" onChange={handleFilesSelected} />
                   </label>
