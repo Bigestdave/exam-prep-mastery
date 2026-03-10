@@ -819,6 +819,10 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="queue">
+            <ContentQueueTab />
+          </TabsContent>
+
           <TabsContent value="review">
             <ContentReviewTab />
           </TabsContent>
