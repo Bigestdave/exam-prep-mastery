@@ -23,6 +23,7 @@ interface UploadRecord {
   course_code: string;
   course_title: string;
   department: string;
+  pdf_url: string | null;
   status: string;
   created_at: string;
   questions_generated: number | null;
