@@ -71,10 +71,7 @@ export default function QuizHub() {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-3xl p-6 mb-6 relative overflow-hidden"
-          style={{
-            background: "linear-gradient(135deg, hsl(20 14% 11%) 0%, hsl(20 12% 8%) 60%, hsl(25 10% 6%) 100%)",
-          }}
+          className="rounded-3xl p-6 mb-6 relative overflow-hidden bg-gradient-to-br from-espresso via-espresso-deep to-espresso-ink"
         >
           <div className="relative z-10 flex items-center gap-5">
             {/* Ring */}
@@ -83,14 +80,14 @@ export default function QuizHub() {
                 <circle
                   cx="60" cy="60" r={ringRadius}
                   fill="none"
-                  stroke="rgba(253,251,247,0.08)"
+                  stroke="hsl(var(--cream) / 0.08)"
                   strokeWidth="5"
                   {...(totalReadiness === 0 ? { strokeDasharray: "4 6" } : {})}
                 />
                 <motion.circle
                   cx="60" cy="60" r={ringRadius}
                   fill="none"
-                  stroke="hsl(142 64% 24%)"
+                  stroke="hsl(var(--academic-green))"
                   strokeWidth="5"
                   strokeLinecap="round"
                   strokeDasharray={circumference}
@@ -100,8 +97,8 @@ export default function QuizHub() {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-3xl font-display font-bold" style={{ color: "#FDFBF7" }}>{totalReadiness}%</span>
-                <span className="text-[7px] uppercase tracking-[0.15em] font-bold mt-0.5" style={{ color: "rgba(253,251,247,0.35)" }}>
+                <span className="text-3xl font-display font-bold text-cream">{totalReadiness}%</span>
+                <span className="text-[7px] uppercase tracking-[0.15em] font-bold mt-0.5 text-cream/35">
                   Readiness
                 </span>
               </div>
@@ -116,10 +113,10 @@ export default function QuizHub() {
                   return getTier(pct).name === tierName;
                 }).length;
                 return (
-                  <div key={tierName} className="flex items-center gap-2 text-xs" style={{ color: "rgba(253,251,247,0.6)" }}>
+                  <div key={tierName} className="flex items-center gap-2 text-xs text-cream/60">
                     <span>{t.emoji}</span>
                     <span className="font-mono">{t.label}</span>
-                    <span className="ml-auto font-bold" style={{ color: count > 0 ? "#FDFBF7" : "rgba(253,251,247,0.25)" }}>
+                    <span className={`ml-auto font-bold ${count > 0 ? "text-cream" : "text-cream/25"}`}>
                       {count}
                     </span>
                   </div>
@@ -144,7 +141,7 @@ export default function QuizHub() {
             })}
           </div>
 
-          <div className="absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl -mr-16 -mt-16" style={{ backgroundColor: "hsla(142,64%,24%,0.08)" }} />
+          <div className="absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl -mr-16 -mt-16 bg-academic-green/[0.08]" />
         </motion.div>
 
         {/* Unlocked Courses */}

@@ -34,9 +34,7 @@ export function QuestionItem({
           {question}
         </p>
         {isFreePreview && (
-          <span className="inline-block mt-2 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded"
-            style={{ backgroundColor: '#ECFDF5', color: '#065F46' }}
-          >
+          <span className="inline-block mt-2 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded bg-badge-free-bg text-badge-free-text">
             Free Preview
           </span>
         )}

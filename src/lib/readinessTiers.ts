@@ -41,7 +41,7 @@ const TIERS: Record<TierName, Omit<TierInfo, "name">> = {
     color: "text-amber-600",
     bgColor: "bg-amber-50",
     borderColor: "border-amber-200/50",
-    ringHsl: "hsl(30, 70%, 60%)",
+    ringHsl: "hsl(var(--tier-silver))",
   },
   bronze: {
     label: "Bronze",

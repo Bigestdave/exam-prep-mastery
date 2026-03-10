@@ -26,15 +26,15 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
 
   if (isLoading) {
     return (
-      <div className="rounded-3xl p-6 md:p-8 mb-8 animate-pulse" style={{ background: "linear-gradient(135deg, hsl(20 14% 11%) 0%, hsl(20 12% 8%) 60%, hsl(25 10% 6%) 100%)" }}>
+      <div className="rounded-3xl p-6 md:p-8 mb-8 animate-pulse bg-gradient-to-br from-espresso via-espresso-deep to-espresso-ink">
         <div className="flex items-center gap-6">
-          <div className="w-32 h-32 rounded-full flex-shrink-0" style={{ border: "5px solid rgba(253,251,247,0.08)" }} />
+          <div className="w-32 h-32 rounded-full flex-shrink-0 border-[5px] border-cream/[0.08]" />
           <div className="flex-1 space-y-3">
-            <div className="h-5 w-40 rounded-lg" style={{ backgroundColor: "rgba(253,251,247,0.1)" }} />
-            <div className="h-3 w-56 rounded" style={{ backgroundColor: "rgba(253,251,247,0.06)" }} />
+            <div className="h-5 w-40 rounded-lg bg-cream/10" />
+            <div className="h-3 w-56 rounded bg-cream/[0.06]" />
           </div>
         </div>
-        <div className="mt-6 h-11 w-full rounded-xl" style={{ backgroundColor: "rgba(253,251,247,0.08)" }} />
+        <div className="mt-6 h-11 w-full rounded-xl bg-cream/[0.08]" />
       </div>
     );
   }
@@ -52,10 +52,7 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
       animate={{ opacity: 1, y: 0 }}
       whileTap={{ scale: 0.98 }}
       onClick={() => navigate("/quiz-hub")}
-      className="rounded-3xl p-6 md:p-8 mb-8 relative overflow-hidden w-full text-left"
-      style={{
-        background: "linear-gradient(135deg, hsl(20 14% 11%) 0%, hsl(20 12% 8%) 60%, hsl(25 10% 6%) 100%)",
-      }}
+      className="rounded-3xl p-6 md:p-8 mb-8 relative overflow-hidden w-full text-left bg-gradient-to-br from-espresso via-espresso-deep to-espresso-ink"
     >
       <div className="relative z-10 flex items-center gap-6">
         {/* Ring */}
@@ -64,14 +61,14 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
             <circle
               cx="60" cy="60" r={ringRadius}
               fill="none"
-              stroke="rgba(253,251,247,0.08)"
+              stroke="hsl(var(--cream) / 0.08)"
               strokeWidth="5"
               {...(totalReadiness === 0 ? { strokeDasharray: "4 6" } : {})}
             />
             <motion.circle
               cx="60" cy="60" r={ringRadius}
               fill="none"
-              stroke="hsl(142 64% 24%)"
+              stroke="hsl(var(--academic-green))"
               strokeWidth="5"
               strokeLinecap="round"
               strokeDasharray={circumference}
@@ -81,8 +78,8 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl font-display font-bold" style={{ color: "#FDFBF7" }}>{totalReadiness}%</span>
-            <span className="text-[7px] uppercase tracking-[0.15em] font-bold mt-0.5" style={{ color: "rgba(253,251,247,0.35)" }}>
+            <span className="text-3xl font-display font-bold text-cream">{totalReadiness}%</span>
+            <span className="text-[7px] uppercase tracking-[0.15em] font-bold mt-0.5 text-cream/35">
               Readiness
             </span>
           </div>
@@ -90,10 +87,10 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <h2 className="text-lg font-display font-bold leading-tight" style={{ color: "#FDFBF7" }}>
+          <h2 className="text-lg font-display font-bold leading-tight text-cream">
             Semester Readiness
           </h2>
-          <p className="text-xs mt-1 leading-relaxed" style={{ color: "rgba(253,251,247,0.45)" }}>
+          <p className="text-xs mt-1 leading-relaxed text-cream/45">
             {hasAnyAttempt
               ? `${goldCount} of ${courses.length} courses at Gold.${goldCount < courses.length ? " Tap to view all." : " Well done!"}`
               : `${courses.length} courses to master. Tap to begin.`}
@@ -120,8 +117,8 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
       )}
 
       {/* Ambient glow */}
-      <div className="absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl -mr-16 -mt-16" style={{ backgroundColor: "hsla(142,64%,24%,0.08)" }} />
-      <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full blur-2xl -ml-8 -mb-8" style={{ backgroundColor: "hsla(30,20%,30%,0.1)" }} />
+      <div className="absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl -mr-16 -mt-16 bg-academic-green/[0.08]" />
+      <div className="absolute bottom-0 left-0 w-32 h-32 rounded-full blur-2xl -ml-8 -mb-8 bg-espresso/10" />
     </motion.button>
   );
 }

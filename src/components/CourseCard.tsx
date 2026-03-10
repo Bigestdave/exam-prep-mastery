@@ -49,7 +49,7 @@ function ProgressLine({ courseId, isOwned }: { courseId: string; isOwned: boolea
   const pct = best ? best.percentage : 0;
 
   return (
-    <div className="w-full h-1 rounded-full overflow-hidden" style={{ backgroundColor: '#F5F5F4' }}>
+    <div className="w-full h-1 rounded-full overflow-hidden bg-progress-track">
       <div
         className="h-full rounded-full transition-all duration-500"
         style={{ width: `${pct}%`, backgroundColor: 'hsl(var(--accent))' }}
