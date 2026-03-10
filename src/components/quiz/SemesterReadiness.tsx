@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useSemesterReadiness } from "@/hooks/useQuizData";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
@@ -11,7 +12,14 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
   const { user, purchases } = useAuth();
   const navigate = useNavigate();
   const courseIds = courses.map(c => c.id);
-  const { readiness, totalPercentage, isLoading } = useSemesterReadiness(user?.id, courseIds);
+  const { readiness, totalPercentage, isLoading, refetch } = useSemesterReadiness(user?.id, courseIds);
+
+  // Refetch when user returns to this page (e.g., after quiz)
+  useEffect(() => {
+    const handleFocus = () => refetch();
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [refetch]);
 
   if (isLoading) {
     return (

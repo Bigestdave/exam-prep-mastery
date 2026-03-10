@@ -344,7 +344,7 @@ export default function AmbassadorDashboard() {
   if (!user || (!isAmbassador && !isAdmin)) return null;
 
   const walletBalance = profile ? (profile as any).wallet_balance || 0 : 0;
-  const vipLink = `lcuprep.vercel.app/vip/${referralCode}`;
+  const vipLink = `${window.location.origin}/vip/${referralCode}`;
   const completedUploads = uploads.filter(u => u.status === "complete").length;
 
   // Milestone progress — based on total course unlocks, not unique buyers
@@ -358,14 +358,14 @@ export default function AmbassadorDashboard() {
     : 100;
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(`https://${vipLink}`);
+    navigator.clipboard.writeText(vipLink);
     setCopied(true);
     toast({ title: "Link copied!", description: "Share it with your coursemates." });
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleWhatsAppShare = () => {
-    const text = `Use my VIP link to get started on LCU Prep past questions!\nhttps://${vipLink}`;
+    const text = `Use my VIP link to get started on LCU Prep past questions!\n${vipLink}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
   };
 
