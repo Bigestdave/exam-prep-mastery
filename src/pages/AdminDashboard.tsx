@@ -817,8 +817,11 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="review">
+            <ContentReviewTab />
+          </TabsContent>
+
           <TabsContent value="sales">
-            <SalesTab />
           </TabsContent>
 
           <TabsContent value="semester">
