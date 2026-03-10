@@ -70,14 +70,12 @@ export default function Quiz() {
 
     setScore(finalScore);
 
-    const percentage = Math.round((finalScore / questions.length) * 100);
     if (user && id) {
       const { error } = await supabase.from("quiz_attempts").insert({
         user_id: user.id,
         course_id: id,
         score: finalScore,
         total_questions: questions.length,
-        percentage,
       });
       if (error) {
         console.error("Failed to save quiz attempt:", error);
