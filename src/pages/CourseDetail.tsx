@@ -195,7 +195,17 @@ export default function CourseDetail() {
 
   const openPaymentModal = () => {
     setPaymentOption('single');
+    setExtraCourseIds([]);
+    setShowMoreCourses(false);
     setShowPaymentModal(true);
+  };
+
+  const toggleExtraCourse = (courseId: string) => {
+    setExtraCourseIds(prev => 
+      prev.includes(courseId) 
+        ? prev.filter(id => id !== courseId) 
+        : [...prev, courseId]
+    );
   };
 
   // Determine display count - if not owned, show at least 1 for free preview
