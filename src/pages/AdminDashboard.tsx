@@ -765,6 +765,7 @@ export default function AdminDashboard() {
         <Tabs defaultValue="courses">
           <TabsList className="mb-6 flex-wrap">
             <TabsTrigger value="courses" className="gap-2"><BookOpen className="w-4 h-4" />Courses</TabsTrigger>
+            <TabsTrigger value="queue" className="gap-2"><ClipboardList className="w-4 h-4" />Content Queue</TabsTrigger>
             <TabsTrigger value="review" className="gap-2"><Eye className="w-4 h-4" />Review</TabsTrigger>
             <TabsTrigger value="sales" className="gap-2"><DollarSign className="w-4 h-4" />Sales</TabsTrigger>
             <TabsTrigger value="semester" className="gap-2"><Target className="w-4 h-4" />Departments</TabsTrigger>
