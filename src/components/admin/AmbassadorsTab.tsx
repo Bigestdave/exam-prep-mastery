@@ -219,8 +219,10 @@ export function AmbassadorsTab() {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Department</TableHead>
+                  <TableHead>Bank Details</TableHead>
                   <TableHead className="text-right">Uploads</TableHead>
                   <TableHead className="text-right">Wallet</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
