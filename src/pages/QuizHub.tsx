@@ -97,7 +97,7 @@ export default function QuizHub() {
 
           {/* Segment bar */}
           <div className="flex items-center gap-1.5 mt-5 relative z-10">
-            {departmentCourses.map(c => {
+            {quizEnabledCourses.map(c => {
               const pct = readiness.get(c.id) ?? 0;
               const tier = getTier(pct);
               return (
