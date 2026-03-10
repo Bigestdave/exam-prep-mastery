@@ -156,19 +156,26 @@ export default function Dashboard() {
             </div>
           </>
         ) : (
-          <div className="text-center py-16 bg-card rounded-3xl card-float">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-              <BookOpen className="w-8 h-8 text-primary" />
+          <div className="text-center py-20 bg-card rounded-3xl card-float border border-border">
+            <div className="w-20 h-20 rounded-3xl bg-accent/10 flex items-center justify-center mx-auto mb-5">
+              <BookOpen className="w-10 h-10 text-accent" />
             </div>
-            <h3 className="font-display font-bold text-foreground mb-2">
+            <h3 className="font-display font-bold text-xl text-foreground mb-2" style={{ letterSpacing: '-0.05em' }}>
               {departmentHasCoursesInDb ? "No courses for this level" : "Coming Soon"}
             </h3>
-            <p className="text-muted-foreground text-sm max-w-xs mx-auto">
+            <p className="text-muted-foreground text-sm max-w-xs mx-auto leading-relaxed mb-6">
               {departmentHasCoursesInDb 
-                ? `No courses for ${profile?.level} in your department yet.`
-                : `Courses for ${profile?.faculty || "your department"} are being prepared.`
+                ? `We don't have ${profile?.level} courses for your department yet. They're on the way.`
+                : `Courses for ${profile?.faculty || "your department"} are being prepared. You'll be the first to know.`
               }
             </p>
+            <button
+              onClick={() => navigate("/request-course")}
+              className="px-6 py-3 rounded-2xl bg-foreground text-background font-display font-bold text-sm"
+              style={{ letterSpacing: '-0.05em' }}
+            >
+              Request a Course
+            </button>
           </div>
         )}
       </main>

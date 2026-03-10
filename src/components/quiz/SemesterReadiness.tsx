@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSemesterReadiness } from "@/hooks/useQuizData";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { calcSemesterReadiness, getTier } from "@/lib/readinessTiers";
 import { ReadinessRing } from "@/components/quiz/ReadinessRing";
 import { motion } from "framer-motion";
@@ -14,7 +15,28 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const courseIds = courses.map(c => c.id);
+
+  const [quizCourseIds, setQuizCourseIds] = useState<Set<string>>(new Set());
+  const [countsLoaded, setCountsLoaded] = useState(false);
+
+  // Fetch which courses have quiz data
+  useEffect(() => {
+    const fetchCounts = async () => {
+      if (courses.length === 0) { setCountsLoaded(true); return; }
+      const ids = courses.map(c => c.id);
+      const { data } = await supabase.rpc('get_course_question_counts', { p_course_ids: ids });
+      const withQuiz = new Set<string>();
+      data?.forEach((row: { course_id: string; question_count: number }) => {
+        if (row.question_count > 0) withQuiz.add(row.course_id);
+      });
+      setQuizCourseIds(withQuiz);
+      setCountsLoaded(true);
+    };
+    fetchCounts();
+  }, [courses.map(c => c.id).join(',')]);
+
+  const quizCourses = courses.filter(c => quizCourseIds.has(c.id));
+  const courseIds = quizCourses.map(c => c.id);
   const { readiness, isLoading, refetch } = useSemesterReadiness(user?.id, courseIds);
 
   useEffect(() => { refetch(); }, [location.key]);
@@ -25,7 +47,7 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
     return () => window.removeEventListener('focus', handleFocus);
   }, [refetch]);
 
-  if (isLoading) {
+  if (isLoading || !countsLoaded) {
     return (
       <div className="rounded-3xl p-6 md:p-8 mb-8 animate-pulse bg-gradient-to-br from-espresso via-espresso-deep to-espresso-ink">
         <div className="flex items-center gap-6">
@@ -39,6 +61,9 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
       </div>
     );
   }
+
+  // Don't render at all if no courses have quizzes
+  if (quizCourses.length === 0) return null;
 
   const hasAnyAttempt = courseIds.some(id => (readiness.get(id) ?? 0) > 0);
   const totalReadiness = hasAnyAttempt ? calcSemesterReadiness(courseIds, readiness) : 0;
@@ -61,8 +86,8 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
           </h2>
           <p className="text-xs mt-1 leading-relaxed text-cream/45">
             {hasAnyAttempt
-              ? `${goldCount} of ${courses.length} courses at Gold.${goldCount < courses.length ? " Tap to view all." : " Well done!"}`
-              : `${courses.length} courses to master. Tap to begin.`}
+              ? `${goldCount} of ${quizCourses.length} courses at Gold.${goldCount < quizCourses.length ? " Tap to view all." : " Well done!"}`
+              : `${quizCourses.length} courses to master. Tap to begin.`}
           </p>
         </div>
       </div>
@@ -70,7 +95,7 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
       {/* Segment bar */}
       {hasAnyAttempt && (
         <div className="flex items-center gap-1.5 mt-6 relative z-10">
-          {courses.map(c => {
+          {quizCourses.map(c => {
             const cpct = readiness.get(c.id) ?? 0;
             const tier = getTier(cpct);
             return (
