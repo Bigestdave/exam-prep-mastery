@@ -60,6 +60,7 @@ const AppContent = () => {
           <Route path="/upload" element={<AmbassadorUpload />} />
           <Route path="/ambassador" element={<AmbassadorDashboard />} />
           <Route path="/withdraw" element={<Withdraw />} />
+          <Route path="/modifier" element={<ModifierDashboard />} />
           <Route path="/vip/:code" element={<VipRedirect />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

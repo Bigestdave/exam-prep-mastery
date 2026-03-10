@@ -54,6 +54,7 @@ export function useRole() {
     roles,
     isAdmin: roles.includes('admin'),
     isAmbassador: roles.includes('ambassador'),
+    isModifier: roles.includes('modifier'),
     isLoading: authLoading || isLoading,
   };
 }
