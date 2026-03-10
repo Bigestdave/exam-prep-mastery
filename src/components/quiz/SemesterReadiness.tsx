@@ -19,20 +19,20 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
   const [quizCourseIds, setQuizCourseIds] = useState<Set<string>>(new Set());
   const [countsLoaded, setCountsLoaded] = useState(false);
 
-  // Fetch which courses have quiz data
+  // Fetch which courses have actual quiz data (not just tutorial answers)
   useEffect(() => {
-    const fetchCounts = async () => {
+    const fetchQuizCourses = async () => {
       if (courses.length === 0) { setCountsLoaded(true); return; }
       const ids = courses.map(c => c.id);
-      const { data } = await supabase.rpc('get_course_question_counts', { p_course_ids: ids });
+      const { data } = await supabase.rpc('get_courses_with_quizzes' as any, { p_course_ids: ids });
       const withQuiz = new Set<string>();
-      data?.forEach((row: { course_id: string; question_count: number }) => {
-        if (row.question_count > 0) withQuiz.add(row.course_id);
+      (data as any[])?.forEach((row: { course_id: string }) => {
+        withQuiz.add(row.course_id);
       });
       setQuizCourseIds(withQuiz);
       setCountsLoaded(true);
     };
-    fetchCounts();
+    fetchQuizCourses();
   }, [courses.map(c => c.id).join(',')]);
 
   const quizCourses = courses.filter(c => quizCourseIds.has(c.id));
