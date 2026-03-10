@@ -152,14 +152,13 @@ export default function AmbassadorDashboard() {
 
   // Fetch uploads
   useEffect(() => {
-    if (!user) return;
+    if (!user || !department) return;
     const fetchUploads = async () => {
       const { data } = await supabase
         .from("course_uploads")
         .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(20);
+        .eq("department", department)
+        .order("course_code", { ascending: true });
       if (data) setUploads(data as UploadRecord[]);
     };
     fetchUploads();
