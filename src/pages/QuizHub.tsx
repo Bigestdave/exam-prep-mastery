@@ -39,8 +39,8 @@ export default function QuizHub() {
   if (!user) return null;
 
   const totalReadiness = calcSemesterReadiness(courseIds, readiness);
-  const ownedCourses = departmentCourses.filter(c => purchases.includes(c.id));
-  const lockedCourses = departmentCourses.filter(c => !purchases.includes(c.id));
+  const ownedCourses = quizEnabledCourses.filter(c => purchases.includes(c.id));
+  const lockedCourses = quizEnabledCourses.filter(c => !purchases.includes(c.id));
 
   return (
     <div className="min-h-screen bg-background pb-32 md:pb-0">
