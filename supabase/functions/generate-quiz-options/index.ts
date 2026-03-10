@@ -145,23 +145,22 @@ serve(async (req) => {
         // Send more content (up to 4000 chars) for better context
         const contentSnippet = q.answer_text.substring(0, 4000);
         
-        const prompt = `You are a quiz generator for a Nigerian university exam prep app called LCU Prep.
+        const prompt = `You are an expert Educational Psychologist creating a diagnostic quiz for a Nigerian university exam prep app called LCU Prep.
 
-Below is the TUTORIAL CONTENT (explanations, notes, or Q&A) for a specific module. Your job is to generate exactly 4 multiple-choice options that test the student's understanding of the KEY CONCEPTS in this content.
+Below is the SIMPLIFIED STUDY ANSWER for a specific module. Your task is to generate ONE multiple-choice question that tests the student's actual understanding of the core concept - not just their ability to memorize words.
 
---- TUTORIAL CONTENT START ---
+--- STUDY ANSWER START ---
 ${contentSnippet}
---- TUTORIAL CONTENT END ---
+--- STUDY ANSWER END ---
 
 Module Title (for context only): ${q.question_text}
 
-RULES:
-1. The correct answer MUST come directly from the tutorial content above. Do NOT invent facts.
-2. Generate 4 options: exactly 1 correct, 3 plausible but wrong.
-3. Wrong options should be related to the topic but factually incorrect based on the content.
+### RULES FOR THE QUIZ:
+1. The Question: Must be clear, concise, and focused on the most important takeaway from the text.
+2. The Correct Answer: Must be 100% accurate based ONLY on the provided text.
+3. The Distractors (Wrong Answers): You must generate 3 highly plausible wrong answers. They should represent common student misconceptions. Do NOT make the correct answer obviously longer or more detailed than the wrong answers.
 4. Keep each option under 20 words. Be concise.
-5. Randomize which position (1-4) is the correct answer.
-6. The question being tested should focus on a CORE concept from the content, not a trivial detail.
+5. Randomize which position (0-3) is the correct answer.
 
 Respond with ONLY a valid JSON array. No markdown, no backticks, no explanation:
 [
