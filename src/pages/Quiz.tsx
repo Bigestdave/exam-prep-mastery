@@ -51,11 +51,11 @@ export default function Quiz() {
 
     await new Promise(r => setTimeout(r, 600));
 
-    if (currentIndex < questions.length - 1) {
+    if (currentIndex < activeQuestions.length - 1) {
       setCurrentIndex(i => i + 1);
     }
     setIsTransitioning(false);
-  }, [currentIndex, questions.length, answers, options, isTransitioning]);
+  }, [currentIndex, activeQuestions.length, answers, options, isTransitioning]);
 
   const handleBack = useCallback(() => {
     if (currentIndex > 0 && !isTransitioning) {
