@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen, ClipboardList, DollarSign, TrendingUp, Users, ShoppingCart, Crown, Upload, Calendar, Target, RefreshCw } from "lucide-react";
 import { AmbassadorsTab } from "@/components/admin/AmbassadorsTab";
 import { UploadsTab } from "@/components/admin/UploadsTab";
+import { ContentReviewTab } from "@/components/admin/ContentReviewTab";
 import { Badge } from "@/components/ui/badge";
 import { facultyCategories, allDepartments } from "@/data/departments";
 
