@@ -1,18 +1,21 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { useSemesterReadiness } from "@/hooks/useQuizData";
+import { supabase } from "@/integrations/supabase/client";
 import { calcSemesterReadiness, getTier, courseContribution } from "@/lib/readinessTiers";
 import { ReadinessRing } from "@/components/quiz/ReadinessRing";
-import { ChevronLeft, Lock, CheckCircle2, Zap } from "lucide-react";
+import { ChevronLeft, Lock, CheckCircle2, Zap, BookOpen } from "lucide-react";
 
 export default function QuizHub() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, profile, purchases, isLoading: authLoading } = useAuth();
   const { courses, isLoading: coursesLoading } = useCourses();
+  const [quizCourseIds, setQuizCourseIds] = useState<Set<string>>(new Set());
+  const [countsLoading, setCountsLoading] = useState(true);
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/login");
@@ -21,12 +24,31 @@ export default function QuizHub() {
   const departmentCourses = courses.filter(
     c => c.faculty === profile?.faculty && c.level === profile?.level
   );
-  const courseIds = departmentCourses.map(c => c.id);
+
+  // Fetch which courses actually have questions (quiz data)
+  useEffect(() => {
+    const fetchCounts = async () => {
+      if (departmentCourses.length === 0) { setCountsLoading(false); return; }
+      const ids = departmentCourses.map(c => c.id);
+      const { data } = await supabase.rpc('get_course_question_counts', { p_course_ids: ids });
+      const withQuiz = new Set<string>();
+      data?.forEach((row: { course_id: string; question_count: number }) => {
+        if (row.question_count > 0) withQuiz.add(row.course_id);
+      });
+      setQuizCourseIds(withQuiz);
+      setCountsLoading(false);
+    };
+    fetchCounts();
+  }, [courses, profile?.faculty, profile?.level]);
+
+  // Only include courses that have quiz data
+  const quizEnabledCourses = departmentCourses.filter(c => quizCourseIds.has(c.id));
+  const courseIds = quizEnabledCourses.map(c => c.id);
   const { readiness, isLoading: readinessLoading, refetch } = useSemesterReadiness(user?.id, courseIds);
 
   useEffect(() => { refetch(); }, [location.key]);
 
-  const isLoading = authLoading || coursesLoading || readinessLoading;
+  const isLoading = authLoading || coursesLoading || countsLoading || readinessLoading;
 
   if (isLoading) {
     return (
@@ -41,6 +63,45 @@ export default function QuizHub() {
   const totalReadiness = calcSemesterReadiness(courseIds, readiness);
   const ownedCourses = quizEnabledCourses.filter(c => purchases.includes(c.id));
   const lockedCourses = quizEnabledCourses.filter(c => !purchases.includes(c.id));
+
+  // Empty state — no quiz-enabled courses
+  if (quizEnabledCourses.length === 0) {
+    return (
+      <div className="min-h-screen bg-background pb-32 md:pb-0">
+        <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border">
+          <div className="container flex items-center gap-3 px-4 py-3">
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="w-10 h-10 rounded-2xl bg-card border border-border flex items-center justify-center hover:bg-secondary transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5 text-muted-foreground" />
+            </button>
+            <h1 className="text-lg font-display font-bold text-foreground" style={{ letterSpacing: '-0.05em' }}>
+              Semester Readiness
+            </h1>
+          </div>
+        </div>
+        <main className="container px-4 py-16 max-w-md mx-auto text-center">
+          <div className="w-20 h-20 rounded-3xl bg-accent/10 flex items-center justify-center mx-auto mb-5">
+            <BookOpen className="w-10 h-10 text-accent" />
+          </div>
+          <h2 className="text-xl font-display font-bold text-foreground mb-2" style={{ letterSpacing: '-0.05em' }}>
+            No quizzes yet
+          </h2>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-8">
+            Quizzes for your courses are being prepared. Check back soon — your readiness score will appear here once they're live.
+          </p>
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="px-6 py-3 rounded-2xl bg-foreground text-background font-display font-bold text-sm"
+            style={{ letterSpacing: '-0.05em' }}
+          >
+            Back to Dashboard
+          </button>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-32 md:pb-0">
@@ -125,7 +186,7 @@ export default function QuizHub() {
               {ownedCourses.map((course, i) => {
                 const pct = readiness.get(course.id) ?? 0;
                 const tier = getTier(pct);
-                const contribution = courseContribution(pct, departmentCourses.length);
+                const contribution = courseContribution(pct, quizEnabledCourses.length);
                 return (
                   <motion.button
                     key={course.id}
@@ -176,7 +237,7 @@ export default function QuizHub() {
             </h2>
             <div className="space-y-2">
               {lockedCourses.map((course, i) => {
-                const slotSize = Math.round(100 / departmentCourses.length);
+                const slotSize = Math.round(100 / quizEnabledCourses.length);
                 return (
                   <motion.button
                     key={course.id}
