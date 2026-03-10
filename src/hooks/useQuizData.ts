@@ -242,6 +242,10 @@ export function useSemesterReadiness(userId: string | undefined, courseIds: stri
         .in('course_id', courseIds)
         .order('percentage', { ascending: false });
 
+      if (error) {
+        console.error('Failed to load readiness data:', error);
+        toast({ title: "Couldn't load readiness", description: "Your progress may be outdated.", variant: "destructive" });
+      }
       if (!error && data) {
         const bestPerCourse = new Map<string, number>();
         data.forEach(row => {
