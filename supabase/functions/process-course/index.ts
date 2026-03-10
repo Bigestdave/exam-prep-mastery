@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const MODEL = "google/gemini-2.5-flash";
+const MODEL = "google/gemini-2.5-pro";
 
 interface ProcessPayload {
   course_code: string;
@@ -162,7 +162,7 @@ Provide a 1-sentence summary that the student can easily memorize for the exam h
 - NEVER use phrases like "According to the notes," or "The document states." Just answer directly.
 - The output MUST be valid JSON.`;
 
-  const userPrompt = `Course: ${courseTitle}\n\n[Specific Question]: ${question}\n\n[Course Notes]:\n${pdfContext.slice(0, 8000)}`;
+  const userPrompt = `Course: ${courseTitle}\n\n[Specific Question]: ${question}\n\n[Course Notes]:\n${pdfContext.slice(0, 25000)}`;
 
   const result = await callAI(apiKey, systemPrompt, userPrompt);
 
@@ -180,11 +180,12 @@ Provide a 1-sentence summary that the student can easily memorize for the exam h
       };
     }
   } catch (e) {
-    console.error("Failed to parse study guide JSON:", e);
+    console.error("Failed to parse study guide JSON:", e, "Raw:", result.slice(0, 500));
   }
 
+  // Fallback: use the raw AI text as the answer instead of placeholder
   return {
-    answer_text: "Study guide content available.",
+    answer_text: result || "The AI could not generate a proper answer for this question. Please review manually.",
     content: { explanation: result, key_points: [], quiz: null },
   };
 }
