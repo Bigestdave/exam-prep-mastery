@@ -254,9 +254,9 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
           >
             <p className="text-sm font-display font-bold text-foreground mb-1.5" style={{ letterSpacing: '-0.03em' }}>
               {percentage >= 70
-                ? `Impressive — but this was only ${total} questions.`
+                ? `Impressive, but this was only ${total} questions.`
                 : percentage >= 40
-                  ? `You got caught on a few — and this was just ${total} questions.`
+                  ? `You got caught on a few, and this was just ${total} questions.`
                   : `${score === 0 ? "Every answer missed" : "Most answers missed"} — and this was only ${total} questions.`}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed mb-5">
