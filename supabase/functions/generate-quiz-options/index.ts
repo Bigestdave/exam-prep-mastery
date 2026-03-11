@@ -31,7 +31,7 @@ function tryParseMCQs(answerText: string, debug = false): Array<{ question: stri
       const correctLetter = answerMatch[1].toLowerCase();
       const options = optionMatches.slice(0, 4).map((opt, i) => {
         const letter = String.fromCharCode(97 + i);
-        const text = opt.replace(/^[a-d]\)\s*/, '').trim();
+        const text = opt.replace(/^[a-dA-D]\)\s*/, '').trim();
         return { text, is_correct: letter === correctLetter };
       });
       
