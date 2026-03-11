@@ -265,7 +265,7 @@ Respond with ONLY a valid JSON array of quiz objects. No markdown, no backticks:
       }
     }
 
-    // Now propagate quiz_options to all other courses with same code
+    // Now propagate content (quizzes) to all other courses with same code
     if (course_code) {
       const { data: allCourses } = await supabase
         .from("courses")
@@ -276,21 +276,28 @@ Respond with ONLY a valid JSON array of quiz objects. No markdown, no backticks:
       if (allCourses?.length) {
         const { data: sourceQs } = await supabase
           .from("course_questions")
-          .select("question_index, quiz_options")
-          .eq("course_id", courseId)
-          .not("quiz_options", "is", null);
+          .select("question_index, content, quiz_options")
+          .eq("course_id", courseId);
 
-        if (sourceQs?.length) {
+        const quizSourceQs = sourceQs?.filter((sq: any) => 
+          (sq.content?.quizzes && sq.content.quizzes.length > 0) || sq.quiz_options
+        );
+
+        if (quizSourceQs?.length) {
           for (const targetCourse of allCourses) {
-            for (const sq of sourceQs) {
+            for (const sq of quizSourceQs) {
+              const updateData: any = {};
+              if (sq.content?.quizzes) updateData.content = sq.content;
+              if (sq.quiz_options) updateData.quiz_options = sq.quiz_options;
+              
               await supabase
                 .from("course_questions")
-                .update({ quiz_options: sq.quiz_options })
+                .update(updateData)
                 .eq("course_id", targetCourse.id)
                 .eq("question_index", sq.question_index);
             }
           }
-          console.log(`Propagated to ${allCourses.length} other courses`);
+          console.log(`Propagated content to ${allCourses.length} other courses`);
         }
       }
     }
