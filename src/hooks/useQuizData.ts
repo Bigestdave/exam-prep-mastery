@@ -68,37 +68,51 @@ function parseQuiz(structured: any): { question: string; options: QuizOption[]; 
 function parseSingleQuiz(quiz: any): { question: string; options: QuizOption[]; hint?: string } | null {
   if (!quiz) return null;
 
-  // Edge Function format (array options + correct_index)
-  if (Array.isArray(quiz.options) && typeof quiz.correct_index === 'number') {
-    const options: QuizOption[] = quiz.options.map((text: string, i: number) => ({
-      text,
-      is_correct: i === quiz.correct_index,
-    }));
-    if (options.length < 2 || !options.some(o => o.is_correct)) return null;
-    return {
-      question: quiz.question || '',
-      options: shuffleArray(options),
-      hint: quiz.explanation || quiz.hint,
-    };
-  }
-
-  // Legacy n8n format (object options + correct_answer letter)
-  if (quiz.options && quiz.correct_answer && !Array.isArray(quiz.options)) {
-    const letters = ['A', 'B', 'C', 'D'];
-    const options: QuizOption[] = letters
-      .filter(l => quiz.options[l])
-      .map(l => ({
-        text: quiz.options[l],
-        is_correct: quiz.correct_answer.toUpperCase() === l,
+  try {
+    // Edge Function format (array options + correct_index)
+    if (Array.isArray(quiz.options) && quiz.correct_index !== undefined && quiz.correct_index !== null) {
+      const correctIdx = Number(quiz.correct_index);
+      const options: QuizOption[] = quiz.options.map((text: string, i: number) => ({
+        text: String(text),
+        is_correct: i === correctIdx,
       }));
-    if (options.length < 2 || !options.some(o => o.is_correct)) return null;
-    return {
-      question: quiz.question || '',
-      options: shuffleArray(options),
-      hint: quiz.hint,
-    };
+      // Skip validation — show everything raw
+      return {
+        question: quiz.question || '(no question text)',
+        options: options.length > 0 ? shuffleArray(options) : [{ text: 'No options', is_correct: true }],
+        hint: quiz.explanation || quiz.hint,
+      };
+    }
+
+    // Legacy n8n format (object options + correct_answer letter)
+    if (quiz.options && quiz.correct_answer && !Array.isArray(quiz.options)) {
+      const letters = ['A', 'B', 'C', 'D'];
+      const options: QuizOption[] = letters
+        .filter(l => quiz.options[l])
+        .map(l => ({
+          text: String(quiz.options[l]),
+          is_correct: quiz.correct_answer.toUpperCase() === l,
+        }));
+      return {
+        question: quiz.question || '(no question text)',
+        options: options.length > 0 ? shuffleArray(options) : [{ text: 'No options', is_correct: true }],
+        hint: quiz.hint,
+      };
+    }
+
+    // Catch-all: if quiz has a question field, try to show it anyway
+    if (quiz.question) {
+      console.warn('[parseSingleQuiz] Unknown format, showing raw:', JSON.stringify(quiz).slice(0, 200));
+      const rawOptions = Array.isArray(quiz.options) 
+        ? quiz.options.map((t: any, i: number) => ({ text: String(t), is_correct: i === 0 }))
+        : [{ text: 'No options available', is_correct: true }];
+      return { question: quiz.question, options: rawOptions, hint: quiz.hint };
+    }
+  } catch (e) {
+    console.error('[parseSingleQuiz] Error parsing quiz:', e, JSON.stringify(quiz).slice(0, 300));
   }
 
+  console.warn('[parseSingleQuiz] Could not parse quiz:', JSON.stringify(quiz).slice(0, 200));
   return null;
 }
 
