@@ -44,10 +44,11 @@ export default function Quiz() {
     }
   }, [questions, isFreePreview]);
 
+  // DEBUG: Temporarily disable redirect so we can see what's happening
   useEffect(() => {
     if (!user) navigate("/login");
-    if (!isLoading && !hasQuizData && id) navigate(`/course/${id}`);
-  }, [user, isLoading, hasQuizData, id, navigate]);
+    // REMOVED: auto-redirect when no quiz data — we want to see the debug info
+  }, [user, navigate]);
 
   const currentQuestion = activeQuestions[currentIndex];
   const options = currentQuestion?.quiz_options ?? [];
