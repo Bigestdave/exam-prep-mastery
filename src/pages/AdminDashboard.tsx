@@ -555,6 +555,8 @@ export default function AdminDashboard() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [generatingQuizFor, setGeneratingQuizFor] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [code, setCode] = useState("");
   const [title, setTitle] = useState("");
