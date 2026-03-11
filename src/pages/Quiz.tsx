@@ -34,12 +34,13 @@ export default function Quiz() {
 
   useEffect(() => {
     if (questions.length === 0) return;
+    console.log(`[Quiz] Setting active questions from ${questions.length} total, isFreePreview=${isFreePreview}`);
     if (isFreePreview) {
       setActiveQuestions(questions.slice(0, FREE_PREVIEW_LIMIT));
     } else {
-      // Shuffle and pick up to QUIZ_SIZE
+      // Show ALL questions temporarily to debug
       const shuffled = [...questions].sort(() => Math.random() - 0.5);
-      setActiveQuestions(shuffled.slice(0, QUIZ_SIZE));
+      setActiveQuestions(shuffled);
     }
   }, [questions, isFreePreview]);
 
