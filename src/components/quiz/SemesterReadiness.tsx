@@ -84,9 +84,6 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
           <h2 className="text-lg font-display font-bold leading-tight text-cream">
             Semester Readiness
           </h2>
-          <p className="text-[11px] font-mono mt-0.5 text-cream/30">
-            {quizCourses.length} {quizCourses.length === 1 ? 'quiz' : 'quizzes'} available
-          </p>
           <p className="text-xs mt-1 leading-relaxed text-cream/45">
             {hasAnyAttempt
               ? `${goldCount} of ${quizCourses.length} courses mastered.${goldCount < quizCourses.length ? " Test yourself →" : " Well done!"}`
