@@ -7,18 +7,22 @@ const corsHeaders = {
 };
 
 // Try to parse existing MCQ content from answer_text (e.g. GST 107 format)
-function tryParseMCQs(answerText: string): Array<{text: string; is_correct: boolean}[]> | null {
+function tryParseMCQs(answerText: string): Array<{ question: string; options: {text: string; is_correct: boolean}[] }> | null {
   // Match patterns like: "1. Question?\na) Option\nb) Option\n- ANSWER: b) ..."
   const questionBlocks = answerText.split(/\n(?=\d+\.\s)/);
-  const parsed: Array<{text: string; is_correct: boolean}[]> = [];
+  const parsed: Array<{ question: string; options: {text: string; is_correct: boolean}[] }> = [];
 
   for (const block of questionBlocks) {
+    // Extract the question text (first line after the number)
+    const questionMatch = block.match(/^\d+\.\s*(.+?)(?:\n|$)/);
+    const questionText = questionMatch ? questionMatch[1].trim() : '';
+    
     // Find options (a-d patterns)
     const optionMatches = block.match(/^[a-d]\)\s*(.+)$/gm);
     // Find answer
     const answerMatch = block.match(/ANSWER:\s*([a-d])\)/i);
     
-    if (optionMatches && optionMatches.length >= 4 && answerMatch) {
+    if (optionMatches && optionMatches.length >= 4 && answerMatch && questionText) {
       const correctLetter = answerMatch[1].toLowerCase();
       const options = optionMatches.slice(0, 4).map((opt, i) => {
         const letter = String.fromCharCode(97 + i); // a, b, c, d
@@ -27,12 +31,12 @@ function tryParseMCQs(answerText: string): Array<{text: string; is_correct: bool
       });
       
       if (options.some(o => o.is_correct)) {
-        parsed.push(options);
+        parsed.push({ question: questionText, options });
       }
     }
   }
   
-  return parsed.length >= 3 ? parsed : null; // Only use if we found enough MCQs
+  return parsed.length >= 1 ? parsed : null;
 }
 
 // Convert parsed MCQs to Edge Function quiz format for content JSONB
