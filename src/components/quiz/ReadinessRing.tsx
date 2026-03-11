@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { getTier } from "@/lib/readinessTiers";
 
-export type RingVariant = "dark" | "light" | "segmented";
+export type RingVariant = "dark" | "light" | "segmented" | "segmented-dark";
 
 interface ReadinessRingProps {
   /** 0-100 readiness percentage */
