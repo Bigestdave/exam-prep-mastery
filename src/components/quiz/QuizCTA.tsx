@@ -43,7 +43,7 @@ export function QuizCTA({ courseId, courseCode }: QuizCTAProps) {
       >
         <div className="flex items-center gap-4 mb-3">
           <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center flex-shrink-0">
-            <Zap className="w-6 h-6 text-accent" />
+            <Lightbulb className="w-6 h-6 text-accent" />
           </div>
           <div className="flex-1">
             <h3 className="font-display font-bold text-foreground text-base" style={{ letterSpacing: '-0.05em' }}>
