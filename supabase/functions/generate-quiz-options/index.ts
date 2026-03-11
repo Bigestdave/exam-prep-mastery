@@ -138,7 +138,7 @@ serve(async (req) => {
     for (const q of toProcess) {
       try {
         // STRATEGY 1: Try to parse existing MCQs from the answer_text
-        const existingMCQs = tryParseMCQs(q.answer_text);
+        const existingMCQs = tryParseMCQs(q.answer_text, true);
         
         if (existingMCQs && existingMCQs.length > 0) {
           // Convert ALL parsed MCQs to quiz format and store in content JSONB
