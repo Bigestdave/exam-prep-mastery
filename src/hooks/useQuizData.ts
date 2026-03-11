@@ -131,12 +131,25 @@ export function useQuizData(courseId: string | undefined) {
         const parsed: QuizQuestion[] = [];
 
         for (const q of data) {
+          // Debug: log what each question has
+          const hasContent = q.content !== null && q.content !== undefined;
+          const hasStructured = q.structured_content !== null && q.structured_content !== undefined;
+          const hasLegacy = q.quiz_options !== null && q.quiz_options !== undefined;
+          console.log(`[useQuizData] Q${q.question_index}: content=${hasContent}, structured=${hasStructured}, legacy=${hasLegacy}`);
+          
+          if (hasContent) {
+            const contentObj = typeof q.content === 'string' ? JSON.parse(q.content as string) : q.content;
+            console.log(`[useQuizData] Q${q.question_index} content keys:`, Object.keys(contentObj || {}), 'quizzes count:', (contentObj as any)?.quizzes?.length ?? 0);
+          }
+
           // Priority 1: Multi-quiz from content/structured_content
           const contentQuizzes = parseQuiz(q.content);
           const quizzes = contentQuizzes.length > 0 
             ? contentQuizzes 
             : parseQuiz(q.structured_content);
           
+          console.log(`[useQuizData] Q${q.question_index}: parsed ${quizzes.length} quizzes`);
+
           if (quizzes.length > 0) {
             for (let qi = 0; qi < quizzes.length; qi++) {
               const quizData = quizzes[qi];
