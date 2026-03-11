@@ -828,7 +828,16 @@ export default function AdminDashboard() {
                           <TableCell>{course.level}</TableCell>
                           <TableCell>₦{course.price.toLocaleString()}</TableCell>
                           <TableCell>{course.questionCount}</TableCell>
-                          <TableCell className="text-right">
+                          <TableCell className="text-right space-x-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleGenerateQuiz(course)}
+                              disabled={generatingQuizFor === course.id}
+                              title="Generate quizzes from content"
+                            >
+                              {generatingQuizFor === course.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4 text-amber-500" />}
+                            </Button>
                             <Button variant="ghost" size="icon" onClick={() => openEditDialog(course)}><Pencil className="w-4 h-4" /></Button>
                             <Button variant="ghost" size="icon" onClick={() => handleDelete(course.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                           </TableCell>
