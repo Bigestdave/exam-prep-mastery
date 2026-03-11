@@ -130,19 +130,19 @@ serve(async (req) => {
         const existingMCQs = tryParseMCQs(q.answer_text);
         
         if (existingMCQs && existingMCQs.length > 0) {
-          // Content already has MCQs - pick one at random
-          const quizOptions = pickRandomMCQ(existingMCQs);
+          // Convert ALL parsed MCQs to quiz format and store in content JSONB
+          const quizzes = mcqsToQuizFormat(q.question_text, existingMCQs);
           
           const { error: updateError } = await supabase
             .from("course_questions")
-            .update({ quiz_options: quizOptions })
+            .update({ content: { quizzes } })
             .eq("id", q.id);
 
           if (updateError) {
             console.error(`Update error for q${q.question_index}:`, updateError);
           } else {
             processed++;
-            console.log(`q${q.question_index}: Parsed existing MCQ directly from content`);
+            console.log(`q${q.question_index}: Extracted ${quizzes.length} MCQs into content.quizzes`);
           }
           continue;
         }
