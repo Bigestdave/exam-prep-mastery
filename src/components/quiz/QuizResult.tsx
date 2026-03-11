@@ -156,7 +156,25 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
           <p className="text-sm text-foreground/80 leading-relaxed">
             {tier.message}
           </p>
+          {/* Near-win motivation */}
+          {percentage < 80 && percentage >= 40 && (
+            <p className="text-sm font-display font-bold text-foreground mt-3" style={{ letterSpacing: '-0.03em' }}>
+              You were {Math.ceil(total * 0.8) - score} question{Math.ceil(total * 0.8) - score !== 1 ? 's' : ''} away from Exam Ready. Retake to lock it in.
+            </p>
+          )}
+          {percentage < 40 && (
+            <p className="text-sm font-display font-bold text-foreground mt-3" style={{ letterSpacing: '-0.03em' }}>
+              You found {total - score} weak spots. Review the guides, then retake.
+            </p>
+          )}
         </div>
+
+        {/* Social proof */}
+        <p className="text-[11px] text-muted-foreground text-center mt-1 italic">
+          {percentage >= 80
+            ? "Top students lock in by retaking once more."
+            : "Students who scored 90%+ practiced at least 2 attempts."}
+        </p>
 
         {/* Upsell for free preview quizzes */}
         {isFreePreview && (
