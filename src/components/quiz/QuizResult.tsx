@@ -31,8 +31,9 @@ function getScoringTier(percentage: number) {
       color: "text-accent",
       bg: "bg-accent/8",
       border: "border-accent/15",
-      stampBg: "from-[#0a2e12] via-[#0d3a17] to-[#041a08]",
-      accentGlow: "bg-accent/20",
+      stampBg: "from-[#2a1f0a] via-[#3d2b10] to-[#1a1204]",
+      accentGlow: "bg-[#c9a96e]/20",
+      confettiColors: ['#c9a96e', '#d4b87a', '#fbbf24', '#ffffff'],
     };
   }
   if (percentage >= 40) {
@@ -46,6 +47,7 @@ function getScoringTier(percentage: number) {
       border: "border-amber-200/30",
       stampBg: "from-[#2a1f0a] via-[#3a2a0d] to-[#1a1404]",
       accentGlow: "bg-amber-500/15",
+      confettiColors: ['#d97706', '#fbbf24', '#c9a96e', '#ffffff'],
     };
   }
   return {
@@ -56,8 +58,9 @@ function getScoringTier(percentage: number) {
     color: "text-muted-foreground",
     bg: "bg-secondary/50",
     border: "border-border",
-    stampBg: "from-[#1a1a1a] via-[#222] to-[#111]",
-    accentGlow: "bg-foreground/10",
+    stampBg: "from-[#1a1408] via-[#221c10] to-[#110e08]",
+    accentGlow: "bg-[#c9a96e]/10",
+    confettiColors: ['#8b7355', '#a0896a', '#c9a96e', '#ffffff'],
   };
 }
 
@@ -103,19 +106,15 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
 
       const frame = () => {
         confetti({
-          particleCount: percentage >= 80 ? 4 : 2,
+          particleCount: percentage >= 80 ? 3 : 2,
           angle: 60 + Math.random() * 60,
-          spread: 55 + Math.random() * 30,
-          origin: { x: Math.random(), y: 0.6 + Math.random() * 0.2 },
-          colors: percentage >= 80
-            ? ['#15803D', '#22c55e', '#fbbf24', '#ffffff']
-            : percentage >= 40
-              ? ['#d97706', '#fbbf24', '#ffffff']
-              : ['#6b7280', '#9ca3af', '#ffffff'],
-          gravity: 1.2,
-          scalar: 0.9,
+          spread: 45 + Math.random() * 20,
+          origin: { x: Math.random(), y: 0.5 + Math.random() * 0.2 },
+          colors: tier.confettiColors,
+          gravity: 1.4,
+          scalar: 0.8,
           drift: 0,
-          ticks: 120,
+          ticks: 100,
           disableForReducedMotion: true,
         });
         if (Date.now() < end) requestAnimationFrame(frame);
@@ -138,9 +137,9 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
         <div className={`absolute w-80 h-80 rounded-full blur-[100px] ${tier.accentGlow} opacity-60`} />
 
         <motion.div
-          initial={{ scale: 3, opacity: 0, rotate: -15 }}
+          initial={{ scale: 1.8, opacity: 0, rotate: -6 }}
           animate={{ scale: 1, opacity: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 160, damping: 14, delay: 0.1 }}
+          transition={{ type: "spring", stiffness: 120, damping: 18, delay: 0.1 }}
           className="text-center relative z-10"
         >
           {/* Big emoji */}
