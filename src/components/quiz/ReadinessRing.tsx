@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { getTier } from "@/lib/readinessTiers";
 
-export type RingVariant = "dark" | "light" | "segmented";
+export type RingVariant = "dark" | "light" | "segmented" | "segmented-dark";
 
 interface ReadinessRingProps {
   /** 0-100 readiness percentage */
@@ -33,24 +33,33 @@ export function ReadinessRing({
   const cy = variant === "segmented" ? 50 : 60;
   const circumference = 2 * Math.PI * ringRadius;
 
-  const isDark = variant === "dark";
+  const isDark = variant === "dark" || variant === "segmented-dark";
   const textColor = isDark ? "text-cream" : "text-foreground";
   const subTextColor = isDark ? "text-cream/35" : "text-muted-foreground";
   const trackStroke = isDark ? "hsl(var(--cream) / 0.08)" : "hsl(var(--border))";
 
-  // Segmented ring (QuizResult style — one arc per course)
-  if (variant === "segmented" && segments && segments.length > 0) {
+  // Segmented ring (one arc per course, no gaps)
+  if ((variant === "segmented" || variant === "segmented-dark") && segments && segments.length > 0) {
     const totalSegs = segments.length;
-    const gapDeg = 4;
-    const segDeg = (360 - gapDeg * totalSegs) / totalSegs;
+    const segDeg = 360 / totalSegs;
 
     return (
       <div className={`relative ${sizeClass}`}>
         <svg viewBox={viewBox} className="w-full h-full -rotate-90">
+          {/* Track ring */}
+          <circle
+            cx={cx} cy={cy} r={ringRadius}
+            fill="none"
+            stroke={trackStroke}
+            strokeWidth="5"
+          />
           {segments.map((seg, i) => {
-            const startAngle = i * (segDeg + gapDeg);
+            const startAngle = i * segDeg;
             const segLength = (segDeg / 360) * circumference;
             const tier = getTier(seg.pct);
+            const hasAttempt = seg.pct > 0;
+
+            if (!hasAttempt) return null;
 
             return (
               <circle
@@ -58,7 +67,7 @@ export function ReadinessRing({
                 cx={cx} cy={cy} r={ringRadius}
                 fill="none"
                 strokeWidth="5"
-                strokeLinecap="round"
+                strokeLinecap="butt"
                 stroke={tier.ringHsl}
                 strokeDasharray={`${segLength} ${circumference - segLength}`}
                 strokeDashoffset={-(startAngle / 360) * circumference}
