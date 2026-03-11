@@ -127,14 +127,15 @@ export function useQuizData(courseId: string | undefined) {
       }
 
       if (!error && data) {
+        console.log(`[useQuizData] Fetched ${data.length} questions for course ${courseId}`);
         const parsed: QuizQuestion[] = [];
 
         for (const q of data) {
           // Priority 1: Multi-quiz from content/structured_content
-          const quizzes = [
-            ...parseQuiz(q.content),
-            ...(parseQuiz(q.content).length === 0 ? parseQuiz(q.structured_content) : []),
-          ];
+          const contentQuizzes = parseQuiz(q.content);
+          const quizzes = contentQuizzes.length > 0 
+            ? contentQuizzes 
+            : parseQuiz(q.structured_content);
           
           if (quizzes.length > 0) {
             for (let qi = 0; qi < quizzes.length; qi++) {
