@@ -65,9 +65,7 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
   // Don't render at all if no courses have quizzes
   if (quizCourses.length === 0) return null;
 
-  const hasAnyAttempt = courseIds.some(id => (readiness.get(id) ?? 0) > 0);
-  const totalReadiness = hasAnyAttempt ? calcSemesterReadiness(courseIds, readiness) : 0;
-  const goldCount = courseIds.filter(id => getTier(readiness.get(id) ?? 0).name === "gold").length;
+  const totalReadiness = calcSemesterReadiness(courseIds, readiness);
 
   return (
     <motion.button
