@@ -290,7 +290,7 @@ export default function QuizHub() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: (ownedCourses.length + i) * 0.05 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => navigate(`/course/${course.id}`)}
+                    onClick={() => navigate(`/course/${course.id}/quiz`)}
                     className="w-full bg-card/50 border border-border/50 rounded-2xl p-4 text-left opacity-60 hover:opacity-80 transition-all"
                   >
                     <div className="flex items-center justify-between">

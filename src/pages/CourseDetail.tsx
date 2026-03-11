@@ -244,8 +244,8 @@ export default function CourseDetail() {
           </p>
         </div>
 
-        {/* Quiz CTA - only shows if quiz data exists and user owns course */}
-        {isOwned && <QuizCTA courseId={course.id} courseCode={course.code} />}
+        {/* Quiz CTA - shows for all users; free users get preview, paid users get full quiz */}
+        <QuizCTA courseId={course.id} courseCode={course.code} />
 
         {questionsLoading ? (
           <div className="space-y-3">
