@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useBestQuizAttempt, useQuizData } from "@/hooks/useQuizData";
 import { useAuth } from "@/contexts/AuthContext";
-import { ArrowRight, Zap } from "lucide-react";
+import { ArrowRight, Lightbulb } from "lucide-react";
 
 interface QuizCTAProps {
   courseId: string;
