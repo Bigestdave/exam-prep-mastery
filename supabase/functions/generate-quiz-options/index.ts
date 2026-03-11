@@ -20,7 +20,7 @@ function tryParseMCQs(answerText: string, debug = false): Array<{ question: stri
     const questionMatch = block.match(/^\d+\.\s*(.+)/m);
     const questionText = questionMatch ? questionMatch[1].trim() : '';
     
-    const optionMatches = block.match(/^[a-d]\)\s*.+$/gm);
+    const optionMatches = block.match(/^[a-dA-D]\)\s*.+$/gm);
     const answerMatch = block.match(/ANSWER:\s*([a-dA-D])\)/i);
     
     if (debug && bi < 3) {
