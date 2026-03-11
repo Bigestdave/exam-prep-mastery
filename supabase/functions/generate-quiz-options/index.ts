@@ -16,14 +16,15 @@ function tryParseMCQs(answerText: string, debug = false): Array<{ question: stri
   for (let bi = 0; bi < questionBlocks.length; bi++) {
     const block = questionBlocks[bi];
     
-    const questionMatch = block.match(/^\d+\.\s*(.+?)(?:\n|$)/);
+    // Use multiline flag so ^ matches start of line within the block
+    const questionMatch = block.match(/^\d+\.\s*(.+)/m);
     const questionText = questionMatch ? questionMatch[1].trim() : '';
     
     const optionMatches = block.match(/^[a-d]\)\s*.+$/gm);
     const answerMatch = block.match(/ANSWER:\s*([a-dA-D])\)/i);
     
     if (debug && bi < 3) {
-      console.log(`Block ${bi}: q="${questionText?.substring(0,40)}" opts=${optionMatches?.length ?? 0} ans=${answerMatch?.[1] ?? 'none'}`);
+      console.log(`Block ${bi}: first30="${block.substring(0,30).replace(/\n/g,'\\n')}" q="${questionText?.substring(0,40)}" opts=${optionMatches?.length ?? 0} ans=${answerMatch?.[1] ?? 'none'}`);
     }
     
     if (optionMatches && optionMatches.length >= 2 && answerMatch && questionText) {
