@@ -77,24 +77,27 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
       onClick={() => navigate("/quiz-hub")}
       className="rounded-3xl p-6 md:p-8 mb-8 relative overflow-hidden w-full text-left bg-gradient-to-br from-espresso via-espresso-deep to-espresso-ink"
     >
-      <div className="relative z-10 flex items-center gap-6">
-        <ReadinessRing
-          percentage={totalReadiness}
-          variant="segmented-dark"
-          sizeClass="w-32 h-32"
-          label={`${quizCourses.length} ${quizCourses.length === 1 ? 'Quiz' : 'Quizzes'}`}
-          segments={quizCourses.map(c => ({ id: c.id, pct: readiness.get(c.id) ?? 0 }))}
-        />
+      <div className="relative z-10 flex items-center gap-5">
+        <ReadinessRing percentage={totalReadiness} variant="dark" sizeClass="w-28 h-28" />
 
-        <div className="flex-1 min-w-0">
-          <h2 className="text-lg font-display font-bold leading-tight text-cream">
-            Semester Readiness
-          </h2>
-          <p className="text-xs mt-1 leading-relaxed text-cream/45">
-            {hasAnyAttempt
-              ? `${goldCount} of ${quizCourses.length} courses mastered.${goldCount < quizCourses.length ? " Test yourself →" : " Well done!"}`
-              : `Prove you're exam ready →`}
-          </p>
+        {/* Legend */}
+        <div className="flex-1 min-w-0 space-y-1.5">
+          {(["gold", "silver", "bronze"] as const).map(tierName => {
+            const t = getTier(tierName === "gold" ? 80 : tierName === "silver" ? 50 : 1);
+            const count = courseIds.filter(id => {
+              const pct = readiness.get(id) ?? 0;
+              return getTier(pct).name === tierName;
+            }).length;
+            return (
+              <div key={tierName} className="flex items-center gap-2 text-xs text-cream/60">
+                <span>{t.emoji}</span>
+                <span className="font-mono">{t.label}</span>
+                <span className={`ml-auto font-bold ${count > 0 ? "text-cream" : "text-cream/25"}`}>
+                  {count} {count === 1 ? "course" : "courses"}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
