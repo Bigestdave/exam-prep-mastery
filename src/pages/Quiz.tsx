@@ -25,7 +25,7 @@ export default function Quiz() {
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const isFreePreview = !isOwned;
-  const FREE_PREVIEW_LIMIT = 5;
+  const FREE_PREVIEW_LIMIT = 10;
   const QUIZ_SIZE = 25;
   const allQuestions = questions;
 
