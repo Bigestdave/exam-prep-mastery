@@ -34,21 +34,20 @@ export default function Quiz() {
 
   useEffect(() => {
     if (questions.length === 0) return;
-    console.log(`[Quiz] Setting active questions from ${questions.length} total, isFreePreview=${isFreePreview}`);
     if (isFreePreview) {
       setActiveQuestions(questions.slice(0, FREE_PREVIEW_LIMIT));
     } else {
-      // Show ALL questions temporarily to debug
+      // Shuffle and pick up to QUIZ_SIZE
       const shuffled = [...questions].sort(() => Math.random() - 0.5);
-      setActiveQuestions(shuffled);
+      setActiveQuestions(shuffled.slice(0, QUIZ_SIZE));
     }
   }, [questions, isFreePreview]);
 
-  // DEBUG: Temporarily disable redirect so we can see what's happening
   useEffect(() => {
     if (!user) navigate("/login");
-    // REMOVED: auto-redirect when no quiz data — we want to see the debug info
-  }, [user, navigate]);
+    // Only redirect if quiz data is truly missing — free preview users should still see the quiz
+    if (!isLoading && !hasQuizData && id) navigate(`/course/${id}`);
+  }, [user, isLoading, hasQuizData, id, navigate]);
 
   const currentQuestion = activeQuestions[currentIndex];
   const options = currentQuestion?.quiz_options ?? [];
