@@ -35,10 +35,17 @@ function tryParseMCQs(answerText: string): Array<{text: string; is_correct: bool
   return parsed.length >= 3 ? parsed : null; // Only use if we found enough MCQs
 }
 
-// Pick a random subset of MCQs and create a single quiz option set
-function pickRandomMCQ(mcqs: Array<{text: string; is_correct: boolean}[]>): {text: string; is_correct: boolean}[] {
-  const idx = Math.floor(Math.random() * mcqs.length);
-  return mcqs[idx];
+// Convert parsed MCQs to Edge Function quiz format for content JSONB
+function mcqsToQuizFormat(questionText: string, mcqs: Array<{ question: string; options: {text: string; is_correct: boolean}[] }>): any[] {
+  return mcqs.map(mcq => {
+    const correctIndex = mcq.options.findIndex(o => o.is_correct);
+    return {
+      question: mcq.question,
+      options: mcq.options.map(o => o.text),
+      correct_index: correctIndex,
+      hint: `From: ${questionText}`,
+    };
+  });
 }
 
 serve(async (req) => {
