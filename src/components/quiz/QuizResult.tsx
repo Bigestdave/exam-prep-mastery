@@ -366,10 +366,9 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
                           <span className={`font-bold ${segTier.color}`}>{segTier.emoji} {seg.pct}%</span>
                         </>
                       ) : (
-                        <>
-                          <span className="text-muted-foreground/30">—</span>
-                          <Lock className="w-3 h-3 text-muted-foreground/30" />
-                        </>
+                        <span className="text-[11px] text-muted-foreground/60 italic">
+                          Take quiz to reveal
+                        </span>
                       )}
                     </div>
                   </div>
