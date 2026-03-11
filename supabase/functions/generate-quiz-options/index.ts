@@ -123,8 +123,14 @@ serve(async (req) => {
     }
 
     let processed = 0;
+    
+    // Filter out questions that already have quizzes in content
+    const toProcess = force ? questions : questions.filter((q: any) => {
+      const c = q.content;
+      return !c || !c.quizzes || !Array.isArray(c.quizzes) || c.quizzes.length === 0;
+    });
 
-    for (const q of questions) {
+    for (const q of toProcess) {
       try {
         // STRATEGY 1: Try to parse existing MCQs from the answer_text
         const existingMCQs = tryParseMCQs(q.answer_text);
