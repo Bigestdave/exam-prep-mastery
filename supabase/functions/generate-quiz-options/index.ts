@@ -91,19 +91,19 @@ serve(async (req) => {
       courseId = course.id;
     }
 
-    // If force mode, clear existing quiz_options first
+    // If force mode, clear existing content quizzes and quiz_options
     if (force) {
       await supabase
         .from("course_questions")
-        .update({ quiz_options: null })
+        .update({ quiz_options: null, content: null })
         .eq("course_id", courseId);
     }
 
+    // Fetch questions that don't yet have content with quizzes
     const { data: questions, error: qError } = await supabase
       .from("course_questions")
-      .select("id, question_index, question_text, answer_text")
+      .select("id, question_index, question_text, answer_text, content")
       .eq("course_id", courseId)
-      .is("quiz_options", null)
       .order("question_index")
       .limit(batchLimit);
 
