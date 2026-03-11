@@ -34,10 +34,14 @@ export default function Quiz() {
 
   useEffect(() => {
     if (questions.length === 0) return;
-    // Always shuffle — free preview users get random questions too
-    const shuffled = [...questions].sort(() => Math.random() - 0.5);
-    const limit = isFreePreview ? FREE_PREVIEW_LIMIT : QUIZ_SIZE;
-    setActiveQuestions(shuffled.slice(0, limit));
+    if (isFreePreview) {
+      // Fixed first 10 questions by question_index — consistent preview for marketing
+      setActiveQuestions(questions.slice(0, FREE_PREVIEW_LIMIT));
+    } else {
+      // Shuffle for paid users — different experience each attempt
+      const shuffled = [...questions].sort(() => Math.random() - 0.5);
+      setActiveQuestions(shuffled.slice(0, QUIZ_SIZE));
+    }
   }, [questions, isFreePreview]);
 
   useEffect(() => {

@@ -137,9 +137,9 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
         <div className={`absolute w-80 h-80 rounded-full blur-[100px] ${tier.accentGlow} opacity-60`} />
 
         <motion.div
-          initial={{ scale: 3, opacity: 0, rotate: -15 }}
+          initial={{ scale: 1.8, opacity: 0, rotate: -6 }}
           animate={{ scale: 1, opacity: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 160, damping: 14, delay: 0.1 }}
+          transition={{ type: "spring", stiffness: 120, damping: 18, delay: 0.1 }}
           className="text-center relative z-10"
         >
           {/* Big emoji */}
