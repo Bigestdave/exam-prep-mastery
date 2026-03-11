@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useBestQuizAttempt, useQuizData } from "@/hooks/useQuizData";
 import { useAuth } from "@/contexts/AuthContext";
-import { ArrowRight, Zap } from "lucide-react";
+import { ArrowRight, Lightbulb } from "lucide-react";
 
 interface QuizCTAProps {
   courseId: string;
@@ -43,14 +43,14 @@ export function QuizCTA({ courseId, courseCode }: QuizCTAProps) {
       >
         <div className="flex items-center gap-4 mb-3">
           <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center flex-shrink-0">
-            <Zap className="w-6 h-6 text-accent" />
+            <Lightbulb className="w-6 h-6 text-accent" />
           </div>
           <div className="flex-1">
             <h3 className="font-display font-bold text-foreground text-base" style={{ letterSpacing: '-0.05em' }}>
               Free Diagnostic Quiz
             </h3>
             <p className="text-xs text-muted-foreground mt-0.5">
-              5 questions to test your {courseCode} readiness
+              10 questions to test your {courseCode} readiness
             </p>
           </div>
         </div>
