@@ -31,8 +31,9 @@ function getScoringTier(percentage: number) {
       color: "text-accent",
       bg: "bg-accent/8",
       border: "border-accent/15",
-      stampBg: "from-[#0a2e12] via-[#0d3a17] to-[#041a08]",
-      accentGlow: "bg-accent/20",
+      stampBg: "from-[#2a1f0a] via-[#3d2b10] to-[#1a1204]",
+      accentGlow: "bg-[#c9a96e]/20",
+      confettiColors: ['#c9a96e', '#d4b87a', '#fbbf24', '#ffffff'],
     };
   }
   if (percentage >= 40) {
@@ -46,6 +47,7 @@ function getScoringTier(percentage: number) {
       border: "border-amber-200/30",
       stampBg: "from-[#2a1f0a] via-[#3a2a0d] to-[#1a1404]",
       accentGlow: "bg-amber-500/15",
+      confettiColors: ['#d97706', '#fbbf24', '#c9a96e', '#ffffff'],
     };
   }
   return {
@@ -56,8 +58,9 @@ function getScoringTier(percentage: number) {
     color: "text-muted-foreground",
     bg: "bg-secondary/50",
     border: "border-border",
-    stampBg: "from-[#1a1a1a] via-[#222] to-[#111]",
-    accentGlow: "bg-foreground/10",
+    stampBg: "from-[#1a1408] via-[#221c10] to-[#110e08]",
+    accentGlow: "bg-[#c9a96e]/10",
+    confettiColors: ['#8b7355', '#a0896a', '#c9a96e', '#ffffff'],
   };
 }
 
