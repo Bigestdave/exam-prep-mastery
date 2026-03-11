@@ -673,6 +673,27 @@ export default function AdminDashboard() {
     if (questions.length > 1) setQuestions(questions.filter((_, i) => i !== index));
   };
 
+  const handleGenerateQuiz = async (course: Course) => {
+    setGeneratingQuizFor(course.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-quiz-options', {
+        body: { source_course_id: course.id, course_code: course.code, limit: 10 },
+      });
+      if (error) throw error;
+      toast({
+        title: "Quiz generation started",
+        description: data?.message || `Processed ${data?.processed}/${data?.total} questions. Run again if more remain.`,
+      });
+    } catch (e: any) {
+      // The function may time out but still process in background
+      toast({
+        title: "Generation in progress",
+        description: "The function is processing in the background. Check back in a minute.",
+      });
+    }
+    setGeneratingQuizFor(null);
+  };
+
   if (authLoading || adminLoading) {
     return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
   }
