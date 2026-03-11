@@ -50,7 +50,7 @@ export function QuizCTA({ courseId, courseCode }: QuizCTAProps) {
               Free Diagnostic Quiz
             </h3>
             <p className="text-xs text-muted-foreground mt-0.5">
-              5 questions to test your {courseCode} readiness
+              10 questions to test your {courseCode} readiness
             </p>
           </div>
         </div>
