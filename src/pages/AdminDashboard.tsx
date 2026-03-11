@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen, ClipboardList, DollarSign, TrendingUp, Users, ShoppingCart, Crown, Upload, Calendar, Target, RefreshCw, Eye } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen, ClipboardList, DollarSign, TrendingUp, Users, ShoppingCart, Crown, Upload, Calendar, Target, RefreshCw, Eye, Zap } from "lucide-react";
 import { AmbassadorsTab } from "@/components/admin/AmbassadorsTab";
 import { UploadsTab } from "@/components/admin/UploadsTab";
 import { ContentReviewTab } from "@/components/admin/ContentReviewTab";
@@ -555,6 +555,7 @@ export default function AdminDashboard() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [generatingQuizFor, setGeneratingQuizFor] = useState<string | null>(null);
 
   const [code, setCode] = useState("");
   const [title, setTitle] = useState("");
@@ -670,6 +671,27 @@ export default function AdminDashboard() {
   };
   const removeQuestion = (index: number) => {
     if (questions.length > 1) setQuestions(questions.filter((_, i) => i !== index));
+  };
+
+  const handleGenerateQuiz = async (course: Course) => {
+    setGeneratingQuizFor(course.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-quiz-options', {
+        body: { source_course_id: course.id, course_code: course.code, limit: 10 },
+      });
+      if (error) throw error;
+      toast({
+        title: "Quiz generation started",
+        description: data?.message || `Processed ${data?.processed}/${data?.total} questions. Run again if more remain.`,
+      });
+    } catch (e: any) {
+      // The function may time out but still process in background
+      toast({
+        title: "Generation in progress",
+        description: "The function is processing in the background. Check back in a minute.",
+      });
+    }
+    setGeneratingQuizFor(null);
   };
 
   if (authLoading || adminLoading) {
@@ -806,7 +828,16 @@ export default function AdminDashboard() {
                           <TableCell>{course.level}</TableCell>
                           <TableCell>₦{course.price.toLocaleString()}</TableCell>
                           <TableCell>{course.questionCount}</TableCell>
-                          <TableCell className="text-right">
+                          <TableCell className="text-right space-x-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleGenerateQuiz(course)}
+                              disabled={generatingQuizFor === course.id}
+                              title="Generate quizzes from content"
+                            >
+                              {generatingQuizFor === course.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4 text-amber-500" />}
+                            </Button>
                             <Button variant="ghost" size="icon" onClick={() => openEditDialog(course)}><Pencil className="w-4 h-4" /></Button>
                             <Button variant="ghost" size="icon" onClick={() => handleDelete(course.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
                           </TableCell>
