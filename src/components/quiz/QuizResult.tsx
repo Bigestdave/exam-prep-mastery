@@ -287,6 +287,15 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
                       );
                     })}
                   </div>
+                  {/* Explanation / Hint */}
+                  {q.hint && (
+                    <div className="ml-8 mt-2 border-l-2 border-accent/30 pl-3">
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
+                        <span className="font-semibold text-accent text-[10px] uppercase tracking-wider">Why → </span>
+                        {q.hint}
+                      </p>
+                    </div>
+                  )}
                 </div>
               );
             })}
