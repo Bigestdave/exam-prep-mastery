@@ -7,25 +7,29 @@ const corsHeaders = {
 };
 
 // Try to parse existing MCQ content from answer_text (e.g. GST 107 format)
-function tryParseMCQs(answerText: string): Array<{ question: string; options: {text: string; is_correct: boolean}[] }> | null {
-  // Match patterns like: "1. Question?\na) Option\nb) Option\n- ANSWER: b) ..."
+function tryParseMCQs(answerText: string, debug = false): Array<{ question: string; options: {text: string; is_correct: boolean}[] }> | null {
   const questionBlocks = answerText.split(/\n(?=\d+\.\s)/);
   const parsed: Array<{ question: string; options: {text: string; is_correct: boolean}[] }> = [];
 
-  for (const block of questionBlocks) {
-    // Extract the question text (first line after the number)
+  if (debug) console.log(`Parser: ${questionBlocks.length} blocks from ${answerText.length} chars`);
+
+  for (let bi = 0; bi < questionBlocks.length; bi++) {
+    const block = questionBlocks[bi];
+    
     const questionMatch = block.match(/^\d+\.\s*(.+?)(?:\n|$)/);
     const questionText = questionMatch ? questionMatch[1].trim() : '';
     
-    // Find options (a-d patterns)
-    const optionMatches = block.match(/^[a-d]\)\s*(.+)$/gm);
-    // Find answer
-    const answerMatch = block.match(/ANSWER:\s*([a-d])\)/i);
+    const optionMatches = block.match(/^[a-d]\)\s*.+$/gm);
+    const answerMatch = block.match(/ANSWER:\s*([a-dA-D])\)/i);
     
-    if (optionMatches && optionMatches.length >= 4 && answerMatch && questionText) {
+    if (debug && bi < 3) {
+      console.log(`Block ${bi}: q="${questionText?.substring(0,40)}" opts=${optionMatches?.length ?? 0} ans=${answerMatch?.[1] ?? 'none'}`);
+    }
+    
+    if (optionMatches && optionMatches.length >= 2 && answerMatch && questionText) {
       const correctLetter = answerMatch[1].toLowerCase();
       const options = optionMatches.slice(0, 4).map((opt, i) => {
-        const letter = String.fromCharCode(97 + i); // a, b, c, d
+        const letter = String.fromCharCode(97 + i);
         const text = opt.replace(/^[a-d]\)\s*/, '').trim();
         return { text, is_correct: letter === correctLetter };
       });
@@ -36,6 +40,7 @@ function tryParseMCQs(answerText: string): Array<{ question: string; options: {t
     }
   }
   
+  if (debug) console.log(`Parser result: ${parsed.length} MCQs found`);
   return parsed.length >= 1 ? parsed : null;
 }
 
