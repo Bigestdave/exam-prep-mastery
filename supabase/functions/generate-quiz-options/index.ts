@@ -7,38 +7,55 @@ const corsHeaders = {
 };
 
 // Try to parse existing MCQ content from answer_text (e.g. GST 107 format)
-function tryParseMCQs(answerText: string): Array<{text: string; is_correct: boolean}[]> | null {
-  // Match patterns like: "1. Question?\na) Option\nb) Option\n- ANSWER: b) ..."
+function tryParseMCQs(answerText: string, debug = false): Array<{ question: string; options: {text: string; is_correct: boolean}[] }> | null {
   const questionBlocks = answerText.split(/\n(?=\d+\.\s)/);
-  const parsed: Array<{text: string; is_correct: boolean}[]> = [];
+  const parsed: Array<{ question: string; options: {text: string; is_correct: boolean}[] }> = [];
 
-  for (const block of questionBlocks) {
-    // Find options (a-d patterns)
-    const optionMatches = block.match(/^[a-d]\)\s*(.+)$/gm);
-    // Find answer
-    const answerMatch = block.match(/ANSWER:\s*([a-d])\)/i);
+  if (debug) console.log(`Parser: ${questionBlocks.length} blocks from ${answerText.length} chars`);
+
+  for (let bi = 0; bi < questionBlocks.length; bi++) {
+    const block = questionBlocks[bi];
     
-    if (optionMatches && optionMatches.length >= 4 && answerMatch) {
+    // Use multiline flag so ^ matches start of line within the block
+    const questionMatch = block.match(/^\d+\.\s*(.+)/m);
+    const questionText = questionMatch ? questionMatch[1].trim() : '';
+    
+    const optionMatches = block.match(/^[a-dA-D]\)\s*.+$/gm);
+    const answerMatch = block.match(/ANSWER:\s*([a-dA-D])\)/i);
+    
+    if (debug && bi < 3) {
+      console.log(`Block ${bi}: first30="${block.substring(0,30).replace(/\n/g,'\\n')}" q="${questionText?.substring(0,40)}" opts=${optionMatches?.length ?? 0} ans=${answerMatch?.[1] ?? 'none'}`);
+    }
+    
+    if (optionMatches && optionMatches.length >= 2 && answerMatch && questionText) {
       const correctLetter = answerMatch[1].toLowerCase();
       const options = optionMatches.slice(0, 4).map((opt, i) => {
-        const letter = String.fromCharCode(97 + i); // a, b, c, d
-        const text = opt.replace(/^[a-d]\)\s*/, '').trim();
+        const letter = String.fromCharCode(97 + i);
+        const text = opt.replace(/^[a-dA-D]\)\s*/, '').trim();
         return { text, is_correct: letter === correctLetter };
       });
       
       if (options.some(o => o.is_correct)) {
-        parsed.push(options);
+        parsed.push({ question: questionText, options });
       }
     }
   }
   
-  return parsed.length >= 3 ? parsed : null; // Only use if we found enough MCQs
+  if (debug) console.log(`Parser result: ${parsed.length} MCQs found`);
+  return parsed.length >= 1 ? parsed : null;
 }
 
-// Pick a random subset of MCQs and create a single quiz option set
-function pickRandomMCQ(mcqs: Array<{text: string; is_correct: boolean}[]>): {text: string; is_correct: boolean}[] {
-  const idx = Math.floor(Math.random() * mcqs.length);
-  return mcqs[idx];
+// Convert parsed MCQs to Edge Function quiz format for content JSONB
+function mcqsToQuizFormat(questionText: string, mcqs: Array<{ question: string; options: {text: string; is_correct: boolean}[] }>): any[] {
+  return mcqs.map(mcq => {
+    const correctIndex = mcq.options.findIndex(o => o.is_correct);
+    return {
+      question: mcq.question,
+      options: mcq.options.map(o => o.text),
+      correct_index: correctIndex,
+      hint: `From: ${questionText}`,
+    };
+  });
 }
 
 serve(async (req) => {
@@ -80,19 +97,19 @@ serve(async (req) => {
       courseId = course.id;
     }
 
-    // If force mode, clear existing quiz_options first
+    // If force mode, clear existing content quizzes and quiz_options
     if (force) {
       await supabase
         .from("course_questions")
-        .update({ quiz_options: null })
+        .update({ quiz_options: null, content: null })
         .eq("course_id", courseId);
     }
 
+    // Fetch questions that don't yet have content with quizzes
     const { data: questions, error: qError } = await supabase
       .from("course_questions")
-      .select("id, question_index, question_text, answer_text")
+      .select("id, question_index, question_text, answer_text, content")
       .eq("course_id", courseId)
-      .is("quiz_options", null)
       .order("question_index")
       .limit(batchLimit);
 
@@ -112,26 +129,32 @@ serve(async (req) => {
     }
 
     let processed = 0;
+    
+    // Filter out questions that already have quizzes in content
+    const toProcess = force ? questions : questions.filter((q: any) => {
+      const c = q.content;
+      return !c || !c.quizzes || !Array.isArray(c.quizzes) || c.quizzes.length === 0;
+    });
 
-    for (const q of questions) {
+    for (const q of toProcess) {
       try {
         // STRATEGY 1: Try to parse existing MCQs from the answer_text
-        const existingMCQs = tryParseMCQs(q.answer_text);
+        const existingMCQs = tryParseMCQs(q.answer_text, true);
         
         if (existingMCQs && existingMCQs.length > 0) {
-          // Content already has MCQs - pick one at random
-          const quizOptions = pickRandomMCQ(existingMCQs);
+          // Convert ALL parsed MCQs to quiz format and store in content JSONB
+          const quizzes = mcqsToQuizFormat(q.question_text, existingMCQs);
           
           const { error: updateError } = await supabase
             .from("course_questions")
-            .update({ quiz_options: quizOptions })
+            .update({ content: { quizzes } })
             .eq("id", q.id);
 
           if (updateError) {
             console.error(`Update error for q${q.question_index}:`, updateError);
           } else {
             processed++;
-            console.log(`q${q.question_index}: Parsed existing MCQ directly from content`);
+            console.log(`q${q.question_index}: Extracted ${quizzes.length} MCQs into content.quizzes`);
           }
           continue;
         }
