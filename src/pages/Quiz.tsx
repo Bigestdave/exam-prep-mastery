@@ -26,8 +26,22 @@ export default function Quiz() {
 
   const isFreePreview = !isOwned;
   const FREE_PREVIEW_LIMIT = 5;
+  const QUIZ_SIZE = 25;
   const allQuestions = questions;
-  const activeQuestions = isFreePreview ? questions.slice(0, FREE_PREVIEW_LIMIT) : questions;
+
+  // Randomize and cap at QUIZ_SIZE for owned courses, FREE_PREVIEW_LIMIT for free
+  const [activeQuestions, setActiveQuestions] = useState<typeof questions>([]);
+
+  useEffect(() => {
+    if (questions.length === 0) return;
+    if (isFreePreview) {
+      setActiveQuestions(questions.slice(0, FREE_PREVIEW_LIMIT));
+    } else {
+      // Shuffle and pick up to QUIZ_SIZE
+      const shuffled = [...questions].sort(() => Math.random() - 0.5);
+      setActiveQuestions(shuffled.slice(0, QUIZ_SIZE));
+    }
+  }, [questions, isFreePreview]);
 
   useEffect(() => {
     if (!user) navigate("/login");

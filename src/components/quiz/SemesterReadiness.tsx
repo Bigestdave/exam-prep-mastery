@@ -93,17 +93,18 @@ export function SemesterReadiness({ courses }: SemesterReadinessProps) {
       </div>
 
       {/* Segment bar */}
-      {hasAnyAttempt && (
+      {quizCourses.length > 0 && (
         <div className="flex items-center gap-1.5 mt-6 relative z-10">
           {quizCourses.map(c => {
             const cpct = readiness.get(c.id) ?? 0;
             const tier = getTier(cpct);
+            const hasAttempt = cpct > 0;
             return (
               <div
                 key={c.id}
                 className="flex-1 h-1.5 rounded-full transition-all"
-                style={{ backgroundColor: tier.ringHsl }}
-                title={`${c.code}: ${cpct}% (${tier.label})`}
+                style={{ backgroundColor: hasAttempt ? tier.ringHsl : 'hsl(var(--muted-foreground) / 0.15)' }}
+                title={hasAttempt ? `${c.code}: ${cpct}% (${tier.label})` : `${c.code}: Take quiz to reveal`}
               />
             );
           })}

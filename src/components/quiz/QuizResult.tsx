@@ -156,7 +156,25 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
           <p className="text-sm text-foreground/80 leading-relaxed">
             {tier.message}
           </p>
+          {/* Near-win motivation */}
+          {percentage < 80 && percentage >= 40 && (
+            <p className="text-sm font-display font-bold text-foreground mt-3" style={{ letterSpacing: '-0.03em' }}>
+              You were {Math.ceil(total * 0.8) - score} question{Math.ceil(total * 0.8) - score !== 1 ? 's' : ''} away from Exam Ready. Retake to lock it in.
+            </p>
+          )}
+          {percentage < 40 && (
+            <p className="text-sm font-display font-bold text-foreground mt-3" style={{ letterSpacing: '-0.03em' }}>
+              You found {total - score} weak spots. Review the guides, then retake.
+            </p>
+          )}
         </div>
+
+        {/* Social proof */}
+        <p className="text-[11px] text-muted-foreground text-center mt-1 italic">
+          {percentage >= 80
+            ? "Top students lock in by retaking once more."
+            : "Students who scored 90%+ practiced at least 2 attempts."}
+        </p>
 
         {/* Upsell for free preview quizzes */}
         {isFreePreview && (
@@ -269,6 +287,15 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
                       );
                     })}
                   </div>
+                  {/* Explanation / Hint */}
+                  {q.hint && (
+                    <div className="ml-8 mt-2 border-l-2 border-accent/30 pl-3">
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
+                        <span className="font-semibold text-accent text-[10px] uppercase tracking-wider">Why → </span>
+                        {q.hint}
+                      </p>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -339,10 +366,9 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
                           <span className={`font-bold ${segTier.color}`}>{segTier.emoji} {seg.pct}%</span>
                         </>
                       ) : (
-                        <>
-                          <span className="text-muted-foreground/30">—</span>
-                          <Lock className="w-3 h-3 text-muted-foreground/30" />
-                        </>
+                        <span className="text-[11px] text-muted-foreground/60 italic">
+                          Take quiz to reveal
+                        </span>
                       )}
                     </div>
                   </div>
