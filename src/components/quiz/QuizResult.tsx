@@ -106,19 +106,15 @@ export default function QuizResult({ courseId, courseCode, courseTitle, score, t
 
       const frame = () => {
         confetti({
-          particleCount: percentage >= 80 ? 4 : 2,
+          particleCount: percentage >= 80 ? 3 : 2,
           angle: 60 + Math.random() * 60,
-          spread: 55 + Math.random() * 30,
-          origin: { x: Math.random(), y: 0.6 + Math.random() * 0.2 },
-          colors: percentage >= 80
-            ? ['#15803D', '#22c55e', '#fbbf24', '#ffffff']
-            : percentage >= 40
-              ? ['#d97706', '#fbbf24', '#ffffff']
-              : ['#6b7280', '#9ca3af', '#ffffff'],
-          gravity: 1.2,
-          scalar: 0.9,
+          spread: 45 + Math.random() * 20,
+          origin: { x: Math.random(), y: 0.5 + Math.random() * 0.2 },
+          colors: tier.confettiColors,
+          gravity: 1.4,
+          scalar: 0.8,
           drift: 0,
-          ticks: 120,
+          ticks: 100,
           disableForReducedMotion: true,
         });
         if (Date.now() < end) requestAnimationFrame(frame);
