@@ -169,6 +169,7 @@ export function useQuizData(courseId: string | undefined) {
           }
         }
 
+        console.log(`[useQuizData] Parsed ${parsed.length} quiz questions total`);
         setQuestions(parsed);
         setHasQuizData(parsed.length > 0);
       }
