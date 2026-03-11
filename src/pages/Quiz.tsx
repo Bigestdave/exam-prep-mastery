@@ -44,10 +44,11 @@ export default function Quiz() {
     }
   }, [questions, isFreePreview]);
 
+  // DEBUG: Temporarily disable redirect so we can see what's happening
   useEffect(() => {
     if (!user) navigate("/login");
-    if (!isLoading && !hasQuizData && id) navigate(`/course/${id}`);
-  }, [user, isLoading, hasQuizData, id, navigate]);
+    // REMOVED: auto-redirect when no quiz data — we want to see the debug info
+  }, [user, navigate]);
 
   const currentQuestion = activeQuestions[currentIndex];
   const options = currentQuestion?.quiz_options ?? [];
@@ -112,7 +113,42 @@ export default function Quiz() {
     );
   }
 
-  if (!course || !currentQuestion) return null;
+  // DEBUG: Show diagnostic info instead of blank screen
+  if (!currentQuestion) {
+    return (
+      <div className="min-h-screen bg-background p-6">
+        <div className="max-w-md mx-auto mt-20 bg-card border border-border rounded-2xl p-6 space-y-3">
+          <h2 className="text-lg font-bold text-foreground">🔍 Quiz Debug Info</h2>
+          <div className="text-sm text-muted-foreground space-y-1">
+            <p>Course ID: <code className="text-foreground">{id}</code></p>
+            <p>Course found: <code className="text-foreground">{course ? '✅ ' + course.code : '❌'}</code></p>
+            <p>Is owned: <code className="text-foreground">{isOwned ? '✅' : '❌'}</code></p>
+            <p>hasQuizData: <code className="text-foreground">{hasQuizData ? '✅' : '❌'}</code></p>
+            <p>Raw questions from hook: <code className="text-foreground">{questions.length}</code></p>
+            <p>Active questions: <code className="text-foreground">{activeQuestions.length}</code></p>
+            <p>Current index: <code className="text-foreground">{currentIndex}</code></p>
+          </div>
+          {questions.length > 0 && (
+            <div className="text-xs bg-muted p-3 rounded-lg overflow-auto max-h-40">
+              <p className="font-bold mb-1">First question sample:</p>
+              <pre>{JSON.stringify({
+                id: questions[0].id,
+                quiz_question_text: questions[0].quiz_question_text?.slice(0, 80),
+                options_count: questions[0].quiz_options?.length,
+                has_correct: questions[0].quiz_options?.some(o => o.is_correct),
+              }, null, 2)}</pre>
+            </div>
+          )}
+          <button
+            onClick={() => navigate(`/course/${id}`)}
+            className="w-full py-3 bg-foreground text-background rounded-xl font-bold text-sm"
+          >
+            Back to Course
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (showResult) {
     return (
