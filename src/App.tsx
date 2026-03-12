@@ -28,6 +28,7 @@ import VipRedirect from "./pages/VipRedirect";
 import Withdraw from "./pages/Withdraw";
 import Onboarding from "./pages/Onboarding";
 import ModifierDashboard from "./pages/ModifierDashboard";
+import BecomeAmbassador from "./pages/BecomeAmbassador";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
