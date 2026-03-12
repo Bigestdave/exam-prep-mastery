@@ -32,4 +32,6 @@ verify_jwt = false
 
 [functions.approve-ambassador]
 verify_jwt = false
+
+[functions.resolve-referrer]
 verify_jwt = false
