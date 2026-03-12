@@ -28,6 +28,7 @@ import VipRedirect from "./pages/VipRedirect";
 import Withdraw from "./pages/Withdraw";
 import Onboarding from "./pages/Onboarding";
 import ModifierDashboard from "./pages/ModifierDashboard";
+import BecomeAmbassador from "./pages/BecomeAmbassador";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -64,6 +65,7 @@ const AppContent = () => {
           <Route path="/ambassador" element={<AmbassadorDashboard />} />
           <Route path="/withdraw" element={<Withdraw />} />
           <Route path="/modifier" element={<ModifierDashboard />} />
+          <Route path="/become-ambassador" element={<BecomeAmbassador />} />
           <Route path="/vip/:code" element={<VipRedirect />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -13,8 +13,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen, ClipboardList, DollarSign, TrendingUp, Users, ShoppingCart, Crown, Upload, Calendar, Target, RefreshCw, Eye, Zap } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen, ClipboardList, DollarSign, TrendingUp, Users, ShoppingCart, Crown, Upload, Calendar, Target, RefreshCw, Eye, Zap, Mail } from "lucide-react";
 import { AmbassadorsTab } from "@/components/admin/AmbassadorsTab";
+import { AmbassadorApplicationsTab } from "@/components/admin/AmbassadorApplicationsTab";
 import { UploadsTab } from "@/components/admin/UploadsTab";
 import { ContentReviewTab } from "@/components/admin/ContentReviewTab";
 import { ContentQueueTab } from "@/components/admin/ContentQueueTab";
@@ -793,6 +794,7 @@ export default function AdminDashboard() {
             <TabsTrigger value="semester" className="gap-2"><Target className="w-4 h-4" />Departments</TabsTrigger>
             <TabsTrigger value="uploads" className="gap-2"><Upload className="w-4 h-4" />Uploads</TabsTrigger>
             <TabsTrigger value="ambassadors" className="gap-2"><Crown className="w-4 h-4" />Ambassadors</TabsTrigger>
+            <TabsTrigger value="applications" className="gap-2"><Mail className="w-4 h-4" />Applications</TabsTrigger>
             <TabsTrigger value="survey" className="gap-2"><ClipboardList className="w-4 h-4" />Survey</TabsTrigger>
           </TabsList>
 
@@ -871,6 +873,10 @@ export default function AdminDashboard() {
 
           <TabsContent value="ambassadors">
             <AmbassadorsTab />
+          </TabsContent>
+
+          <TabsContent value="applications">
+            <AmbassadorApplicationsTab />
           </TabsContent>
 
           <TabsContent value="survey">

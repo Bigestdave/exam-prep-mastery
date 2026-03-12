@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import sovereignKey from "@/assets/sovereign-key.png";
 
 export function LandingFooter() {
@@ -11,7 +12,13 @@ export function LandingFooter() {
             </div>
             <span className="font-display font-semibold text-foreground">LCU Prep</span>
           </div>
-          <p>© 2026 LCU Prep. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+            <Link to="/become-ambassador" className="hover:text-foreground transition-colors">
+              Become an Ambassador
+            </Link>
+            <span>·</span>
+            <p>© 2026 LCU Prep. All rights reserved.</p>
+          </div>
         </div>
       </div>
     </footer>
