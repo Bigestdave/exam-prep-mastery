@@ -4,7 +4,8 @@ import { Header } from "@/components/Header";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { BookPlus, BookOpen, LogOut, ArrowLeft, ChevronRight, User } from "lucide-react";
+import { BookPlus, BookOpen, LogOut, ArrowLeft, ChevronRight, User, Megaphone } from "lucide-react";
+import { useRole } from "@/hooks/useRole";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 
 export default function Profile() {
