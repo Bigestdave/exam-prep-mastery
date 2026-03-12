@@ -1,16 +1,23 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
 import { Header } from "@/components/Header";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Crown, CheckCircle, Loader2, Zap, DollarSign, Users } from "lucide-react";
+import { Crown, CheckCircle, Loader2, ArrowRight } from "lucide-react";
 import sovereignKey from "@/assets/sovereign-key.png";
+
+const ease = [0.25, 0.46, 0.45, 0.94] as const;
+const fadeUp = (delay: number) => ({
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { delay, duration: 0.5, ease },
+});
 
 export default function BecomeAmbassador() {
   const { user, profile } = useAuth();
@@ -45,7 +52,6 @@ export default function BecomeAmbassador() {
         }
       } else {
         setSubmitted(true);
-        toast({ title: "Application submitted! 🎉", description: "We'll review it and get back to you." });
       }
     } catch (err) {
       toast({ title: "Something went wrong", description: err instanceof Error ? err.message : "Try again later.", variant: "destructive" });
@@ -57,11 +63,22 @@ export default function BecomeAmbassador() {
     return (
       <div className="min-h-screen bg-background">
         <Header isLoggedIn={!!user} userName={profile?.full_name || ''} />
-        <div className="container max-w-lg py-20 text-center">
-          <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-            <h1 className="text-2xl font-display font-bold mb-2">Application Received!</h1>
-            <p className="text-muted-foreground">We'll review your application and reach out via email once you're approved.</p>
+        <div className="container max-w-lg py-24 px-4 text-center">
+          <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.5, ease }}>
+            <div className="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-10 h-10 text-accent" />
+            </div>
+            <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-3">
+              Application Received
+            </h1>
+            <p className="text-muted-foreground leading-relaxed mb-8 max-w-sm mx-auto">
+              We'll review your application and reach out via email once you're approved. This usually takes less than 24 hours.
+            </p>
+            <Link to="/">
+              <Button variant="outline" size="lg">
+                Back to Home
+              </Button>
+            </Link>
           </motion.div>
         </div>
       </div>
@@ -71,88 +88,158 @@ export default function BecomeAmbassador() {
   return (
     <div className="min-h-screen bg-background">
       <Header isLoggedIn={!!user} userName={profile?.full_name || ''} />
-      
-      <div className="container max-w-2xl py-12 px-4">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            <Crown className="w-4 h-4" /> Ambassador Program
-          </div>
-          <h1 className="text-3xl md:text-4xl font-display font-bold mb-3">
-            Become an LCU Prep Ambassador
-          </h1>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Represent your department, help students prepare, and earn money doing it.
-          </p>
-        </motion.div>
 
-        {/* Benefits */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-          {[
-            { icon: DollarSign, title: "Earn up to ₦30K", desc: "Per semester through milestones" },
-            { icon: Users, title: "Help your dept", desc: "Be the go-to prep resource" },
-            { icon: Zap, title: "Exclusive access", desc: "Upload materials & track impact" },
-          ].map((b, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 * i }}>
-              <Card className="text-center p-4">
-                <b.icon className="w-8 h-8 mx-auto mb-2 text-primary" />
-                <h3 className="font-semibold text-sm">{b.title}</h3>
-                <p className="text-xs text-muted-foreground">{b.desc}</p>
-              </Card>
+      {/* Hero */}
+      <section className="pt-8 pb-12 md:pt-12 md:pb-16">
+        <div className="container px-4">
+          <div className="max-w-2xl mx-auto text-left md:text-center">
+            <motion.div
+              className="inline-flex items-center gap-2 glass-pill rounded-full text-muted-foreground px-5 py-2 text-xs font-mono font-semibold tracking-[0.15em] uppercase mb-8"
+              {...fadeUp(0)}
+            >
+              <Crown className="w-4 h-4" />
+              Ambassador Program
             </motion.div>
-          ))}
+
+            <motion.h1 className="text-foreground leading-[1.1] mb-6" {...fadeUp(0.1)}>
+              <span className="block text-[32px] md:text-5xl font-display font-bold">
+                Represent your department.
+              </span>
+              <span className="block text-[32px] md:text-5xl font-serif italic text-accent mt-1">
+                Get paid for it.
+              </span>
+            </motion.h1>
+
+            <motion.p
+              className="text-base md:text-lg text-muted-foreground mb-4 max-w-lg mx-auto leading-relaxed"
+              {...fadeUp(0.2)}
+            >
+              Ambassadors upload course materials, help students in their department prepare, and earn up to ₦30,000 per semester through our milestone system.
+            </motion.p>
+          </div>
         </div>
+      </section>
 
-        {/* Application Form */}
-        <Card>
-          <CardContent className="pt-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <Label htmlFor="email">Email address *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="your@email.com"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  required
-                  className="mt-1"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Must match the email you signed up with on LCU Prep.
-                </p>
+      {/* How it works + Form */}
+      <section className="pb-16 md:pb-24">
+        <div className="container px-4">
+          <div className="max-w-2xl mx-auto">
+
+            {/* Milestones */}
+            <motion.div className="mb-12" {...fadeUp(0.3)}>
+              <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-6">
+                How You Earn
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {[
+                  { milestone: "40 unlocks", reward: "₦7,500", label: "Tier 1" },
+                  { milestone: "80 unlocks", reward: "+₦7,500", label: "Tier 2" },
+                  { milestone: "150 unlocks", reward: "+₦15,000", label: "Tier 3" },
+                ].map((tier, i) => (
+                  <div
+                    key={i}
+                    className="relative rounded-xl border border-border bg-card p-5 card-float text-center"
+                  >
+                    <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground mb-2">
+                      {tier.label}
+                    </p>
+                    <p className="text-2xl font-display font-bold text-foreground mb-1">
+                      {tier.reward}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      at {tier.milestone}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-center text-xs text-muted-foreground mt-4 font-mono">
+                Total potential: <span className="text-foreground font-semibold">₦30,000</span> per semester + leaderboard prizes
+              </p>
+            </motion.div>
+
+            {/* Application Form */}
+            <motion.div {...fadeUp(0.4)}>
+              <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-6">
+                Apply Now
+              </p>
+
+              <div className="rounded-xl border border-border bg-card p-6 md:p-8 card-shadow">
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div>
+                    <Label htmlFor="email" className="text-sm font-medium text-foreground">
+                      Email address
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="your@email.com"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      required
+                      className="mt-1.5"
+                    />
+                    <p className="text-[11px] text-muted-foreground mt-1.5">
+                      Must match the email you signed up with on LCU Prep.
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="name" className="text-sm font-medium text-foreground">
+                      Full name
+                    </Label>
+                    <Input
+                      id="name"
+                      placeholder="Your full name"
+                      value={fullName}
+                      onChange={e => setFullName(e.target.value)}
+                      className="mt-1.5"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="reason" className="text-sm font-medium text-foreground">
+                      Why do you want to be an ambassador?
+                      <span className="text-muted-foreground font-normal ml-1">(optional)</span>
+                    </Label>
+                    <Textarea
+                      id="reason"
+                      placeholder="Tell us about yourself and your department..."
+                      value={reason}
+                      onChange={e => setReason(e.target.value)}
+                      className="mt-1.5 min-h-[100px]"
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full group"
+                    disabled={submitting || !email.trim()}
+                  >
+                    {submitting ? (
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    ) : (
+                      <Crown className="w-4 h-4 mr-2" />
+                    )}
+                    Submit Application
+                    {!submitting && (
+                      <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                    )}
+                  </Button>
+                </form>
               </div>
 
-              <div>
-                <Label htmlFor="name">Full name</Label>
-                <Input
-                  id="name"
-                  placeholder="Your full name"
-                  value={fullName}
-                  onChange={e => setFullName(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="reason">Why do you want to be an ambassador? (optional)</Label>
-                <Textarea
-                  id="reason"
-                  placeholder="Tell us about yourself and your department..."
-                  value={reason}
-                  onChange={e => setReason(e.target.value)}
-                  className="mt-1"
-                  rows={3}
-                />
-              </div>
-
-              <Button type="submit" className="w-full" disabled={submitting || !email.trim()}>
-                {submitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Crown className="w-4 h-4 mr-2" />}
-                Submit Application
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+              <p className="text-center text-xs text-muted-foreground mt-6">
+                Don't have an account yet?{" "}
+                <Link to="/signup" className="text-foreground font-medium underline underline-offset-4 hover:text-accent transition-colors">
+                  Sign up first
+                </Link>
+                , then come back here.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
