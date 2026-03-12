@@ -76,6 +76,17 @@ export default function AmbassadorDashboard() {
   const [achievedMilestones, setAchievedMilestones] = useState<MilestoneRecord[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
 
+  // Referral stats
+  interface ReferralRecord {
+    id: string;
+    referred_id: string;
+    status: string;
+    created_at: string;
+    referred_name?: string;
+  }
+  const [referrals, setReferrals] = useState<ReferralRecord[]>([]);
+  const [referralsLoading, setReferralsLoading] = useState(true);
+
   // Bounty form state
   const [courseCode, setCourseCode] = useState("");
   const [courseTitle, setCourseTitle] = useState("");
@@ -157,6 +168,38 @@ export default function AmbassadorDashboard() {
 
     fetchStats();
   }, [user, profile]);
+
+  // Fetch referrals for this ambassador
+  useEffect(() => {
+    if (!user) return;
+    const fetchReferrals = async () => {
+      setReferralsLoading(true);
+      const { data: refs } = await supabase
+        .from("referrals")
+        .select("id, referred_id, status, created_at")
+        .eq("referrer_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (refs && refs.length > 0) {
+        // Fetch referred user names
+        const referredIds = refs.map(r => r.referred_id);
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", referredIds);
+
+        const nameMap = new Map(profiles?.map(p => [p.id, p.full_name]) || []);
+        setReferrals(refs.map(r => ({
+          ...r,
+          referred_name: nameMap.get(r.referred_id) || "Unknown",
+        })));
+      } else {
+        setReferrals([]);
+      }
+      setReferralsLoading(false);
+    };
+    fetchReferrals();
+  }, [user]);
 
   // Fetch uploads
   useEffect(() => {
@@ -690,6 +733,52 @@ export default function AmbassadorDashboard() {
                 >
                   <MessageCircle className="w-4 h-4" /> Share on WhatsApp
                 </motion.button>
+              </div>
+
+              {/* Referral Stats */}
+              <div className="bg-card rounded-3xl card-float p-6 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-accent" />
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Your Referrals</h2>
+                </div>
+
+                {referralsLoading ? (
+                  <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>
+                ) : referrals.length === 0 ? (
+                  <p className="text-xs text-muted-foreground text-center py-6">No referrals yet. Share your VIP link to get started!</p>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-secondary/60 rounded-2xl p-3 text-center">
+                        <p className="text-2xl font-mono font-bold">{referrals.length}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Signups</p>
+                      </div>
+                      <div className="bg-secondary/60 rounded-2xl p-3 text-center">
+                        <p className="text-2xl font-mono font-bold">{referrals.filter(r => r.status === "converted").length}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Converted</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      {referrals.slice(0, 10).map(r => (
+                        <div key={r.id} className="flex items-center justify-between bg-secondary/40 rounded-xl px-4 py-2.5">
+                          <div>
+                            <p className="text-sm font-medium">{r.referred_name}</p>
+                            <p className="text-[10px] text-muted-foreground">
+                              {new Date(r.created_at).toLocaleDateString("en-NG", { day: "numeric", month: "short" })}
+                            </p>
+                          </div>
+                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                            r.status === "converted" 
+                              ? "bg-accent/10 text-accent" 
+                              : "bg-muted text-muted-foreground"
+                          }`}>
+                            {r.status === "converted" ? "Purchased" : "Pending"}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Quick Dept Stats Reminder */}
