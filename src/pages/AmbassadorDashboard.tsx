@@ -169,6 +169,38 @@ export default function AmbassadorDashboard() {
     fetchStats();
   }, [user, profile]);
 
+  // Fetch referrals for this ambassador
+  useEffect(() => {
+    if (!user) return;
+    const fetchReferrals = async () => {
+      setReferralsLoading(true);
+      const { data: refs } = await supabase
+        .from("referrals")
+        .select("id, referred_id, status, created_at")
+        .eq("referrer_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (refs && refs.length > 0) {
+        // Fetch referred user names
+        const referredIds = refs.map(r => r.referred_id);
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", referredIds);
+
+        const nameMap = new Map(profiles?.map(p => [p.id, p.full_name]) || []);
+        setReferrals(refs.map(r => ({
+          ...r,
+          referred_name: nameMap.get(r.referred_id) || "Unknown",
+        })));
+      } else {
+        setReferrals([]);
+      }
+      setReferralsLoading(false);
+    };
+    fetchReferrals();
+  }, [user]);
+
   // Fetch uploads
   useEffect(() => {
     if (!user || !department) return;
