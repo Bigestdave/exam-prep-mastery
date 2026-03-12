@@ -120,13 +120,48 @@ export default function BecomeAmbassador() {
         </div>
       </section>
 
-      {/* How it works + Form */}
+      {/* How It Works */}
+      <section className="pb-12 md:pb-16">
+        <div className="container px-4">
+          <div className="max-w-2xl mx-auto">
+            <motion.div {...fadeUp(0.3)}>
+              <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-6">
+                How It Works
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {[
+                  { step: "01", title: "Upload Materials", desc: "Collect past questions & tutorial sheets from your department and upload them." },
+                  { step: "02", title: "We Process Them", desc: "Our AI converts them into structured answers and quizzes — you don't write anything." },
+                  { step: "03", title: "Students Unlock", desc: "When students in your department unlock courses, you earn per milestone hit." },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl border border-border bg-card p-5 card-float"
+                  >
+                    <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-accent font-bold mb-2">
+                      Step {item.step}
+                    </p>
+                    <p className="text-sm font-display font-semibold text-foreground mb-1">
+                      {item.title}
+                    </p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* How You Earn + Form */}
       <section className="pb-16 md:pb-24">
         <div className="container px-4">
           <div className="max-w-2xl mx-auto">
 
             {/* Milestones */}
-            <motion.div className="mb-12" {...fadeUp(0.3)}>
+            <motion.div className="mb-12" {...fadeUp(0.4)}>
               <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-6">
                 How You Earn
               </p>
