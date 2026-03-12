@@ -130,7 +130,7 @@ export default function BecomeAmbassador() {
               <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-6">
                 How You Earn
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 {[
                   { milestone: "40 unlocks", reward: "₦7,500", label: "Tier 1" },
                   { milestone: "80 unlocks", reward: "+₦7,500", label: "Tier 2" },
@@ -152,8 +152,29 @@ export default function BecomeAmbassador() {
                   </div>
                 ))}
               </div>
-              <p className="text-center text-xs text-muted-foreground mt-4 font-mono">
-                Total potential: <span className="text-foreground font-semibold">₦30,000</span> per semester + leaderboard prizes
+
+              {/* Leaderboard prizes */}
+              <div className="rounded-xl border border-border bg-card p-5 card-float mb-4">
+                <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground mb-3 text-center">
+                  Semester Leaderboard Prizes
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
+                  {[
+                    { pos: "🥇 1st", amount: "₦50,000" },
+                    { pos: "🥈 2nd", amount: "₦30,000" },
+                    { pos: "🥉 3rd", amount: "₦20,000" },
+                    { pos: "4th–5th", amount: "₦10,000" },
+                  ].map((p, i) => (
+                    <div key={i} className="flex items-center gap-1.5">
+                      <span className="text-muted-foreground text-xs">{p.pos}</span>
+                      <span className="font-display font-bold text-foreground">{p.amount}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <p className="text-center text-xs text-muted-foreground font-mono">
+                Total potential: <span className="text-foreground font-semibold">₦80,000+</span> per semester
               </p>
             </motion.div>
 
