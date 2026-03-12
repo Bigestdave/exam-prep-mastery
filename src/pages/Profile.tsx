@@ -10,6 +10,7 @@ import { TextShimmer } from "@/components/ui/text-shimmer";
 
 export default function Profile() {
   const { user, profile, isLoading, logout, purchases } = useAuth();
+  const { isAmbassador } = useRole();
   const navigate = useNavigate();
 
   useEffect(() => {
