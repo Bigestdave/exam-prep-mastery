@@ -132,7 +132,7 @@ export default function BecomeAmbassador() {
                 {[
                   { step: "01", title: "Upload Materials", desc: "Collect course materials & tutorial questions from your department and upload them." },
                   { step: "02", title: "We Process Them", desc: "Our team creates First Class answers and quizzes, you don't write anything." },
-                  { step: "03", title: "Students Unlock", desc: "When students in your department unlock courses, you earn per milestone hit." },
+                  { step: "03", title: "Share Your Link", desc: "Share your unique referral link with students in your department to help them prepare and earn per unlock." },
                 ].map((item, i) => (
                   <div
                     key={i}
