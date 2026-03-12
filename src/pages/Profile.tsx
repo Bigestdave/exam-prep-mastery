@@ -149,8 +149,27 @@ export default function Profile() {
             <ChevronRight className="w-5 h-5 text-muted-foreground" />
           </Link>
 
+          {/* Ambassador Dashboard */}
+          {isAmbassador && (
+            <Link
+              to="/ambassador"
+              className="w-full bg-card rounded-2xl border border-border shadow-card p-5 flex items-center justify-between hover:bg-secondary/30 transition-colors group btn-thud"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <Megaphone className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-display font-semibold text-foreground">Ambassador Dashboard</h3>
+                  <p className="text-sm text-muted-foreground">Track referrals & earnings</p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </Link>
+          )}
+
           {/* Logout */}
-          <Button 
+          <Button
             variant="ghost" 
             className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10 rounded-2xl h-14 px-5"
             onClick={handleLogout}

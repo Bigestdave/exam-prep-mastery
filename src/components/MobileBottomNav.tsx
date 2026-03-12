@@ -94,7 +94,7 @@ export function MobileBottomNav() {
           <>
             <NavItem
               to="/ambassador"
-              icon={<Upload className={cn("w-6 h-6", activeState === "ambassador" && "fill-current")} />}
+              icon={<Megaphone className={cn("w-6 h-6", activeState === "ambassador" && "fill-current")} />}
               label="Upload"
               isActive={activeState === "ambassador"}
             />
