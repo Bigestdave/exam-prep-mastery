@@ -28,9 +28,24 @@ export default function Signup() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [departmentOpen, setDepartmentOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [referrerName, setReferrerName] = useState<string | null>(null);
   const { signup } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Look up referrer name from stored referral code
+  useEffect(() => {
+    const code = localStorage.getItem("referral_code");
+    if (!code) return;
+    supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("referral_code", code)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.full_name) setReferrerName(data.full_name);
+      });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
