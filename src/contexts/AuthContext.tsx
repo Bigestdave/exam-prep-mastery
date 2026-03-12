@@ -127,12 +127,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         
-        if (session?.user) {
-          setTimeout(() => {
+      if (session?.user) {
+          setTimeout(async () => {
             fetchProfile(session.user.id);
             fetchPurchases(session.user.id);
-            // Track device on login/token refresh
             trackSession('track');
+            // Handle referral code from OAuth flows (e.g., Google sign-in)
+            const storedReferralCode = localStorage.getItem("referral_code");
+            if (storedReferralCode) {
+              try {
+                await supabase.functions.invoke("record-referral", {
+                  body: {
+                    referral_code: storedReferralCode,
+                    referred_user_id: session.user.id,
+                  },
+                });
+                localStorage.removeItem("referral_code");
+              } catch (e) {
+                console.error("Failed to record referral from OAuth:", e);
+              }
+            }
           }, 0);
         } else {
           setProfile(null);
