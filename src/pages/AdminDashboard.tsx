@@ -875,6 +875,10 @@ export default function AdminDashboard() {
             <AmbassadorsTab />
           </TabsContent>
 
+          <TabsContent value="applications">
+            <AmbassadorApplicationsTab />
+          </TabsContent>
+
           <TabsContent value="survey">
             <SurveyResultsTab />
           </TabsContent>
