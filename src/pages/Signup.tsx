@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { GraduationCap, ArrowLeft, Loader2, Eye, EyeOff, Check, ChevronsUpDown } from "lucide-react";
+import { GraduationCap, ArrowLeft, Loader2, Eye, EyeOff, Check, ChevronsUpDown, UserCheck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { levels } from "@/data/courses";
@@ -13,6 +13,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { cn } from "@/lib/utils";
 import { facultyCategories, allDepartments } from "@/data/departments";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -27,9 +28,24 @@ export default function Signup() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [departmentOpen, setDepartmentOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [referrerName, setReferrerName] = useState<string | null>(null);
   const { signup } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Look up referrer name from stored referral code
+  useEffect(() => {
+    const code = localStorage.getItem("referral_code");
+    if (!code) return;
+    supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("referral_code", code)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.full_name) setReferrerName(data.full_name);
+      });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,6 +145,15 @@ export default function Signup() {
               Enter your details to get started
             </p>
           </div>
+
+          {referrerName && (
+            <div className="flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 p-3 mb-4">
+              <UserCheck className="w-4 h-4 text-primary shrink-0" />
+              <p className="text-sm text-foreground">
+                Referred by <span className="font-semibold">{referrerName}</span>
+              </p>
+            </div>
+          )}
 
           <GoogleSignInButton label="Sign up with Google" />
 
