@@ -794,6 +794,7 @@ export default function AdminDashboard() {
             <TabsTrigger value="semester" className="gap-2"><Target className="w-4 h-4" />Departments</TabsTrigger>
             <TabsTrigger value="uploads" className="gap-2"><Upload className="w-4 h-4" />Uploads</TabsTrigger>
             <TabsTrigger value="ambassadors" className="gap-2"><Crown className="w-4 h-4" />Ambassadors</TabsTrigger>
+            <TabsTrigger value="applications" className="gap-2"><Mail className="w-4 h-4" />Applications</TabsTrigger>
             <TabsTrigger value="survey" className="gap-2"><ClipboardList className="w-4 h-4" />Survey</TabsTrigger>
           </TabsList>
 
