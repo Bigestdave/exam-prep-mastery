@@ -114,7 +114,7 @@ export default function BecomeAmbassador() {
               className="text-base md:text-lg text-muted-foreground mb-4 max-w-lg mx-auto leading-relaxed"
               {...fadeUp(0.2)}
             >
-              Ambassadors upload course materials, help students in their department prepare, and earn up to ₦30,000 per semester through our milestone system.
+              Ambassadors upload course materials, help students in their department prepare, and earn up to ₦80,000 per semester through milestones and leaderboard prizes.
             </motion.p>
           </div>
         </div>
