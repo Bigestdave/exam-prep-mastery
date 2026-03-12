@@ -130,8 +130,8 @@ export default function BecomeAmbassador() {
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {[
-                  { step: "01", title: "Upload Materials", desc: "Collect past questions & tutorial sheets from your department and upload them." },
-                  { step: "02", title: "We Process Them", desc: "Our AI converts them into structured answers and quizzes — you don't write anything." },
+                  { step: "01", title: "Upload Materials", desc: "Collect course materials & tutorial questions from your department and upload them." },
+                  { step: "02", title: "We Process Them", desc: "Our team creates First Class answers and quizzes, you don't write anything." },
                   { step: "03", title: "Students Unlock", desc: "When students in your department unlock courses, you earn per milestone hit." },
                 ].map((item, i) => (
                   <div
