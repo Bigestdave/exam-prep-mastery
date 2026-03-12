@@ -42,10 +42,23 @@ export function AmbassadorApplicationsTab() {
     setProcessing(app.id);
     try {
       const { data, error } = await supabase.functions.invoke('approve-ambassador', {
-        body: { email: app.email, application_id: app.id },
+        body: { email: app.email, application_id: app.id, user_id: app.user_id },
       });
 
-      if (error) throw error;
+      if (error) {
+        let message = error.message;
+        const context = (error as { context?: Response }).context;
+        if (context instanceof Response) {
+          try {
+            const payload = await context.json();
+            if (payload?.error) message = payload.error;
+          } catch {
+            // keep default message
+          }
+        }
+        throw new Error(message);
+      }
+
       if (data?.error) throw new Error(data.error);
 
       toast({ title: "Ambassador approved! 🎉", description: `${app.email} is now an ambassador.` });

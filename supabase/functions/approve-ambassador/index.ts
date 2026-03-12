@@ -15,6 +15,25 @@ function getUserIdFromToken(authHeader: string): string | null {
   }
 }
 
+async function findUserByEmail(adminClient: ReturnType<typeof createClient>, email: string) {
+  const normalizedEmail = email.toLowerCase();
+  let page = 1;
+  const perPage = 200;
+
+  while (page <= 25) {
+    const { data, error } = await adminClient.auth.admin.listUsers({ page, perPage });
+    if (error) throw error;
+
+    const match = data.users.find((u) => u.email?.toLowerCase() === normalizedEmail);
+    if (match) return match;
+
+    if (data.users.length < perPage) break;
+    page += 1;
+  }
+
+  return null;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -24,60 +43,73 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Verify caller via manual JWT decoding
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("Not authenticated");
+    if (!authHeader?.startsWith("Bearer ")) throw new Error("Not authenticated");
 
     const callerId = getUserIdFromToken(authHeader);
     if (!callerId) throw new Error("Invalid token");
 
-    // Check admin role
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
-    const { data: roleData } = await adminClient
+
+    const { data: roleData, error: roleError } = await adminClient
       .from("user_roles")
       .select("role")
       .eq("user_id", callerId)
       .eq("role", "admin")
-      .single();
+      .maybeSingle();
 
-    if (!roleData) throw new Error("Not authorized — admin only");
+    if (roleError || !roleData) throw new Error("Not authorized — admin only");
 
-    const { email, application_id } = await req.json();
-    if (!email) throw new Error("Email required");
+    const { email, application_id, user_id } = await req.json();
+    if (!email && !user_id) throw new Error("Email or user_id required");
 
-    // Find user by email using admin API
-    const { data: { users }, error: listErr } = await adminClient.auth.admin.listUsers();
-    if (listErr) throw listErr;
+    let targetUser: { id: string; email?: string | null } | null = null;
 
-    const targetUser = users.find(u => u.email?.toLowerCase() === email.toLowerCase());
-    if (!targetUser) {
-      throw new Error(`No user found with email: ${email}. They must sign up first.`);
+    if (user_id) {
+      const { data: userById, error: userByIdError } = await adminClient.auth.admin.getUserById(user_id);
+      if (!userByIdError && userById?.user) {
+        targetUser = userById.user;
+      }
     }
 
-    // Add ambassador role (ignore if already exists)
-    const { error: roleErr } = await adminClient
+    if (!targetUser && email) {
+      targetUser = await findUserByEmail(adminClient, email);
+    }
+
+    if (!targetUser) {
+      throw new Error(`No user found for application (${email ?? user_id}). They must sign up first.`);
+    }
+
+    const { error: roleInsertError } = await adminClient
       .from("user_roles")
       .insert({ user_id: targetUser.id, role: "ambassador" });
 
-    if (roleErr && roleErr.code !== "23505") throw roleErr;
+    if (roleInsertError && roleInsertError.code !== "23505") throw roleInsertError;
 
-    // Update application status
     if (application_id) {
-      await adminClient
+      const { error: applicationError } = await adminClient
         .from("ambassador_applications")
-        .update({ status: "approved", reviewed_at: new Date().toISOString(), user_id: targetUser.id })
+        .update({
+          status: "approved",
+          reviewed_at: new Date().toISOString(),
+          user_id: targetUser.id,
+        })
         .eq("id", application_id);
+
+      if (applicationError) throw applicationError;
     }
 
     return new Response(
       JSON.stringify({ success: true, user_id: targetUser.id }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (err) {
-    console.error("approve-ambassador error:", err.message);
+    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("approve-ambassador error:", message);
+
     return new Response(
-      JSON.stringify({ error: err.message }),
-      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: message }),
+      { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
 });
