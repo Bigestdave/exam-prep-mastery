@@ -12,6 +12,7 @@ export default function VipRedirect() {
   useEffect(() => {
     if (code) {
       localStorage.setItem("referral_code", code);
+      sessionStorage.setItem("referral_code", code);
     }
     navigate("/signup", { replace: true });
   }, [code, navigate]);

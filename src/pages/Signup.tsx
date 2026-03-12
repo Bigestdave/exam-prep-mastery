@@ -35,15 +35,22 @@ export default function Signup() {
 
   // Look up referrer name from stored referral code
   useEffect(() => {
-    const code = localStorage.getItem("referral_code");
+    const code = localStorage.getItem("referral_code") || sessionStorage.getItem("referral_code");
     if (!code) return;
-    supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("referral_code", code)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data?.full_name) setReferrerName(data.full_name);
+
+    supabase.functions
+      .invoke("resolve-referrer", {
+        body: { referral_code: code },
+      })
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Failed to resolve referrer:", error);
+          return;
+        }
+
+        if (data?.full_name) {
+          setReferrerName(data.full_name);
+        }
       });
   }, []);
 
