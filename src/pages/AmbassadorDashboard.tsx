@@ -735,6 +735,52 @@ export default function AmbassadorDashboard() {
                 </motion.button>
               </div>
 
+              {/* Referral Stats */}
+              <div className="bg-card rounded-3xl card-float p-6 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-accent" />
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Your Referrals</h2>
+                </div>
+
+                {referralsLoading ? (
+                  <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>
+                ) : referrals.length === 0 ? (
+                  <p className="text-xs text-muted-foreground text-center py-6">No referrals yet. Share your VIP link to get started!</p>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-secondary/60 rounded-2xl p-3 text-center">
+                        <p className="text-2xl font-mono font-bold">{referrals.length}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Signups</p>
+                      </div>
+                      <div className="bg-secondary/60 rounded-2xl p-3 text-center">
+                        <p className="text-2xl font-mono font-bold">{referrals.filter(r => r.status === "converted").length}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Converted</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      {referrals.slice(0, 10).map(r => (
+                        <div key={r.id} className="flex items-center justify-between bg-secondary/40 rounded-xl px-4 py-2.5">
+                          <div>
+                            <p className="text-sm font-medium">{r.referred_name}</p>
+                            <p className="text-[10px] text-muted-foreground">
+                              {new Date(r.created_at).toLocaleDateString("en-NG", { day: "numeric", month: "short" })}
+                            </p>
+                          </div>
+                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                            r.status === "converted" 
+                              ? "bg-accent/10 text-accent" 
+                              : "bg-muted text-muted-foreground"
+                          }`}>
+                            {r.status === "converted" ? "Purchased" : "Pending"}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+
               {/* Quick Dept Stats Reminder */}
               {myDeptStats && (
                 <div className="bg-card rounded-3xl card-float p-5">
