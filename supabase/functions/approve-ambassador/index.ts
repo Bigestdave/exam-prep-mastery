@@ -99,6 +99,51 @@ Deno.serve(async (req) => {
       if (applicationError) throw applicationError;
     }
 
+    // Send approval notification email
+    const resendKey = Deno.env.get("RESEND_API_KEY");
+    const recipientEmail = targetUser.email;
+    if (resendKey && recipientEmail) {
+      try {
+        const emailRes = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${resendKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: "LCU Prep <noreply@lcuprep.com>",
+            to: [recipientEmail],
+            subject: "🎉 You're now an LCU Prep Ambassador!",
+            html: `
+              <div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:32px;background:#ffffff;">
+                <h1 style="color:#1a1a1a;font-size:22px;margin-bottom:16px;">Welcome aboard, Ambassador! 🎓</h1>
+                <p style="color:#444;font-size:15px;line-height:1.6;">
+                  Great news — your ambassador application has been <strong>approved</strong>!
+                </p>
+                <p style="color:#444;font-size:15px;line-height:1.6;">
+                  You can now log in to your <strong>Ambassador Dashboard</strong> where you'll find your unique referral link. Share it with students in your department to help them prepare — and earn rewards for every unlock.
+                </p>
+                <div style="text-align:center;margin:28px 0;">
+                  <a href="https://lcuprep.lovable.app/ambassador" 
+                     style="background:#1a1a1a;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-size:15px;font-weight:600;">
+                    Open Your Dashboard
+                  </a>
+                </div>
+                <p style="color:#888;font-size:13px;margin-top:24px;">
+                  Thank you for helping your department excel.<br/>— The LCU Prep Team
+                </p>
+              </div>
+            `,
+          }),
+        });
+        if (!emailRes.ok) {
+          console.error("Email send failed:", await emailRes.text());
+        }
+      } catch (emailErr) {
+        console.error("Email error:", emailErr);
+      }
+    }
+
     return new Response(
       JSON.stringify({ success: true, user_id: targetUser.id }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
