@@ -146,6 +146,15 @@ export default function Signup() {
             </p>
           </div>
 
+          {referrerName && (
+            <div className="flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 p-3 mb-4">
+              <UserCheck className="w-4 h-4 text-primary shrink-0" />
+              <p className="text-sm text-foreground">
+                Referred by <span className="font-semibold">{referrerName}</span>
+              </p>
+            </div>
+          )}
+
           <GoogleSignInButton label="Sign up with Google" />
 
           <div className="relative my-6">
