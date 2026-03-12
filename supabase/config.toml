@@ -29,3 +29,7 @@ verify_jwt = false
 
 [functions.check-milestones]
 verify_jwt = false
+
+[functions.approve-ambassador]
+verify_jwt = false
+verify_jwt = false
