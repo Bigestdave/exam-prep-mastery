@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { User, Settings, Upload } from "lucide-react";
+import { User, Settings, Megaphone } from "lucide-react";
 import { Button } from "./ui/button";
 import sovereignKey from "@/assets/sovereign-key.png";
 import { Avatar, AvatarFallback } from "./ui/avatar";
@@ -65,7 +65,7 @@ export function Header({ isLoggedIn = false, userName }: HeaderProps) {
             {isAmbassador && (
               <Link to="/ambassador">
                 <Button variant="ghost" size="sm" className="gap-2">
-                  <Upload className="w-4 h-4" />
+                  <Megaphone className="w-4 h-4" />
                   <span className="hidden sm:inline">Ambassador</span>
                 </Button>
               </Link>
