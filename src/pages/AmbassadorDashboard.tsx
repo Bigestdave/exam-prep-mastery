@@ -76,6 +76,17 @@ export default function AmbassadorDashboard() {
   const [achievedMilestones, setAchievedMilestones] = useState<MilestoneRecord[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
 
+  // Referral stats
+  interface ReferralRecord {
+    id: string;
+    referred_id: string;
+    status: string;
+    created_at: string;
+    referred_name?: string;
+  }
+  const [referrals, setReferrals] = useState<ReferralRecord[]>([]);
+  const [referralsLoading, setReferralsLoading] = useState(true);
+
   // Bounty form state
   const [courseCode, setCourseCode] = useState("");
   const [courseTitle, setCourseTitle] = useState("");
