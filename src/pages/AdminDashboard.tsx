@@ -15,6 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Pencil, Trash2, ArrowLeft, Loader2, BookOpen, ClipboardList, DollarSign, TrendingUp, Users, ShoppingCart, Crown, Upload, Calendar, Target, RefreshCw, Eye, Zap } from "lucide-react";
 import { AmbassadorsTab } from "@/components/admin/AmbassadorsTab";
+import { AmbassadorApplicationsTab } from "@/components/admin/AmbassadorApplicationsTab";
 import { UploadsTab } from "@/components/admin/UploadsTab";
 import { ContentReviewTab } from "@/components/admin/ContentReviewTab";
 import { ContentQueueTab } from "@/components/admin/ContentQueueTab";
