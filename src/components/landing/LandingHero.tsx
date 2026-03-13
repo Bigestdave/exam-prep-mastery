@@ -28,7 +28,7 @@ export function LandingHero() {
               className="block text-[36px] md:text-5xl lg:text-6xl font-display font-bold leading-[1.1]"
               {...fadeUp(0.1)}
             >
-              You studied the notes.
+              You studied your notes.
             </motion.span>
             <motion.span
               className="block text-[36px] md:text-5xl lg:text-6xl font-display font-bold leading-[1.1] mt-1"
