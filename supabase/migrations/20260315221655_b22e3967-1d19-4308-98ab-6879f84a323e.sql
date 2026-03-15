@@ -1,0 +1,1 @@
+INSERT INTO purchases (user_id, course_id) VALUES ('494dac52-2fee-4326-90dd-77e12f283ecf', '6f6dc7dc-d7ef-4308-8fc2-8a1156e79adf') ON CONFLICT DO NOTHING;
