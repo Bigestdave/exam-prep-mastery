@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { QuizCTA } from "@/components/quiz/QuizCTA";
 import { TextShimmer } from "@/components/ui/text-shimmer";
+import { useQuizData } from "@/hooks/useQuizData";
 
 const PAYSTACK_PUBLIC_KEY = "pk_live_2320cc6bb508955bd07391f75a4c73d757a0d6f6";
 
