@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { QuizCTA } from "@/components/quiz/QuizCTA";
 import { TextShimmer } from "@/components/ui/text-shimmer";
+import { useQuizData } from "@/hooks/useQuizData";
 
 const PAYSTACK_PUBLIC_KEY = "pk_live_2320cc6bb508955bd07391f75a4c73d757a0d6f6";
 
@@ -40,6 +41,7 @@ export default function CourseDetail() {
 
   const course = id ? getCourseById(id) : undefined;
   const isOwned = id ? purchases.includes(id) : false;
+  const { hasQuizData } = useQuizData(id);
 
   // Other unowned courses in same faculty & level (for multi-buy)
   const otherUnownedCourses = courses.filter(c => 
@@ -301,7 +303,7 @@ export default function CourseDetail() {
             onClick={openPaymentModal}
           >
             <Lock className="w-4 h-4" />
-            Unlock {displayCount} Answers + Quiz • ₦{course.price.toLocaleString()}
+            Unlock {displayCount} Answers{hasQuizData ? ' + Quiz' : ''} • ₦{course.price.toLocaleString()}
           </Button>
         </div>
       )}
@@ -394,7 +396,7 @@ export default function CourseDetail() {
               <Lock className="w-4 h-4" />
               {extraCourseIds.length > 0 
                 ? `Unlock ${1 + extraCourseIds.length} Courses • ₦${activeAmount.toLocaleString()}`
-                : `Unlock ${displayCount} Answers + Quiz • ₦${activeAmount.toLocaleString()}`
+                : `Unlock ${displayCount} Answers${hasQuizData ? ' + Quiz' : ''} • ₦${activeAmount.toLocaleString()}`
               }
             </Button>
             
