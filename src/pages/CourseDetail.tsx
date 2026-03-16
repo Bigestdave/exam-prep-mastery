@@ -396,7 +396,7 @@ export default function CourseDetail() {
               <Lock className="w-4 h-4" />
               {extraCourseIds.length > 0 
                 ? `Unlock ${1 + extraCourseIds.length} Courses • ₦${activeAmount.toLocaleString()}`
-                : `Unlock ${displayCount} Answers + Quiz • ₦${activeAmount.toLocaleString()}`
+                : `Unlock ${displayCount} Answers${hasQuizData ? ' + Quiz' : ''} • ₦${activeAmount.toLocaleString()}`
               }
             </Button>
             
