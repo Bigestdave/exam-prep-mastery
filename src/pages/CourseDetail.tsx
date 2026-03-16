@@ -303,7 +303,7 @@ export default function CourseDetail() {
             onClick={openPaymentModal}
           >
             <Lock className="w-4 h-4" />
-            Unlock {displayCount} Answers + Quiz • ₦{course.price.toLocaleString()}
+            Unlock {displayCount} Answers{hasQuizData ? ' + Quiz' : ''} • ₦{course.price.toLocaleString()}
           </Button>
         </div>
       )}
