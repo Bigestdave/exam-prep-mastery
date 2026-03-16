@@ -41,6 +41,7 @@ export default function CourseDetail() {
 
   const course = id ? getCourseById(id) : undefined;
   const isOwned = id ? purchases.includes(id) : false;
+  const { hasQuizData } = useQuizData(id);
 
   // Other unowned courses in same faculty & level (for multi-buy)
   const otherUnownedCourses = courses.filter(c => 
