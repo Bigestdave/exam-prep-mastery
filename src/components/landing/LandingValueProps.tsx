@@ -26,7 +26,7 @@ export function LandingValueProps() {
             { 
               icon: Shield, 
               title: 'Verified Against Lecturer Notes', 
-              desc: 'Every answer is written from your lecturer\'s tutorial sheet and verified against their lecture notes. What you read is what your exam expects.',
+              desc: 'Every answer is written from your course materials and verified against their lecture notes. What you read is what your exam expects.',
               stat: 'First-class standard, every answer'
             },
           ].map((item, i) => (
