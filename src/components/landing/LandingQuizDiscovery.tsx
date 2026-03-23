@@ -14,15 +14,15 @@ export function LandingQuizDiscovery() {
             {[
               { 
                 icon: AlertCircle, 
-                text: 'The 3 questions they thought they knew, but actually misunderstood' 
+                text: 'The questions they need to focus on and put more time into understanding' 
               },
               { 
                 icon: Target, 
-                text: 'The trick questions lecturers repeat every semester' 
+                text: 'The tricky questions they might forget the answers to in the exam hall' 
               },
               { 
                 icon: Brain, 
-                text: 'Whether they are actually exam ready, or just familiar with the material' 
+                text: 'Whether they are actually ready for the exam' 
               },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-4 glass-card rounded-xl p-5 opacity-0 animate-fade-in" style={{ animationDelay: `${i * 100 + 100}ms` }}>
