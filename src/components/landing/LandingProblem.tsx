@@ -14,11 +14,11 @@ export function LandingProblem() {
           
           <div className="space-y-4 text-muted-foreground leading-relaxed">
             <p>
-              You spend hours reading notes, highlighting PDFs, rewriting summaries. 
+              You spend hours reading notes, PDFs, and trying to answer tutorial questions. 
               But when you sit in the exam hall, your mind goes blank on the one question you "definitely studied."
             </p>
             <p>
-              The truth? You recognized the material. You didn't <span className="text-foreground font-semibold">know</span> it. 
+              The truth is you recognized the questions but you didn't <span className="text-foreground font-semibold">know</span> it. 
               There's a difference between "I've seen this before" and "I can answer this right now."
             </p>
             <p>
