@@ -23,7 +23,7 @@ export function CourseCard({ id, code, title, isOwned = false, questionsCount = 
       >
         <div className="flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-mono font-semibold text-muted-foreground tracking-wider uppercase">
+            <span className="text-xs font-mono font-semibold text-muted-foreground tracking-wider uppercase">
               {code}
             </span>
             {isOwned ? (
@@ -33,11 +33,11 @@ export function CourseCard({ id, code, title, isOwned = false, questionsCount = 
             )}
           </div>
           
-          <h3 className="font-display font-extrabold text-foreground text-base leading-snug line-clamp-2">
+          <h3 className="font-display font-extrabold text-foreground text-[15px] md:text-lg leading-snug line-clamp-2">
             {title}
           </h3>
           
-          <span className="text-[11px] font-mono text-muted-foreground/60">{questionsCount} Questions</span>
+          <span className="text-xs font-mono text-muted-foreground/60">{questionsCount} Questions</span>
         </div>
       </Link>
     </motion.div>

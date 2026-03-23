@@ -116,7 +116,7 @@ export default function Dashboard() {
       <main className="container py-8 px-4 md:px-6">
         {/* Greeting + Stats */}
         <div className="mb-8">
-          <p className="text-sm text-muted-foreground font-mono tracking-wider uppercase mb-1">
+          <p className="text-xs text-muted-foreground font-mono tracking-wider uppercase mb-1">
             {profile?.faculty} · {profile?.level}
           </p>
           <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">
