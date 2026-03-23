@@ -11,7 +11,7 @@ export function LandingFAQ() {
             {[
               { q: 'How do I know this will actually help me pass?', a: 'Your exams are set from tutorial questions. We solve every single one to first-class standard, then give you a quiz to make sure you actually retained the material. Students who use LCU Prep consistently report walking into exams feeling confident, not anxious.' },
               { q: 'Is the quiz free?', a: 'Yes. Every course with quiz data has a free confidence check you can take before or after unlocking. It\'s our way of proving the material works.' },
-              { q: 'Are these real answers or just AI guessing?', a: 'Every answer is written from your lecturer\'s actual tutorial sheet and verified against their lecture notes. We don\'t generate generic content. What you read is what your exam expects.' },
+              { q: 'Are these real answers or just AI guessing?', a: 'Every answer is written from your course materials and verified against their lecture notes. We don\'t generate generic content. What you read is what your exam expects.' },
               { q: 'Is payment for all courses or one course?', a: 'Payment is per course. You unlock only the courses you\'re actually taking this semester.' },
               { q: 'Can I see the answers before paying?', a: 'You can preview one solved question per course and take the free quiz before unlocking.' },
               { q: 'How long do I have access after paying?', a: 'Access lasts for the current semester. Study at your own pace.' },
