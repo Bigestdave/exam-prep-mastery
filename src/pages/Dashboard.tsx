@@ -36,6 +36,20 @@ export default function Dashboard() {
     }
   }, [user, isLoading, profile, navigate]);
 
+  // Welcome back toast — once per session
+  useEffect(() => {
+    if (!isLoading && user && profile?.full_name) {
+      const key = `welcomed_${user.id}`;
+      if (!sessionStorage.getItem(key)) {
+        sessionStorage.setItem(key, "1");
+        toast({
+          title: `Welcome back, ${profile.full_name.split(' ')[0]} 👋`,
+          description: "Let's get you exam ready.",
+        });
+      }
+    }
+  }, [isLoading, user, profile, toast]);
+
   useEffect(() => {
     const fetchQuestionCounts = async () => {
       if (courses.length === 0) return;
