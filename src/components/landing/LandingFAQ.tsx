@@ -6,7 +6,7 @@ export function LandingFAQ() {
       <div className="container px-4">
         <div className="max-w-2xl mx-auto">
           <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-2">Questions</p>
-          <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-6">We anticipated<br/>your doubts</h2>
+          <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-6">We anticipated<br/>your questions</h2>
           <Accordion type="single" collapsible className="w-full">
             {[
               { q: 'How do I know this will actually help me pass?', a: 'Your exams are set from tutorial questions. We solve every single one to first-class standard, then give you a quiz to make sure you actually retained the material. Students who use LCU Prep consistently report walking into exams feeling confident, not anxious.' },
