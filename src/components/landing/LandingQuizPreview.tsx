@@ -40,7 +40,7 @@ export function LandingQuizPreview() {
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-3xl font-display font-bold text-foreground">79%</span>
+                    <span className="text-3xl font-display font-bold text-foreground">76%</span>
                   </div>
                 </div>
                 <div className="inline-flex items-center gap-1.5 bg-accent/10 text-accent px-3 py-1.5 rounded-full text-sm font-semibold">
