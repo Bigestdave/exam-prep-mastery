@@ -14,11 +14,11 @@ export function LandingQuizDiscovery() {
             {[
               { 
                 icon: AlertCircle, 
-                text: 'The questions they need to focus on and put more time into understanding' 
+                text: 'Which questions they need to focus on and put more time into understanding' 
               },
               { 
                 icon: Target, 
-                text: 'The tricky questions they might forget the answers to in the exam hall' 
+                text: 'Which tricky questions they might forget the answers to in the exam hall' 
               },
               { 
                 icon: Brain, 
