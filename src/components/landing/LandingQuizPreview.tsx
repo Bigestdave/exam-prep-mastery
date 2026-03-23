@@ -36,7 +36,7 @@ export function LandingQuizPreview() {
                       className="stroke-accent" 
                       strokeWidth="8" 
                       strokeLinecap="round"
-                      strokeDasharray={`${2 * Math.PI * 54 * 0.79} ${2 * Math.PI * 54 * 0.21}`}
+                      strokeDasharray={`${2 * Math.PI * 54 * 0.76} ${2 * Math.PI * 54 * 0.24}`}
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
