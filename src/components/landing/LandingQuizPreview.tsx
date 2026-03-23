@@ -36,11 +36,11 @@ export function LandingQuizPreview() {
                       className="stroke-accent" 
                       strokeWidth="8" 
                       strokeLinecap="round"
-                      strokeDasharray={`${2 * Math.PI * 54 * 0.79} ${2 * Math.PI * 54 * 0.21}`}
+                      strokeDasharray={`${2 * Math.PI * 54 * 0.76} ${2 * Math.PI * 54 * 0.24}`}
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-3xl font-display font-bold text-foreground">79%</span>
+                    <span className="text-3xl font-display font-bold text-foreground">76%</span>
                   </div>
                 </div>
                 <div className="inline-flex items-center gap-1.5 bg-accent/10 text-accent px-3 py-1.5 rounded-full text-sm font-semibold">
@@ -52,7 +52,7 @@ export function LandingQuizPreview() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between py-2 border-b border-border/50">
                   <span className="text-sm text-muted-foreground">Questions answered</span>
-                  <span className="text-sm font-semibold text-foreground">20 / 25</span>
+                  <span className="text-sm font-semibold text-foreground">19 / 25</span>
                 </div>
                 <div className="flex items-center justify-between py-2 border-b border-border/50">
                   <span className="text-sm text-muted-foreground">Current tier</span>
@@ -60,7 +60,7 @@ export function LandingQuizPreview() {
                 </div>
                 <div className="flex items-center gap-2 py-2">
                   <Target className="w-4 h-4 text-accent" />
-                  <span className="text-sm font-medium text-foreground">3 questions away from Gold</span>
+                  <span className="text-sm font-medium text-foreground">1 question away from Gold</span>
                 </div>
               </div>
             </motion.div>
