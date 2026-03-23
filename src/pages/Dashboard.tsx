@@ -120,7 +120,7 @@ export default function Dashboard() {
             {profile?.faculty} · {profile?.level}
           </p>
           <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">
-            Welcome back, {profile?.full_name?.split(' ')[0] || 'Student'}
+            {profile?.full_name?.split(' ')[0] || 'Student'}
           </h1>
         </div>
 
