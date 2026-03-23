@@ -14,7 +14,7 @@ export function LandingValueProps() {
             { 
               icon: BookOpen, 
               title: 'Every Tutorial Question, Solved', 
-              desc: 'All 15 questions answered to first-class standard. Written directly from the tutorial sheet your lecturer gave your class, not guessed answers.',
+              desc: 'All 15 questions answered to first-class standard. Written directly from the course materials your lecturer gave your class, not guessed answers.',
               stat: '150+ exam-style questions per course'
             },
             { 
