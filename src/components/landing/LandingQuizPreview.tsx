@@ -60,7 +60,7 @@ export function LandingQuizPreview() {
                 </div>
                 <div className="flex items-center gap-2 py-2">
                   <Target className="w-4 h-4 text-accent" />
-                  <span className="text-sm font-medium text-foreground">3 questions away from Gold</span>
+                  <span className="text-sm font-medium text-foreground">1 question away from Gold</span>
                 </div>
               </div>
             </motion.div>
