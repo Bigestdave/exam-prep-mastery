@@ -52,7 +52,7 @@ export function LandingQuizPreview() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between py-2 border-b border-border/50">
                   <span className="text-sm text-muted-foreground">Questions answered</span>
-                  <span className="text-sm font-semibold text-foreground">20 / 25</span>
+                  <span className="text-sm font-semibold text-foreground">19 / 25</span>
                 </div>
                 <div className="flex items-center justify-between py-2 border-b border-border/50">
                   <span className="text-sm text-muted-foreground">Current tier</span>
