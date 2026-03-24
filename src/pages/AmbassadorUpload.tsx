@@ -283,9 +283,13 @@ export default function AmbassadorUpload() {
     } catch (error) {
       console.error("Upload error:", error);
       setIsUploading(false);
+      const message = error instanceof Error ? error.message : "Something went wrong.";
+      const isNetworkError = message.includes("Failed to fetch") || message.includes("NetworkError");
       toast({
-        title: "Upload failed",
-        description: error instanceof Error ? error.message : "Something went wrong.",
+        title: isNetworkError ? "Network error" : "Upload failed",
+        description: isNetworkError
+          ? "Check your internet connection and try again. Large files may fail on slow networks."
+          : message,
         variant: "destructive",
       });
     }
