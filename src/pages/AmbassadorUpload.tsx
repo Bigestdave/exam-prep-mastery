@@ -231,9 +231,15 @@ export default function AmbassadorUpload() {
 
           const { data: fileData, error: uploadError } = await supabase.storage
             .from("course_materials")
-            .upload(filePath, file);
+            .upload(filePath, file, {
+              cacheControl: '3600',
+              upsert: false,
+            });
 
-          if (uploadError) throw new Error(`Upload failed for ${file.name}: ${uploadError.message}`);
+          if (uploadError) {
+            console.error("Storage upload error:", uploadError);
+            throw new Error(`Upload failed for ${file.name}: ${uploadError.message}`);
+          }
 
           const { data: urlData } = supabase.storage
             .from("course_materials")
