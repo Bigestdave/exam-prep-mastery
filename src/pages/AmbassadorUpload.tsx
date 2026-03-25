@@ -342,6 +342,67 @@ export default function AmbassadorUpload() {
     }
   };
 
+  const handleAddPdfs = async (upload: UploadRecord, newFiles: FileList) => {
+    setAddingPdfTo(upload.id);
+    try {
+      const validFiles = Array.from(newFiles).filter(f => {
+        if (!f.name.toLowerCase().endsWith(".pdf")) {
+          toast({ title: `${f.name} skipped`, description: "Only PDF files.", variant: "destructive" });
+          return false;
+        }
+        if (f.size > 20 * 1024 * 1024) {
+          toast({ title: `${f.name} skipped`, description: "Exceeds 20MB.", variant: "destructive" });
+          return false;
+        }
+        return true;
+      });
+
+      if (validFiles.length === 0) { setAddingPdfTo(null); return; }
+
+      const pdfUrls: string[] = [];
+      // Keep existing URLs
+      if (upload.pdf_url) {
+        pdfUrls.push(...upload.pdf_url.split(",").map(u => u.trim()).filter(Boolean));
+      }
+
+      for (const file of validFiles) {
+        const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+        const filePath = `pdfs/${user!.id}/${fileName}`;
+        const { data: fileData, error: uploadError } = await supabase.storage
+          .from("course_materials")
+          .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+        if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
+
+        const { data: urlData } = supabase.storage
+          .from("course_materials")
+          .getPublicUrl(fileData.path);
+        pdfUrls.push(urlData.publicUrl);
+      }
+
+      const newPdfUrl = pdfUrls.join(",");
+      const { error: updateError } = await supabase
+        .from("course_uploads")
+        .update({ pdf_url: newPdfUrl })
+        .eq("id", upload.id);
+
+      if (updateError) throw new Error(updateError.message);
+
+      setUploads(prev => prev.map(u => u.id === upload.id ? { ...u, pdf_url: newPdfUrl } : u));
+      toast({ title: `${validFiles.length} PDF(s) added! ✅` });
+    } catch (error) {
+      console.error("Add PDF error:", error);
+      const message = error instanceof Error ? error.message : "Something went wrong.";
+      const isNetworkError = message.includes("Failed to fetch") || message.includes("NetworkError");
+      toast({
+        title: isNetworkError ? "Network error" : "Upload failed",
+        description: isNetworkError ? "Check your internet connection and try again." : message,
+        variant: "destructive",
+      });
+    }
+    setAddingPdfTo(null);
+  };
+
   const statusIcon = (status: string) => {
     switch (status) {
       case "complete": return <CheckCircle2 className="w-4 h-4 text-green-600" />;
