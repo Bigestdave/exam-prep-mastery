@@ -10,7 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { allDepartments } from "@/data/departments";
-import { Upload, FileText, Loader2, CheckCircle2, AlertCircle, Clock, X, Sparkles } from "lucide-react";
+import { Upload, FileText, Loader2, CheckCircle2, AlertCircle, Clock, X, Sparkles, PlusCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 interface UploadRecord {
