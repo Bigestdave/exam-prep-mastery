@@ -57,6 +57,8 @@ export default function AmbassadorUpload() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploads, setUploads] = useState<UploadRecord[]>([]);
   const [activeUpload, setActiveUpload] = useState<ActiveUpload | null>(null);
+  const [addingPdfTo, setAddingPdfTo] = useState<string | null>(null);
+  const addPdfInputRef = useRef<HTMLInputElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const uploadStartRef = useRef<number>(0);
 
