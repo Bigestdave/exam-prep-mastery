@@ -10,7 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { allDepartments } from "@/data/departments";
-import { Upload, FileText, Loader2, CheckCircle2, AlertCircle, Clock, X, Sparkles } from "lucide-react";
+import { Upload, FileText, Loader2, CheckCircle2, AlertCircle, Clock, X, Sparkles, PlusCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 interface UploadRecord {
@@ -57,6 +57,8 @@ export default function AmbassadorUpload() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploads, setUploads] = useState<UploadRecord[]>([]);
   const [activeUpload, setActiveUpload] = useState<ActiveUpload | null>(null);
+  const [addingPdfTo, setAddingPdfTo] = useState<string | null>(null);
+  const addPdfInputRef = useRef<HTMLInputElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const uploadStartRef = useRef<number>(0);
 
@@ -340,6 +342,67 @@ export default function AmbassadorUpload() {
     }
   };
 
+  const handleAddPdfs = async (upload: UploadRecord, newFiles: FileList) => {
+    setAddingPdfTo(upload.id);
+    try {
+      const validFiles = Array.from(newFiles).filter(f => {
+        if (!f.name.toLowerCase().endsWith(".pdf")) {
+          toast({ title: `${f.name} skipped`, description: "Only PDF files.", variant: "destructive" });
+          return false;
+        }
+        if (f.size > 20 * 1024 * 1024) {
+          toast({ title: `${f.name} skipped`, description: "Exceeds 20MB.", variant: "destructive" });
+          return false;
+        }
+        return true;
+      });
+
+      if (validFiles.length === 0) { setAddingPdfTo(null); return; }
+
+      const pdfUrls: string[] = [];
+      // Keep existing URLs
+      if (upload.pdf_url) {
+        pdfUrls.push(...upload.pdf_url.split(",").map(u => u.trim()).filter(Boolean));
+      }
+
+      for (const file of validFiles) {
+        const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+        const filePath = `pdfs/${user!.id}/${fileName}`;
+        const { data: fileData, error: uploadError } = await supabase.storage
+          .from("course_materials")
+          .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+        if (uploadError) throw new Error(`Upload failed: ${uploadError.message}`);
+
+        const { data: urlData } = supabase.storage
+          .from("course_materials")
+          .getPublicUrl(fileData.path);
+        pdfUrls.push(urlData.publicUrl);
+      }
+
+      const newPdfUrl = pdfUrls.join(",");
+      const { error: updateError } = await supabase
+        .from("course_uploads")
+        .update({ pdf_url: newPdfUrl })
+        .eq("id", upload.id);
+
+      if (updateError) throw new Error(updateError.message);
+
+      setUploads(prev => prev.map(u => u.id === upload.id ? { ...u, pdf_url: newPdfUrl } : u));
+      toast({ title: `${validFiles.length} PDF(s) added! ✅` });
+    } catch (error) {
+      console.error("Add PDF error:", error);
+      const message = error instanceof Error ? error.message : "Something went wrong.";
+      const isNetworkError = message.includes("Failed to fetch") || message.includes("NetworkError");
+      toast({
+        title: isNetworkError ? "Network error" : "Upload failed",
+        description: isNetworkError ? "Check your internet connection and try again." : message,
+        variant: "destructive",
+      });
+    }
+    setAddingPdfTo(null);
+  };
+
   const statusIcon = (status: string) => {
     switch (status) {
       case "complete": return <CheckCircle2 className="w-4 h-4 text-green-600" />;
@@ -523,37 +586,70 @@ export default function AmbassadorUpload() {
         {/* Most Recent Upload */}
         {uploads.length > 0 && (() => {
           const recent = uploads[0];
+          const pdfCount = recent.pdf_url ? recent.pdf_url.split(",").filter(Boolean).length : 0;
           return (
             <div>
               <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Most Recent Upload</h2>
-              <div className="bg-card rounded-2xl card-shadow p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-mono text-muted-foreground">{recent.course_code}</p>
-                  <p className="text-sm font-semibold">{recent.course_title}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {recent.department} · {new Date(recent.created_at).toLocaleDateString()}
-                  </p>
-                  {recent.error_message && (
-                    <p className="text-xs text-destructive mt-1">{recent.error_message}</p>
-                  )}
+              <div className="bg-card rounded-2xl card-shadow p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-mono text-muted-foreground">{recent.course_code}</p>
+                    <p className="text-sm font-semibold">{recent.course_title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {recent.department} · {new Date(recent.created_at).toLocaleDateString()}
+                      {pdfCount > 0 && ` · ${pdfCount} PDF${pdfCount > 1 ? "s" : ""}`}
+                    </p>
+                    {recent.error_message && (
+                      <p className="text-xs text-destructive mt-1">{recent.error_message}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {recent.questions_generated && recent.questions_generated > 0 && (
+                      <span className="text-xs text-muted-foreground">{recent.questions_generated} Qs</span>
+                    )}
+                    {(recent.status === "processing" || recent.status === "failed") && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="rounded-xl text-xs h-8"
+                        disabled={isUploading}
+                        onClick={() => handleRetry(recent)}
+                      >
+                        Retry
+                      </Button>
+                    )}
+                    {statusIcon(recent.status)}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {recent.questions_generated && recent.questions_generated > 0 && (
-                    <span className="text-xs text-muted-foreground">{recent.questions_generated} Qs</span>
-                  )}
-                  {(recent.status === "processing" || recent.status === "failed") && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="rounded-xl text-xs h-8"
-                      disabled={isUploading}
-                      onClick={() => handleRetry(recent)}
-                    >
-                      <Loader2 className={`w-3 h-3 mr-1 ${isUploading ? "animate-spin" : "hidden"}`} />
-                      Retry
-                    </Button>
-                  )}
-                  {statusIcon(recent.status)}
+                {/* Add more PDFs */}
+                <div>
+                  <input
+                    type="file"
+                    accept="application/pdf,.pdf"
+                    multiple
+                    className="hidden"
+                    ref={addPdfInputRef}
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files.length > 0) {
+                        handleAddPdfs(recent, e.target.files);
+                        e.target.value = "";
+                      }
+                    }}
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-xl text-xs h-8 gap-1"
+                    disabled={addingPdfTo === recent.id || isUploading}
+                    onClick={() => addPdfInputRef.current?.click()}
+                  >
+                    {addingPdfTo === recent.id ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <PlusCircle className="w-3 h-3" />
+                    )}
+                    Add More PDFs
+                  </Button>
                 </div>
               </div>
             </div>

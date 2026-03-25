@@ -246,12 +246,17 @@ export default function ModifierDashboard() {
                       {!item.pdf_url && (
                         <Badge variant="outline" className="text-amber-600 border-amber-300 text-xs">No PDF</Badge>
                       )}
+                      {item.pdf_url && item.pdf_url.includes(",") && (
+                        <Badge variant="outline" className="text-xs">
+                          {item.pdf_url.split(",").filter(Boolean).length} PDFs
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-sm">{item.course_title}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">{item.department} · {item.level}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    {item.pdf_url && (
+                    {item.pdf_url && !item.pdf_url.includes(",") && (
                       <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); window.open(item.pdf_url!, "_blank"); }}>
                         <Download className="w-4 h-4" />
                       </Button>
@@ -262,11 +267,18 @@ export default function ModifierDashboard() {
 
                 {expandedId === item.id && (
                   <div className="border-t px-4 py-4 space-y-4 bg-muted/10">
-                    {item.pdf_url && (
-                      <Button size="sm" variant="outline" className="gap-1" onClick={() => window.open(item.pdf_url!, "_blank")}>
-                        <ExternalLink className="w-3 h-3" /> Open Material PDF
-                      </Button>
-                    )}
+                    {item.pdf_url && (() => {
+                      const urls = item.pdf_url.split(",").map(u => u.trim()).filter(Boolean);
+                      return (
+                        <div className="flex flex-wrap gap-2">
+                          {urls.map((url, idx) => (
+                            <Button key={idx} size="sm" variant="outline" className="gap-1" onClick={() => window.open(url, "_blank")}>
+                              <ExternalLink className="w-3 h-3" /> {urls.length > 1 ? `PDF ${idx + 1}` : "Open Material PDF"}
+                            </Button>
+                          ))}
+                        </div>
+                      );
+                    })()}
 
                     {item.status === "pending" && (
                       <Button size="sm" onClick={() => handleMarkProcessing(item.id)} className="gap-1">
