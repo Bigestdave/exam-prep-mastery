@@ -256,7 +256,7 @@ export default function ModifierDashboard() {
                     <p className="text-xs text-muted-foreground mt-0.5">{item.department} · {item.level}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    {item.pdf_url && (
+                    {item.pdf_url && !item.pdf_url.includes(",") && (
                       <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); window.open(item.pdf_url!, "_blank"); }}>
                         <Download className="w-4 h-4" />
                       </Button>
