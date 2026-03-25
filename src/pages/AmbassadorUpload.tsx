@@ -586,37 +586,70 @@ export default function AmbassadorUpload() {
         {/* Most Recent Upload */}
         {uploads.length > 0 && (() => {
           const recent = uploads[0];
+          const pdfCount = recent.pdf_url ? recent.pdf_url.split(",").filter(Boolean).length : 0;
           return (
             <div>
               <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Most Recent Upload</h2>
-              <div className="bg-card rounded-2xl card-shadow p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-mono text-muted-foreground">{recent.course_code}</p>
-                  <p className="text-sm font-semibold">{recent.course_title}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {recent.department} · {new Date(recent.created_at).toLocaleDateString()}
-                  </p>
-                  {recent.error_message && (
-                    <p className="text-xs text-destructive mt-1">{recent.error_message}</p>
-                  )}
+              <div className="bg-card rounded-2xl card-shadow p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-mono text-muted-foreground">{recent.course_code}</p>
+                    <p className="text-sm font-semibold">{recent.course_title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {recent.department} · {new Date(recent.created_at).toLocaleDateString()}
+                      {pdfCount > 0 && ` · ${pdfCount} PDF${pdfCount > 1 ? "s" : ""}`}
+                    </p>
+                    {recent.error_message && (
+                      <p className="text-xs text-destructive mt-1">{recent.error_message}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {recent.questions_generated && recent.questions_generated > 0 && (
+                      <span className="text-xs text-muted-foreground">{recent.questions_generated} Qs</span>
+                    )}
+                    {(recent.status === "processing" || recent.status === "failed") && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="rounded-xl text-xs h-8"
+                        disabled={isUploading}
+                        onClick={() => handleRetry(recent)}
+                      >
+                        Retry
+                      </Button>
+                    )}
+                    {statusIcon(recent.status)}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {recent.questions_generated && recent.questions_generated > 0 && (
-                    <span className="text-xs text-muted-foreground">{recent.questions_generated} Qs</span>
-                  )}
-                  {(recent.status === "processing" || recent.status === "failed") && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="rounded-xl text-xs h-8"
-                      disabled={isUploading}
-                      onClick={() => handleRetry(recent)}
-                    >
-                      <Loader2 className={`w-3 h-3 mr-1 ${isUploading ? "animate-spin" : "hidden"}`} />
-                      Retry
-                    </Button>
-                  )}
-                  {statusIcon(recent.status)}
+                {/* Add more PDFs */}
+                <div>
+                  <input
+                    type="file"
+                    accept="application/pdf,.pdf"
+                    multiple
+                    className="hidden"
+                    ref={addPdfInputRef}
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files.length > 0) {
+                        handleAddPdfs(recent, e.target.files);
+                        e.target.value = "";
+                      }
+                    }}
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-xl text-xs h-8 gap-1"
+                    disabled={addingPdfTo === recent.id || isUploading}
+                    onClick={() => addPdfInputRef.current?.click()}
+                  >
+                    {addingPdfTo === recent.id ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <PlusCircle className="w-3 h-3" />
+                    )}
+                    Add More PDFs
+                  </Button>
                 </div>
               </div>
             </div>
