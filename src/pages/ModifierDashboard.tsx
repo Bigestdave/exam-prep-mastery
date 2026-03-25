@@ -246,6 +246,11 @@ export default function ModifierDashboard() {
                       {!item.pdf_url && (
                         <Badge variant="outline" className="text-amber-600 border-amber-300 text-xs">No PDF</Badge>
                       )}
+                      {item.pdf_url && item.pdf_url.includes(",") && (
+                        <Badge variant="outline" className="text-xs">
+                          {item.pdf_url.split(",").filter(Boolean).length} PDFs
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-sm">{item.course_title}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">{item.department} · {item.level}</p>
