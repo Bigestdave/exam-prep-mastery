@@ -267,11 +267,18 @@ export default function ModifierDashboard() {
 
                 {expandedId === item.id && (
                   <div className="border-t px-4 py-4 space-y-4 bg-muted/10">
-                    {item.pdf_url && (
-                      <Button size="sm" variant="outline" className="gap-1" onClick={() => window.open(item.pdf_url!, "_blank")}>
-                        <ExternalLink className="w-3 h-3" /> Open Material PDF
-                      </Button>
-                    )}
+                    {item.pdf_url && (() => {
+                      const urls = item.pdf_url.split(",").map(u => u.trim()).filter(Boolean);
+                      return (
+                        <div className="flex flex-wrap gap-2">
+                          {urls.map((url, idx) => (
+                            <Button key={idx} size="sm" variant="outline" className="gap-1" onClick={() => window.open(url, "_blank")}>
+                              <ExternalLink className="w-3 h-3" /> {urls.length > 1 ? `PDF ${idx + 1}` : "Open Material PDF"}
+                            </Button>
+                          ))}
+                        </div>
+                      );
+                    })()}
 
                     {item.status === "pending" && (
                       <Button size="sm" onClick={() => handleMarkProcessing(item.id)} className="gap-1">
