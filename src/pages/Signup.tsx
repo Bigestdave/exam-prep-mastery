@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { GraduationCap, ArrowLeft, Loader2, Eye, EyeOff, Check, ChevronsUpDown, UserCheck } from "lucide-react";
+import { GraduationCap, ArrowLeft, Loader2, Eye, EyeOff, Check, ChevronsUpDown } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { levels } from "@/data/courses";
@@ -28,31 +28,9 @@ export default function Signup() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [departmentOpen, setDepartmentOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [referrerName, setReferrerName] = useState<string | null>(null);
   const { signup } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  // Look up referrer name from stored referral code
-  useEffect(() => {
-    const code = localStorage.getItem("referral_code") || sessionStorage.getItem("referral_code");
-    if (!code) return;
-
-    supabase.functions
-      .invoke("resolve-referrer", {
-        body: { referral_code: code },
-      })
-      .then(({ data, error }) => {
-        if (error) {
-          console.error("Failed to resolve referrer:", error);
-          return;
-        }
-
-        if (data?.full_name) {
-          setReferrerName(data.full_name);
-        }
-      });
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,14 +131,6 @@ export default function Signup() {
             </p>
           </div>
 
-          {referrerName && (
-            <div className="flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 p-3 mb-4">
-              <UserCheck className="w-4 h-4 text-primary shrink-0" />
-              <p className="text-sm text-foreground">
-                Referred by <span className="font-semibold">{referrerName}</span>
-              </p>
-            </div>
-          )}
 
           <GoogleSignInButton label="Sign up with Google" />
 

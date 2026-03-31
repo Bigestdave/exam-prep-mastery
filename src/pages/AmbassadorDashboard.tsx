@@ -147,7 +147,7 @@ export default function AmbassadorDashboard() {
           avg_per_buyer: Number(r.avg_per_buyer),
           rank: Number(r.rank),
         }));
-        setLeaderboard(mapped.slice(0, 10));
+        setLeaderboard(mapped.slice(0, 5));
 
         const myStats = mapped.find((s: DeptStats) => s.department === profile.faculty);
         setMyDeptStats(myStats || null);
@@ -484,7 +484,78 @@ export default function AmbassadorDashboard() {
               className="space-y-6"
             >
               {statsLoading ? (
-                <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+                <div className="space-y-6">
+                  {/* Department Stats Skeleton */}
+                  <div className="bg-card rounded-3xl card-float p-6 space-y-5 animate-pulse">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-2">
+                        <div className="h-5 w-40 bg-muted rounded-lg" />
+                        <div className="h-3 w-52 bg-muted/50 rounded" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      {[1, 2, 3].map(i => (
+                        <div key={i} className="bg-secondary/60 rounded-2xl p-3 space-y-2">
+                          <div className="h-4 w-4 bg-muted rounded mx-auto" />
+                          <div className="h-6 w-10 bg-muted rounded mx-auto" />
+                          <div className="h-2 w-14 bg-muted/50 rounded mx-auto" />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="h-14 w-full bg-secondary/40 rounded-2xl" />
+                  </div>
+
+                  {/* Milestones Skeleton */}
+                  <div className="bg-card rounded-3xl card-float p-6 space-y-5 animate-pulse">
+                    <div className="flex items-center gap-2">
+                      <div className="h-4 w-4 bg-muted rounded" />
+                      <div className="h-4 w-44 bg-muted rounded" />
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <div className="h-3 w-32 bg-muted rounded" />
+                        <div className="h-3 w-24 bg-muted/50 rounded" />
+                      </div>
+                      <div className="h-3 w-full bg-muted/30 rounded-full" />
+                    </div>
+                    <div className="space-y-2">
+                      {[1, 2, 3].map(i => (
+                        <div key={i} className="flex items-center justify-between rounded-2xl px-4 py-3 border border-border bg-secondary/30">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-muted" />
+                            <div className="space-y-1">
+                              <div className="h-3.5 w-20 bg-muted rounded" />
+                              <div className="h-2.5 w-28 bg-muted/50 rounded" />
+                            </div>
+                          </div>
+                          <div className="h-4 w-16 bg-muted rounded" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Leaderboard Skeleton */}
+                  <div className="bg-card rounded-3xl card-float p-6 animate-pulse">
+                    <div className="flex items-center gap-2 mb-5">
+                      <div className="h-4 w-4 bg-muted rounded" />
+                      <div className="h-4 w-40 bg-muted rounded" />
+                    </div>
+                    <div className="space-y-0">
+                      {[1, 2, 3, 4, 5].map(i => (
+                        <div key={i} className={`flex items-center justify-between py-3.5 ${i < 5 ? "border-b border-dashed border-border" : ""}`}>
+                          <div className="flex items-center gap-3">
+                            <div className="w-7 h-7 rounded-full bg-muted" />
+                            <div className="space-y-1">
+                              <div className="h-3.5 w-28 bg-muted rounded" />
+                              <div className="h-2.5 w-36 bg-muted/50 rounded" />
+                            </div>
+                          </div>
+                          <div className="h-4 w-8 bg-muted rounded" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <>
                   {/* Department Stats Card */}
