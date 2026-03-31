@@ -20,11 +20,11 @@ export function LandingFooter() {
             Built for Lead City University students
           </p>
           
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-sm text-muted-foreground">
             <Link to="/become-ambassador" className="hover:text-foreground transition-colors">
               Become an Ambassador
             </Link>
-            <span>·</span>
+            <span className="hidden sm:inline">·</span>
             <p>© 2026 LCU Prep. All rights reserved.</p>
           </div>
         </div>
