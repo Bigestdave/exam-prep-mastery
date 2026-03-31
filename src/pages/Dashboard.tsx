@@ -193,7 +193,7 @@ export default function Dashboard() {
         )}
       </main>
 
-      <SurveyDialog />
+      
       
     </div>
   );
