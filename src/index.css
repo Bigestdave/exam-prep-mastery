@@ -29,7 +29,7 @@
 
     /* Muted: Parchment */
     --muted: 30 10% 94%;
-    --muted-foreground: 25 8% 35%; /* Darker warm grey for legibility */
+    --muted-foreground: 25 10% 28%; /* Strong warm grey for legibility */
 
     /* Accent: Oxford Navy (LCU Blue, deepened for authority) */
     --accent: 213 56% 24%; /* #1B3A5C Dark institutional navy */
