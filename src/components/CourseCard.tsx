@@ -21,24 +21,22 @@ export function CourseCard({ id, code, title, isOwned = false, questionsCount = 
         to={`/course/${id}`}
         className="flex flex-col bg-card border border-border rounded-2xl p-5 card-float transition-all duration-200 group h-full"
       >
-        <div className="flex flex-col gap-2.5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-semibold text-muted-foreground tracking-wider uppercase">
-              {code}
-            </span>
-            {isOwned ? (
-              <CheckCircle className="w-4 h-4 text-accent" />
-            ) : (
-              <Lock className="w-3.5 h-3.5 text-muted-foreground/50" />
-            )}
-          </div>
-          
-           <h3 className="leading-snug line-clamp-2">
-            {title}
-          </h3>
-          
-          <span className="text-xs font-mono text-muted-foreground">{questionsCount} Questions</span>
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-mono font-semibold text-muted-foreground tracking-wider uppercase">
+            {code}
+          </span>
+          {isOwned ? (
+            <CheckCircle className="w-4 h-4 text-accent" />
+          ) : (
+            <Lock className="w-3.5 h-3.5 text-muted-foreground/50" />
+          )}
         </div>
+        
+        <h3 className="leading-snug line-clamp-2 flex-1">
+          {title}
+        </h3>
+        
+        <span className="text-xs font-mono text-muted-foreground mt-3">{questionsCount} Questions</span>
       </Link>
     </motion.div>
   );
