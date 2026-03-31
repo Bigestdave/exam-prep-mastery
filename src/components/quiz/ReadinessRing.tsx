@@ -110,7 +110,7 @@ export function ReadinessRing({
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className={`text-3xl font-display font-bold ${textColor}`}>{percentage}%</span>
+        <span className={`text-2xl font-display font-bold ${textColor}`}>{percentage}%</span>
         <span className={`text-[7px] uppercase tracking-[0.15em] font-bold mt-0.5 ${subTextColor}`}>
           {label}
         </span>
