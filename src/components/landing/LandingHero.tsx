@@ -73,13 +73,6 @@ export function LandingHero() {
             </Link>
           </motion.div>
 
-          {/* Urgency line */}
-          <motion.p 
-            className="text-sm text-muted-foreground mt-4"
-            {...fadeUp(0.65)}
-          >
-            Takes 3 minutes. Free for GST 107.
-          </motion.p>
 
           {/* Partnership badge */}
           <motion.div 
