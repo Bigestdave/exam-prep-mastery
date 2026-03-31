@@ -33,11 +33,11 @@ export function CourseCard({ id, code, title, isOwned = false, questionsCount = 
             )}
           </div>
           
-          <h3 className="font-display font-extrabold text-foreground text-[15px] md:text-lg leading-snug line-clamp-2">
+           <h3 className="leading-snug line-clamp-2">
             {title}
           </h3>
           
-          <span className="text-xs font-mono text-muted-foreground/60">{questionsCount} Questions</span>
+          <span className="text-xs font-mono text-muted-foreground">{questionsCount} Questions</span>
         </div>
       </Link>
     </motion.div>

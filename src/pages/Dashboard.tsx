@@ -144,7 +144,7 @@ export default function Dashboard() {
             <SemesterReadiness courses={displayCourses.map(c => ({ id: c.id, code: c.code, title: c.title }))} />
 
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-display font-bold text-foreground">Your Courses</h2>
+              <h2>Your Courses</h2>
               <span className="text-sm text-muted-foreground">
                 <span className="font-bold text-foreground">{ownedCount}</span>/{displayCourses.length} unlocked
               </span>
