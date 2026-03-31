@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import sovereignKey from "@/assets/sovereign-key.png";
+import lcuLogo from "@/assets/lcu-logo.png";
 
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
 const fadeUp = (delay: number) => ({
