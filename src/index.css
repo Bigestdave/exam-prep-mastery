@@ -29,7 +29,7 @@
 
     /* Muted: Parchment */
     --muted: 30 10% 94%;
-    --muted-foreground: 25 8% 45%; /* Warm grey */
+    --muted-foreground: 25 8% 35%; /* Darker warm grey for legibility */
 
     /* Accent: Deep Navy-Teal (LCU Blue, warmed for Old Money) */
     --accent: 210 60% 32%; /* #214F82 */
