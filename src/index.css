@@ -97,13 +97,20 @@
     font-size: 16px;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-bold text-foreground;
-    letter-spacing: -0.02em;
-  }
+  /* ─── Typography Scale ───
+     Page title:    text-2xl  (24px)  font-display font-bold
+     Section head:  text-lg   (18px)  font-display font-bold
+     Card title:    text-base (16px)  font-display font-bold
+     Body:          text-sm   (14px)  font-sans
+     Caption/meta:  text-xs   (12px)  font-mono uppercase tracking-wider
+  */
+  h1 { @apply text-2xl font-display font-bold text-foreground; letter-spacing: -0.02em; }
+  h2 { @apply text-lg font-display font-bold text-foreground; letter-spacing: -0.02em; }
+  h3 { @apply text-base font-display font-bold text-foreground; letter-spacing: -0.01em; }
+  h4, h5, h6 { @apply text-sm font-display font-semibold text-foreground; }
 
   .prose-content {
-    @apply font-sans leading-relaxed;
+    @apply font-sans leading-relaxed text-sm;
   }
 }
 
