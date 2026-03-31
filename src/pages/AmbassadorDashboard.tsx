@@ -313,9 +313,9 @@ export default function AmbassadorDashboard() {
         }
         setUploads(prev => [uploadRecord as UploadRecord, ...prev]);
         toast({
-          title: files.length > 0 ? "✨ Course Submitted!" : "✅ Course Registered!",
+          title: files.length > 0 ? "✨ Uploaded successfully!" : "✅ Course Registered!",
           description: files.length > 0
-            ? "Materials uploaded. Our team will prepare the content and it'll be live soon!"
+            ? "You'll be notified when the answers and quiz are ready."
             : "Course saved. You can upload materials later.",
         });
       }
