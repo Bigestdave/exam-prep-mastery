@@ -781,9 +781,9 @@ export default function AmbassadorDashboard() {
             >
               <div className="bg-card rounded-3xl card-float p-6 space-y-4">
                 <div>
-                  <h2 className="text-lg font-display font-bold">Your VIP Link</h2>
+                  <h2 className="text-lg font-display font-bold">Your Referral Link</h2>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Share with coursemates. Every signup helps your department hit milestones.
+                    Track signups from your link. You earn from <span className="font-bold text-foreground">all</span> course unlocks in your department — not just referral purchases.
                   </p>
                 </div>
                 <div className="bg-secondary/70 rounded-xl px-4 py-3 flex items-center gap-3">
