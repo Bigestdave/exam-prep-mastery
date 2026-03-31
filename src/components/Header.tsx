@@ -2,7 +2,6 @@ import { Link, useLocation } from "react-router-dom";
 import { User, Settings, Megaphone } from "lucide-react";
 import { Button } from "./ui/button";
 import sovereignKey from "@/assets/sovereign-key.png";
-import lcuLogo from "@/assets/lcu-logo.png";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useRole } from "@/hooks/useRole";
@@ -30,11 +29,9 @@ export function Header({ isLoggedIn = false, userName }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 glass shadow-sm border-b border-border/60">
       <div className="container flex items-center justify-between h-16">
-        <Link to={isLoggedIn ? "/dashboard" : "/"} className="flex items-center gap-2.5">
-          <div className="flex items-center gap-1.5">
-            <img src={lcuLogo} alt="Lead City University" className="w-7 h-7 object-contain" />
-            <span className="text-muted-foreground/40 font-light text-lg select-none">×</span>
-            <img src={sovereignKey} alt="LCU Prep" className="w-6 h-6 object-contain" style={{ filter: 'brightness(0)' }} />
+        <Link to={isLoggedIn ? "/dashboard" : "/"} className="flex items-center gap-2">
+          <div className="w-9 h-9 flex items-center justify-center">
+            <img src={sovereignKey} alt="LCU Prep" className="w-7 h-7 object-contain" style={{ filter: 'brightness(0)' }} />
           </div>
           <span className="font-display font-bold text-lg text-foreground">LCU Prep</span>
         </Link>

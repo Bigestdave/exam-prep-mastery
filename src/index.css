@@ -29,10 +29,10 @@
 
     /* Muted: Parchment */
     --muted: 30 10% 94%;
-    --muted-foreground: 25 8% 45%; /* Warm grey */
+    --muted-foreground: 25 8% 35%; /* Darker warm grey for legibility */
 
-    /* Accent: LCU Sky Blue */
-    --accent: 197 71% 52%; /* #2BA3D4 Sky Blue */
+    /* Accent: Deep Navy-Teal (LCU Blue, warmed for Old Money) */
+    --accent: 210 60% 32%; /* #214F82 */
     --accent-foreground: 0 0% 100%;
 
     /* Destructive / Alert: Burnt Sienna */
@@ -56,15 +56,15 @@
     --cream: 40 33% 98%;        /* #FDFBF7 */
     --cream-muted: 40 20% 80%;  /* for /0.45-level opacity replacement */
 
-    /* LCU Blue — accent on dark surfaces */
-    --academic-green: 197 71% 52%; /* #2BA3D4 */
+    /* LCU Navy — accent on dark surfaces */
+    --academic-green: 210 60% 32%; /* #214F82 */
 
     /* Amber tier */
     --tier-silver: 30 70% 60%;
 
     /* Free preview badge */
-    --badge-free-bg: 197 80% 95%;  /* Light sky blue */
-    --badge-free-text: 197 71% 30%; /* Dark sky blue */
+    --badge-free-bg: 210 60% 95%;  /* Light navy tint */
+    --badge-free-text: 210 60% 25%; /* Dark navy */
 
     /* Progress track */
     --progress-track: 30 8% 96%; /* #F5F5F4 */
