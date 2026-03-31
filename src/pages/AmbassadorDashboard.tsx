@@ -974,12 +974,11 @@ export default function AmbassadorDashboard() {
                             {statusIcon(u.status)}
                           </div>
                         </div>
-                        {!u.pdf_url && (
-                          <label
+                        <label
                             htmlFor={`add-material-${u.id}`}
                             className="mt-3 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border-2 border-dashed border-border hover:border-accent/40 hover:bg-accent/[0.04] cursor-pointer transition-all text-sm font-semibold text-muted-foreground hover:text-foreground"
                           >
-                            <Upload className="w-4 h-4" /> Add Materials
+                            <Upload className="w-4 h-4" /> {u.pdf_url ? "Replace / Add Materials" : "Add Materials"}
                             <input
                               id={`add-material-${u.id}`}
                               type="file"
