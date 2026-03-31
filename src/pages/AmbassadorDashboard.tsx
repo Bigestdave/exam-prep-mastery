@@ -439,7 +439,7 @@ export default function AmbassadorDashboard() {
               ₦{walletBalance.toLocaleString()}
             </h1>
             <p className="text-xs text-background/50 mt-1">
-              Milestone rewards only · No per-sale commission
+              Earned from all course unlocks in your department
             </p>
           </div>
           <motion.button
@@ -561,7 +561,7 @@ export default function AmbassadorDashboard() {
                   {/* Department Stats Card */}
                   <div className="bg-card rounded-3xl card-float p-6 space-y-5">
                     <div className="flex items-center justify-between">
-                      <div>
+                <div>
                         <h2 className="text-lg font-display font-bold">{profile?.faculty || "Your Department"}</h2>
                         <p className="text-xs text-muted-foreground mt-0.5">
                           {myDeptStats ? `Rank #${myDeptStats.rank} across university` : "No data yet this semester"}
@@ -618,6 +618,15 @@ export default function AmbassadorDashboard() {
                         </div>
                       </div>
                     )}
+                  </div>
+
+                  {/* How it works explainer */}
+                  <div className="rounded-2xl bg-secondary/40 p-4">
+                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">How You Earn</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      You earn milestone bonuses when <span className="font-bold text-foreground">anyone in your department</span> unlocks courses — 
+                      whether they used your referral link or not. Your link helps track signups, but all department activity counts toward your rewards.
+                    </p>
                   </div>
 
                   {/* ─── MILESTONES ─── */}
@@ -781,9 +790,9 @@ export default function AmbassadorDashboard() {
             >
               <div className="bg-card rounded-3xl card-float p-6 space-y-4">
                 <div>
-                  <h2 className="text-lg font-display font-bold">Your VIP Link</h2>
+                  <h2 className="text-lg font-display font-bold">Your Referral Link</h2>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Share with coursemates. Every signup helps your department hit milestones.
+                    Track signups from your link. You earn from <span className="font-bold text-foreground">all</span> course unlocks in your department — not just referral purchases.
                   </p>
                 </div>
                 <div className="bg-secondary/70 rounded-xl px-4 py-3 flex items-center gap-3">
@@ -974,12 +983,11 @@ export default function AmbassadorDashboard() {
                             {statusIcon(u.status)}
                           </div>
                         </div>
-                        {!u.pdf_url && (
-                          <label
+                        <label
                             htmlFor={`add-material-${u.id}`}
                             className="mt-3 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border-2 border-dashed border-border hover:border-accent/40 hover:bg-accent/[0.04] cursor-pointer transition-all text-sm font-semibold text-muted-foreground hover:text-foreground"
                           >
-                            <Upload className="w-4 h-4" /> Add Materials
+                            <Upload className="w-4 h-4" /> {u.pdf_url ? "Replace / Add Materials" : "Add Materials"}
                             <input
                               id={`add-material-${u.id}`}
                               type="file"
@@ -1012,7 +1020,6 @@ export default function AmbassadorDashboard() {
                               }}
                             />
                           </label>
-                        )}
                       </div>
                     ))}
                   </div>
