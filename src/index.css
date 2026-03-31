@@ -113,7 +113,7 @@
   h4, h5, h6 { @apply text-sm font-display font-semibold text-foreground; }
 
   .prose-content {
-    @apply font-sans leading-relaxed text-sm;
+    @apply font-sans leading-relaxed text-base;
   }
 }
 
