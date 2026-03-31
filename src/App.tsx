@@ -19,7 +19,7 @@ import AnswerView from "./pages/AnswerView";
 import Profile from "./pages/Profile";
 import RequestCourse from "./pages/RequestCourse";
 import Library from "./pages/Library";
-import Survey from "./pages/Survey";
+
 import AmbassadorUpload from "./pages/AmbassadorUpload";
 import AmbassadorDashboard from "./pages/AmbassadorDashboard";
 import Quiz from "./pages/Quiz";
@@ -60,7 +60,7 @@ const AppContent = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/request-course" element={<RequestCourse />} />
           <Route path="/library" element={<Library />} />
-          <Route path="/survey" element={<Survey />} />
+          
           <Route path="/upload" element={<AmbassadorUpload />} />
           <Route path="/ambassador" element={<AmbassadorDashboard />} />
           <Route path="/withdraw" element={<Withdraw />} />
