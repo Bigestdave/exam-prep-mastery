@@ -19,10 +19,6 @@ export function LandingHero() {
     <section className="relative">
       <div className="container pt-8 pb-16 md:pt-12 md:pb-24 px-4">
         <div className="max-w-3xl mx-auto text-left md:text-center">
-          <div className="inline-flex items-center gap-2 glass-pill rounded-full text-muted-foreground px-5 py-2 text-xs font-mono font-semibold tracking-[0.15em] uppercase mb-8 opacity-0 animate-fade-in">
-            <img src={lcuLogo} alt="" className="w-5 h-5 object-contain" />
-            Lead City University
-          </div>
           
           <h1 className="text-foreground leading-[1.1] mb-6">
             <motion.span
