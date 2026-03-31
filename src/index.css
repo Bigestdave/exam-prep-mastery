@@ -39,7 +39,7 @@
     --destructive: 28 91% 37%; /* #B45309 */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 30 12% 89%; /* #E7E5E4 subtle grey */
+    --border: 30 12% 84%; /* Stronger card edges */
     --input: 30 12% 89%;
     --ring: 20 14% 9%;
 
