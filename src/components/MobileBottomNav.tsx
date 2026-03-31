@@ -60,7 +60,7 @@ export function MobileBottomNav() {
   }, [isAmbassador, isRoleLoading]);
 
   // Hide on public/auth pages and quiz
-  const hiddenPaths = ["/", "/login", "/signup", "/forgot-password", "/reset-password", "/admin", "/survey", "/become-ambassador"];
+  const hiddenPaths = ["/", "/login", "/signup", "/forgot-password", "/reset-password", "/admin", "/become-ambassador"];
   const isQuizRoute = currentPath.includes("/quiz");
   const isVipRoute = currentPath.startsWith("/vip/");
   const isCourseDetail = currentPath.startsWith("/course/");

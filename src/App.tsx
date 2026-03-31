@@ -60,7 +60,7 @@ const AppContent = () => {
           <Route path="/profile" element={<Profile />} />
           <Route path="/request-course" element={<RequestCourse />} />
           <Route path="/library" element={<Library />} />
-          <Route path="/survey" element={<Survey />} />
+          
           <Route path="/upload" element={<AmbassadorUpload />} />
           <Route path="/ambassador" element={<AmbassadorDashboard />} />
           <Route path="/withdraw" element={<Withdraw />} />
