@@ -63,8 +63,8 @@
     --tier-silver: 30 70% 60%;
 
     /* Free preview badge */
-    --badge-free-bg: 210 60% 95%;  /* Light navy tint */
-    --badge-free-text: 210 60% 25%; /* Dark navy */
+    --badge-free-bg: 213 50% 95%;
+    --badge-free-text: 213 56% 20%;
 
     /* Progress track */
     --progress-track: 30 8% 96%; /* #F5F5F4 */
