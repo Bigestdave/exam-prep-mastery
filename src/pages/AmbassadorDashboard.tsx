@@ -147,7 +147,7 @@ export default function AmbassadorDashboard() {
           avg_per_buyer: Number(r.avg_per_buyer),
           rank: Number(r.rank),
         }));
-        setLeaderboard(mapped.slice(0, 10));
+        setLeaderboard(mapped.slice(0, 5));
 
         const myStats = mapped.find((s: DeptStats) => s.department === profile.faculty);
         setMyDeptStats(myStats || null);
