@@ -34,7 +34,7 @@ export function LandingHero() {
               Now prove you're
             </motion.span>
             <motion.span
-              className="block text-[28px] md:text-5xl lg:text-6xl font-serif italic text-accent mt-1"
+              className="block text-[36px] md:text-5xl lg:text-6xl font-serif italic text-accent mt-1"
               {...fadeUp(0.3)}
             >
               ready for the exam.
