@@ -22,7 +22,7 @@ export function LandingHero() {
           
           <h1 className="text-foreground leading-[1.1] mb-6">
             <motion.span
-              className="block text-[36px] md:text-5xl lg:text-6xl font-display font-bold leading-[1.1]"
+              className="block text-[28px] md:text-5xl lg:text-6xl font-display font-bold leading-[1.1]"
               {...fadeUp(0.1)}
             >
               You've read your notes.
