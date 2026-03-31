@@ -620,6 +620,15 @@ export default function AmbassadorDashboard() {
                     )}
                   </div>
 
+                  {/* How it works explainer */}
+                  <div className="rounded-2xl bg-secondary/40 p-4">
+                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">How You Earn</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      You earn milestone bonuses when <span className="font-bold text-foreground">anyone in your department</span> unlocks courses — 
+                      whether they used your referral link or not. Your link helps track signups, but all department activity counts toward your rewards.
+                    </p>
+                  </div>
+
                   {/* ─── MILESTONES ─── */}
                   <div className="bg-card rounded-3xl card-float p-6 space-y-5">
                     <div className="flex items-center gap-2">
