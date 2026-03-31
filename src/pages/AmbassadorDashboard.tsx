@@ -1011,7 +1011,6 @@ export default function AmbassadorDashboard() {
                               }}
                             />
                           </label>
-                        )}
                       </div>
                     ))}
                   </div>
