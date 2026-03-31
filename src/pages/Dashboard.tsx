@@ -133,7 +133,7 @@ export default function Dashboard() {
           <p className="text-xs text-muted-foreground font-mono tracking-wider uppercase mb-1">
             {profile?.faculty} · {profile?.level}
           </p>
-          <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground">
+          <h1>
             {profile?.full_name?.split(' ')[0] || 'Student'}
           </h1>
         </div>
@@ -144,7 +144,7 @@ export default function Dashboard() {
             <SemesterReadiness courses={displayCourses.map(c => ({ id: c.id, code: c.code, title: c.title }))} />
 
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-display font-bold text-foreground">Your Courses</h2>
+              <h2>Your Courses</h2>
               <span className="text-sm text-muted-foreground">
                 <span className="font-bold text-foreground">{ownedCount}</span>/{displayCourses.length} unlocked
               </span>
