@@ -313,9 +313,9 @@ export default function AmbassadorDashboard() {
         }
         setUploads(prev => [uploadRecord as UploadRecord, ...prev]);
         toast({
-          title: files.length > 0 ? "✨ Course Submitted!" : "✅ Course Registered!",
+          title: files.length > 0 ? "✨ Uploaded successfully!" : "✅ Course Registered!",
           description: files.length > 0
-            ? "Materials uploaded. Our team will prepare the content and it'll be live soon!"
+            ? "You'll be notified when the answers and quiz are ready."
             : "Course saved. You can upload materials later.",
         });
       }
@@ -395,7 +395,7 @@ export default function AmbassadorDashboard() {
   if (!user || (!isAmbassador && !isAdmin)) return null;
 
   const walletBalance = profile ? (profile as any).wallet_balance || 0 : 0;
-  const vipLink = `https://lcuprep.lovable.app/vip/${referralCode}`;
+  const vipLink = `https://lcuprep.study/vip/${referralCode}`;
   const completedUploads = uploads.filter(u => u.status === "complete").length;
 
   // Milestone progress — based on total course unlocks, not unique buyers
@@ -975,14 +975,8 @@ export default function AmbassadorDashboard() {
                           <div className="min-w-0 flex-1">
                             <p className="text-xs font-mono text-muted-foreground">{u.course_code}</p>
                             <p className="text-sm font-semibold">{u.course_title}</p>
-                            <p className="text-xs mt-0.5">
-                              {u.pdf_url ? (
-                                <span className="text-accent flex items-center gap-1">
-                                  <CheckCircle2 className="w-3 h-3" /> Uploaded successfully. You'll be notified when answers & quiz are ready.
-                                </span>
-                              ) : (
-                                <span className="text-muted-foreground">No materials yet</span>
-                              )}
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {u.pdf_url ? "📎 Materials uploaded" : "No materials yet"}
                             </p>
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
@@ -995,7 +989,7 @@ export default function AmbassadorDashboard() {
                             htmlFor={`add-material-${u.id}`}
                             className="mt-3 flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border-2 border-dashed border-border hover:border-accent/40 hover:bg-accent/[0.04] cursor-pointer transition-all text-sm font-semibold text-muted-foreground hover:text-foreground"
                           >
-                            <Upload className="w-4 h-4" /> {u.pdf_url ? "Replace / Add Materials" : "Add Materials"}
+                            <Upload className="w-4 h-4" /> {u.pdf_url ? `Update ${u.course_code} Materials` : `Add ${u.course_code} Materials`}
                             <input
                               id={`add-material-${u.id}`}
                               type="file"
@@ -1020,7 +1014,7 @@ export default function AmbassadorDashboard() {
                                   const { data: urlData } = supabase.storage.from("course_materials").getPublicUrl(fileData.path);
                                   await supabase.from("course_uploads").update({ pdf_url: urlData.publicUrl, status: "pending" }).eq("id", u.id);
                                   setUploads(prev => prev.map(x => x.id === u.id ? { ...x, pdf_url: urlData.publicUrl, status: "pending" } : x));
-                                  toast({ title: "✨ Materials added!", description: `Uploaded for ${u.course_code}` });
+                                  toast({ title: "✨ Uploaded successfully!", description: "You'll be notified when the answers and quiz are ready." });
                                 } catch (err) {
                                   toast({ title: "Upload failed", description: err instanceof Error ? err.message : "Something went wrong", variant: "destructive" });
                                 }
