@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { GraduationCap, ArrowLeft, Loader2, Eye, EyeOff, Check, ChevronsUpDown, UserCheck } from "lucide-react";
+import { GraduationCap, ArrowLeft, Loader2, Eye, EyeOff, Check, ChevronsUpDown } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { levels } from "@/data/courses";
