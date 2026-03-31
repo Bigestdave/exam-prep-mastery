@@ -28,31 +28,9 @@ export default function Signup() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [departmentOpen, setDepartmentOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [referrerName, setReferrerName] = useState<string | null>(null);
   const { signup } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  // Look up referrer name from stored referral code
-  useEffect(() => {
-    const code = localStorage.getItem("referral_code") || sessionStorage.getItem("referral_code");
-    if (!code) return;
-
-    supabase.functions
-      .invoke("resolve-referrer", {
-        body: { referral_code: code },
-      })
-      .then(({ data, error }) => {
-        if (error) {
-          console.error("Failed to resolve referrer:", error);
-          return;
-        }
-
-        if (data?.full_name) {
-          setReferrerName(data.full_name);
-        }
-      });
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
