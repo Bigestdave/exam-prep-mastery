@@ -28,7 +28,7 @@ export function LandingHero() {
               You've read your notes.
             </motion.span>
             <motion.span
-              className="block text-[28px] md:text-5xl lg:text-6xl font-display font-bold leading-[1.1] mt-1"
+              className="block text-[36px] md:text-5xl lg:text-6xl font-display font-bold leading-[1.1] mt-1"
               {...fadeUp(0.2)}
             >
               Now prove you're
