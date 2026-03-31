@@ -2,7 +2,6 @@ import { Link, useLocation } from "react-router-dom";
 import { User, Settings, Megaphone } from "lucide-react";
 import { Button } from "./ui/button";
 import sovereignKey from "@/assets/sovereign-key.png";
-import lcuLogo from "@/assets/lcu-logo.png";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useRole } from "@/hooks/useRole";
