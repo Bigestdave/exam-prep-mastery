@@ -35,7 +35,7 @@ export function LandingValueProps() {
                 <item.icon className="w-5 h-5 text-accent" />
               </div>
               <h3 className="font-display font-semibold text-foreground mb-2">{item.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-3">{item.desc}</p>
+              <p className="text-base text-muted-foreground leading-relaxed mb-3">{item.desc}</p>
               <p className="text-xs font-mono text-accent font-semibold uppercase tracking-wide">{item.stat}</p>
             </div>
           ))}
