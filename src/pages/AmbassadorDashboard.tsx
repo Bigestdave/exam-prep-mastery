@@ -395,7 +395,7 @@ export default function AmbassadorDashboard() {
   if (!user || (!isAmbassador && !isAdmin)) return null;
 
   const walletBalance = profile ? (profile as any).wallet_balance || 0 : 0;
-  const vipLink = `${window.location.origin}/vip/${referralCode}`;
+  const vipLink = `https://lcuprep.lovable.app/vip/${referralCode}`;
   const completedUploads = uploads.filter(u => u.status === "complete").length;
 
   // Milestone progress — based on total course unlocks, not unique buyers
