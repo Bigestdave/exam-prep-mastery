@@ -561,7 +561,7 @@ export default function AmbassadorDashboard() {
                   {/* Department Stats Card */}
                   <div className="bg-card rounded-3xl card-float p-6 space-y-5">
                     <div className="flex items-center justify-between">
-                      <div>
+                <div>
                         <h2 className="text-lg font-display font-bold">{profile?.faculty || "Your Department"}</h2>
                         <p className="text-xs text-muted-foreground mt-0.5">
                           {myDeptStats ? `Rank #${myDeptStats.rank} across university` : "No data yet this semester"}
