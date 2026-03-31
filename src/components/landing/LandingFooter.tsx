@@ -17,7 +17,7 @@ export function LandingFooter() {
             </div>
           </div>
           <p className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground">
-            In partnership with Lead City University
+            Built for Lead City University students
           </p>
           
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
