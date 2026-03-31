@@ -439,7 +439,7 @@ export default function AmbassadorDashboard() {
               ₦{walletBalance.toLocaleString()}
             </h1>
             <p className="text-xs text-background/50 mt-1">
-              Milestone rewards only · No per-sale commission
+              Earned from all course unlocks in your department
             </p>
           </div>
           <motion.button
