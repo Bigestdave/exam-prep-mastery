@@ -975,8 +975,14 @@ export default function AmbassadorDashboard() {
                           <div className="min-w-0 flex-1">
                             <p className="text-xs font-mono text-muted-foreground">{u.course_code}</p>
                             <p className="text-sm font-semibold">{u.course_title}</p>
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              {u.pdf_url ? "📎 Materials uploaded" : "No materials yet"}
+                            <p className="text-xs mt-0.5">
+                              {u.pdf_url ? (
+                                <span className="text-accent flex items-center gap-1">
+                                  <CheckCircle2 className="w-3 h-3" /> Uploaded successfully. You'll be notified when answers & quiz are ready.
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground">No materials yet</span>
+                              )}
                             </p>
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
