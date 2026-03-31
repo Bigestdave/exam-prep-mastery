@@ -986,7 +986,9 @@ export default function AmbassadorDashboard() {
                             </p>
                           </div>
                           <div className="flex items-center gap-2 shrink-0">
-                            {statusIcon(u.status)}
+                            {u.pdf_url && u.status === "pending" ? (
+                              <CheckCircle2 className="w-4 h-4 text-accent" />
+                            ) : statusIcon(u.status)}
                           </div>
                         </div>
                         <label
