@@ -25,19 +25,19 @@ export function LandingHero() {
               className="block text-[36px] md:text-5xl lg:text-6xl font-display font-bold leading-[1.1]"
               {...fadeUp(0.1)}
             >
-              You studied your notes.
+              You've read your notes.
             </motion.span>
             <motion.span
               className="block text-[36px] md:text-5xl lg:text-6xl font-display font-bold leading-[1.1] mt-1"
               {...fadeUp(0.2)}
             >
-              But are you actually
+              Now prove you're
             </motion.span>
             <motion.span
               className="block text-[36px] md:text-5xl lg:text-6xl font-serif italic text-accent mt-1"
               {...fadeUp(0.3)}
             >
-              ready for the exam?
+              ready for the exam.
             </motion.span>
           </h1>
           
@@ -45,7 +45,7 @@ export function LandingHero() {
             className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto leading-relaxed"
             {...fadeUp(0.45)}
           >
-            We solved every tutorial question your lecturer set, verified to first-class standard. Then we built a quiz so you can prove to yourself you actually know it.
+            We solved every question from your course materials, verified to first-class standard. Then we built a quiz so you can prove to yourself you actually know it.
           </motion.p>
           
           <motion.div 
@@ -58,7 +58,7 @@ export function LandingHero() {
                 whileTap={{ scale: 0.96 }}
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
               >
-                Find My Course
+                Test My Readiness
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </MotionButton>
             </Link>
@@ -72,6 +72,14 @@ export function LandingHero() {
               </MotionButton>
             </Link>
           </motion.div>
+
+          {/* Urgency line */}
+          <motion.p 
+            className="text-sm text-muted-foreground mt-4"
+            {...fadeUp(0.65)}
+          >
+            Takes 3 minutes. Free for GST 107.
+          </motion.p>
 
           {/* Partnership badge */}
           <motion.div 
@@ -87,7 +95,7 @@ export function LandingHero() {
               </div>
             </div>
             <p className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground">
-              In partnership with Lead City University
+              Built for Lead City University students
             </p>
           </motion.div>
         </div>
