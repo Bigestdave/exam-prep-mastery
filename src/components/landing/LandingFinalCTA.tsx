@@ -11,10 +11,10 @@ export function LandingFinalCTA() {
             Stop hoping you'll remember.<br/>
             <span className="font-serif italic text-accent">Know</span> you will.
           </h2>
-          <p className="text-muted-foreground mb-4">
+          <p className="text-lg text-muted-foreground mb-4">
             2,400+ students already preparing with certainty.
           </p>
-          <p className="text-sm text-muted-foreground mb-8">
+          <p className="text-base text-muted-foreground mb-8">
             Used by students across 30+ departments in Lead City University.
           </p>
           <Link to="/signup">

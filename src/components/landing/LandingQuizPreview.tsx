@@ -13,7 +13,7 @@ export function LandingQuizPreview() {
                 Know your readiness<br/>
                 <span className="font-serif italic text-accent">before</span> the exam hall
               </h2>
-              <p className="text-muted-foreground leading-relaxed mb-6">
+              <p className="text-base text-muted-foreground leading-relaxed mb-6">
                 After studying, take our quiz and get an instant readiness score. No more guessing if you're prepared. You'll see exactly where you stand.
               </p>
             </div>

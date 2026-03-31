@@ -46,7 +46,7 @@ export function LandingHero() {
           </h1>
           
           <motion.p 
-            className="text-base md:text-lg text-muted-foreground mb-8 max-w-xl mx-auto leading-relaxed"
+            className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl mx-auto leading-relaxed"
             {...fadeUp(0.45)}
           >
             We solved every tutorial question your lecturer set, verified to first-class standard. Then we built a quiz so you can prove to yourself you actually know it.
