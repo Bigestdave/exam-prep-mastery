@@ -1014,7 +1014,7 @@ export default function AmbassadorDashboard() {
                                   const { data: urlData } = supabase.storage.from("course_materials").getPublicUrl(fileData.path);
                                   await supabase.from("course_uploads").update({ pdf_url: urlData.publicUrl, status: "pending" }).eq("id", u.id);
                                   setUploads(prev => prev.map(x => x.id === u.id ? { ...x, pdf_url: urlData.publicUrl, status: "pending" } : x));
-                                  toast({ title: "✨ Materials added!", description: `Uploaded for ${u.course_code}` });
+                                  toast({ title: "✨ Uploaded successfully!", description: "You'll be notified when the answers and quiz are ready." });
                                 } catch (err) {
                                   toast({ title: "Upload failed", description: err instanceof Error ? err.message : "Something went wrong", variant: "destructive" });
                                 }
