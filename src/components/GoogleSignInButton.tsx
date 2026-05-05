@@ -10,10 +10,12 @@ export function GoogleSignInButton({ label = "Continue with Google" }: { label?:
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
+    const params = new URLSearchParams(window.location.search);
+    const redirectPath = params.get("redirect") || "/dashboard";
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/dashboard`,
+        redirectTo: `${window.location.origin}${redirectPath}`,
       },
     });
 
