@@ -1,17 +1,56 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { BookPlus, BookOpen, LogOut, ArrowLeft, ChevronRight, User, Megaphone } from "lucide-react";
+import { BookPlus, BookOpen, LogOut, ArrowLeft, ChevronRight, User, Megaphone, Pencil, Check, X, Loader2 } from "lucide-react";
 import { useRole } from "@/hooks/useRole";
 import { TextShimmer } from "@/components/ui/text-shimmer";
+import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Profile() {
   const { user, profile, isLoading, logout, purchases } = useAuth();
   const { isAmbassador } = useRole();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [editing, setEditing] = useState(false);
+  const [nameDraft, setNameDraft] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [displayName, setDisplayName] = useState<string | null>(null);
+
+  useEffect(() => {
+    setDisplayName(profile?.full_name ?? null);
+  }, [profile?.full_name]);
+
+  const startEdit = () => {
+    setNameDraft(displayName ?? "");
+    setEditing(true);
+  };
+
+  const saveName = async () => {
+    const trimmed = nameDraft.trim();
+    if (!trimmed || !user) return;
+    if (trimmed.length > 80) {
+      toast({ title: "Name too long", description: "Keep it under 80 characters.", variant: "destructive" });
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ full_name: trimmed })
+      .eq("id", user.id);
+    setSaving(false);
+    if (error) {
+      toast({ title: "Couldn't save name", description: error.message, variant: "destructive" });
+      return;
+    }
+    setDisplayName(trimmed);
+    setEditing(false);
+    toast({ title: "Name updated" });
+  };
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -98,10 +137,40 @@ export default function Profile() {
         <div className="bg-card rounded-3xl border border-border shadow-card p-8 mb-6 flex flex-col items-center text-center">
           <div className="w-20 h-20 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center mb-4">
             <span className="text-2xl font-display font-bold text-primary" style={{ letterSpacing: '-0.03em' }}>
-              {getInitials(profile?.full_name)}
+              {getInitials(displayName)}
             </span>
           </div>
-          <h1 className="text-xl font-display font-bold text-foreground mb-0.5">{profile?.full_name}</h1>
+          {editing ? (
+            <div className="w-full max-w-xs flex items-center gap-2 mb-2">
+              <Input
+                value={nameDraft}
+                onChange={(e) => setNameDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") saveName();
+                  if (e.key === "Escape") setEditing(false);
+                }}
+                autoFocus
+                maxLength={80}
+                className="h-9 text-center"
+                placeholder="Your full name"
+              />
+              <Button size="icon" variant="default" className="h-9 w-9 shrink-0" onClick={saveName} disabled={saving || !nameDraft.trim()}>
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+              </Button>
+              <Button size="icon" variant="ghost" className="h-9 w-9 shrink-0" onClick={() => setEditing(false)} disabled={saving}>
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          ) : (
+            <button
+              onClick={startEdit}
+              className="group inline-flex items-center gap-2 mb-0.5 hover:opacity-80 transition-opacity"
+              aria-label="Edit name"
+            >
+              <h1 className="text-xl font-display font-bold text-foreground">{displayName || "Add your name"}</h1>
+              <Pencil className="w-3.5 h-3.5 text-muted-foreground opacity-60 group-hover:opacity-100" />
+            </button>
+          )}
           <p className="text-sm text-muted-foreground mb-3">{user?.email}</p>
           <p className="text-xs font-mono tracking-wider uppercase text-muted-foreground">
             {profile?.faculty} · {profile?.level}
