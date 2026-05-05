@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Header } from "@/components/Header";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Crown, CheckCircle, Loader2, ArrowRight } from "lucide-react";
+import { Crown, CheckCircle, Loader2, ArrowRight, Lock } from "lucide-react";
 import sovereignKey from "@/assets/sovereign-key.png";
 
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
@@ -21,17 +21,32 @@ const fadeUp = (delay: number) => ({
 
 export default function BecomeAmbassador() {
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
-  const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [reason, setReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  // Prefill name from profile when available
+  useEffect(() => {
+    if (profile?.full_name && !fullName) setFullName(profile.full_name);
+  }, [profile?.full_name]);
+
+  const email = user?.email ?? "";
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmedEmail = email.trim().toLowerCase();
-    if (!trimmedEmail) return;
+    if (!user) {
+      // Save current intent and send to login
+      navigate("/login?redirect=/become-ambassador");
+      return;
+    }
+    const trimmedEmail = (user.email ?? "").trim().toLowerCase();
+    if (!trimmedEmail) {
+      toast({ title: "No email on your account", description: "Please contact support.", variant: "destructive" });
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -41,7 +56,7 @@ export default function BecomeAmbassador() {
           email: trimmedEmail,
           full_name: fullName.trim() || null,
           reason: reason.trim() || null,
-          user_id: user?.id || null,
+          user_id: user.id,
         } as any);
 
       if (error) {
@@ -225,17 +240,22 @@ export default function BecomeAmbassador() {
                     <Label htmlFor="email" className="text-sm font-medium text-foreground">
                       Email address
                     </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="your@email.com"
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      required
-                      className="mt-1.5"
-                    />
+                    <div className="relative mt-1.5">
+                      <Input
+                        id="email"
+                        type="email"
+                        value={email}
+                        readOnly
+                        disabled={!user}
+                        placeholder={user ? "" : "Sign in to autofill your email"}
+                        className="pr-9 bg-muted/40 cursor-not-allowed"
+                      />
+                      <Lock className="w-3.5 h-3.5 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2" />
+                    </div>
                     <p className="text-[11px] text-muted-foreground mt-1.5">
-                      Must match the email you signed up with on LCU Prep.
+                      {user
+                        ? "Locked to your signed-in email — this prevents typos so we can approve you instantly."
+                        : "Sign in first so we can match your application to your account."}
                     </p>
                   </div>
 
@@ -270,14 +290,14 @@ export default function BecomeAmbassador() {
                     type="submit"
                     size="lg"
                     className="w-full group"
-                    disabled={submitting || !email.trim()}
+                    disabled={submitting || (!!user && !email.trim())}
                   >
                     {submitting ? (
                       <Loader2 className="w-4 h-4 animate-spin mr-2" />
                     ) : (
                       <Crown className="w-4 h-4 mr-2" />
                     )}
-                    Submit Application
+                    {user ? "Submit Application" : "Sign in to apply"}
                     {!submitting && (
                       <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
                     )}
