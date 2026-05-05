@@ -234,7 +234,46 @@ export default function BecomeAmbassador() {
                 Apply Now
               </p>
 
-              <div className="rounded-xl border border-border bg-card p-6 md:p-8 card-shadow">
+              {!user && (
+                <div className="mb-5 rounded-xl border-2 border-accent/30 bg-accent/5 p-5 card-shadow">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+                      <Lock className="w-4 h-4 text-accent" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-display font-semibold text-foreground mb-1">
+                        Sign in first to apply
+                      </p>
+                      <p className="text-xs text-muted-foreground leading-relaxed mb-4">
+                        We lock your application to your signed-in email so we can approve you instantly with no typos or mismatches.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <Button
+                          size="sm"
+                          className="w-full sm:w-auto group"
+                          onClick={() => navigate("/login?redirect=/become-ambassador")}
+                        >
+                          Sign in
+                          <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full sm:w-auto"
+                          onClick={() => navigate("/signup?redirect=/become-ambassador")}
+                        >
+                          Create an account
+                        </Button>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground mt-3">
+                        Takes 30 seconds. You'll come straight back here.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className={`rounded-xl border border-border bg-card p-6 md:p-8 card-shadow ${!user ? 'opacity-60 pointer-events-none select-none' : ''}`}>
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div>
                     <Label htmlFor="email" className="text-sm font-medium text-foreground">
