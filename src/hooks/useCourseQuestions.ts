@@ -10,9 +10,26 @@ export interface CourseQuestion {
   answer_text: string;
 }
 
+// Per-course cache so revisits feel instant.
+const questionsCache: Record<string, CourseQuestion[]> = {};
+const SS_PREFIX = 'lcu_qcache_v1_';
+function readCache(courseId: string): CourseQuestion[] | null {
+  if (questionsCache[courseId]) return questionsCache[courseId];
+  try {
+    const raw = sessionStorage.getItem(SS_PREFIX + courseId);
+    if (raw) {
+      const parsed = JSON.parse(raw) as CourseQuestion[];
+      questionsCache[courseId] = parsed;
+      return parsed;
+    }
+  } catch {}
+  return null;
+}
+
 export function useCourseQuestions(courseId: string | undefined) {
-  const [questions, setQuestions] = useState<CourseQuestion[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const initial = courseId ? readCache(courseId) : null;
+  const [questions, setQuestions] = useState<CourseQuestion[]>(initial ?? []);
+  const [isLoading, setIsLoading] = useState(initial === null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchQuestions = useCallback(async () => {
@@ -22,7 +39,13 @@ export function useCourseQuestions(courseId: string | undefined) {
       return;
     }
 
-    setIsLoading(true);
+    const cached = readCache(courseId);
+    if (cached) {
+      setQuestions(cached);
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
+    }
     setError(null);
 
     const { data, error: fetchError } = await supabase
@@ -34,15 +57,21 @@ export function useCourseQuestions(courseId: string | undefined) {
 
     if (fetchError) {
       setError(fetchError.message);
-      setQuestions([]);
       console.error('Failed to load questions:', fetchError);
-      toast({
-        title: "Couldn't load questions",
-        description: "Pull down to refresh or check your connection.",
-        variant: "destructive",
-      });
+      // Only show error if we have nothing cached to display.
+      if (!cached) {
+        setQuestions([]);
+        toast({
+          title: "Couldn't load questions",
+          description: "Pull down to refresh or check your connection.",
+          variant: "destructive",
+        });
+      }
     } else {
-      setQuestions(data || []);
+      const next = (data || []) as CourseQuestion[];
+      questionsCache[courseId] = next;
+      try { sessionStorage.setItem(SS_PREFIX + courseId, JSON.stringify(next)); } catch {}
+      setQuestions(next);
     }
     setIsLoading(false);
   }, [courseId]);
