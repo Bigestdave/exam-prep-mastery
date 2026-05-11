@@ -260,13 +260,13 @@ export default function AnswerView() {
           aria-label="Previous question"
           onClick={goPrev}
           disabled={questionIndex === 0}
-          className="fixed left-0 top-32 bottom-0 w-[22vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
+          className="fixed left-0 bottom-0 h-[55vh] w-[22vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
         />
         <button
           aria-label="Next question"
           onClick={goNext}
           disabled={!isOwned || questionIndex >= questions.length - 1}
-          className="fixed right-0 top-32 bottom-0 w-[22vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
+          className="fixed right-0 bottom-0 h-[55vh] w-[22vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
         />
 
         {/* First-time tap hint overlay — Linear/Arc inspired */}
