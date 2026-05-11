@@ -25,10 +25,15 @@ export default function Landing() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLoading && user) {
-      navigate("/dashboard");
+    if (isLoading || !user) return;
+    // If we don't have profile yet, wait for it
+    if (!profile) return;
+    if (!profile.faculty || !profile.level) {
+      navigate("/onboarding", { replace: true });
+    } else {
+      navigate("/dashboard", { replace: true });
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, profile, navigate]);
 
   return (
     <div className="min-h-screen bg-background">

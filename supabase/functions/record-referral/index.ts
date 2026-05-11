@@ -18,8 +18,9 @@ serve(async (req) => {
     );
 
     const { referral_code, referred_user_id } = await req.json();
+    const normalizedCode = String(referral_code || "").trim().toLowerCase();
 
-    if (!referral_code || !referred_user_id) {
+    if (!normalizedCode || !referred_user_id) {
       return new Response(JSON.stringify({ error: "Missing referral_code or referred_user_id" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -30,11 +31,11 @@ serve(async (req) => {
     const { data: referrerProfile, error: profileError } = await supabase
       .from("profiles")
       .select("id")
-      .eq("referral_code", referral_code)
+      .ilike("referral_code", normalizedCode)
       .maybeSingle();
 
     if (profileError || !referrerProfile) {
-      console.log("No referrer found for code:", referral_code);
+      console.log("No referrer found for code:", normalizedCode);
       return new Response(JSON.stringify({ error: "Invalid referral code" }), {
         status: 404,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -69,7 +70,7 @@ serve(async (req) => {
       .insert({
         referrer_id: referrerProfile.id,
         referred_id: referred_user_id,
-        referral_code,
+        referral_code: normalizedCode,
         status: "pending",
       });
 
