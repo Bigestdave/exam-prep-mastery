@@ -305,8 +305,6 @@ export default function AnswerView() {
             </div>
           </div>
         )}
-          </div>
-        )}
 
         {/* Navigation Buttons */}
         <div className="flex items-center justify-between pb-20">
