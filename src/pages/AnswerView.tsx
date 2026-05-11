@@ -260,31 +260,48 @@ export default function AnswerView() {
           aria-label="Previous question"
           onClick={goPrev}
           disabled={questionIndex === 0}
-          className="fixed left-0 top-0 h-full w-[28vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
+          className="fixed left-0 top-32 bottom-0 w-[22vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
         />
         <button
           aria-label="Next question"
           onClick={goNext}
           disabled={!isOwned || questionIndex >= questions.length - 1}
-          className="fixed right-0 top-0 h-full w-[28vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
+          className="fixed right-0 top-32 bottom-0 w-[22vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
         />
 
-        {/* First-time tap hint overlay */}
+        {/* First-time tap hint overlay — Linear/Arc inspired */}
         {showTapHint && (
           <div
-            className="fixed inset-0 z-40 md:hidden bg-foreground/60 backdrop-blur-sm flex items-center justify-between px-6 animate-fade-in"
+            className="fixed inset-0 z-50 md:hidden bg-foreground/40 backdrop-blur-md flex items-center justify-center px-8 animate-fade-in"
             onClick={dismissTapHint}
           >
-            <div className="flex flex-col items-center gap-2 text-background">
-              <ChevronLeft className="w-10 h-10" />
-              <span className="text-xs font-display font-bold uppercase tracking-wider">Tap to go back</span>
-            </div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-background text-center px-4">
-              <p className="text-sm font-medium opacity-90">Tap anywhere to dismiss</p>
-            </div>
-            <div className="flex flex-col items-center gap-2 text-background">
-              <ChevronRight className="w-10 h-10" />
-              <span className="text-xs font-display font-bold uppercase tracking-wider">Tap for next</span>
+            <div
+              className="bg-card/95 backdrop-blur-xl border border-border/60 rounded-2xl shadow-elevated max-w-xs w-full p-6 text-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-center gap-3 mb-5">
+                <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary border border-border/60">
+                  <ChevronLeft className="w-4 h-4 text-foreground" />
+                  <span className="text-[10px] font-display font-bold uppercase tracking-widest text-muted-foreground">Prev</span>
+                </div>
+                <div className="h-px w-4 bg-border" />
+                <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-foreground text-background">
+                  <span className="text-[10px] font-display font-bold uppercase tracking-widest">Next</span>
+                  <ChevronRight className="w-4 h-4" />
+                </div>
+              </div>
+              <h3 className="text-base font-display font-bold text-foreground mb-1.5 tracking-tight">
+                Move at your pace
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed font-serif mb-5">
+                Tap the left or right edge of the screen to glide between questions.
+              </p>
+              <button
+                onClick={dismissTapHint}
+                className="w-full py-2.5 rounded-xl bg-foreground text-background text-sm font-display font-bold tracking-tight hover:opacity-90 transition-opacity"
+              >
+                Got it
+              </button>
             </div>
           </div>
         )}
