@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ import { useCourseQuestions } from "@/hooks/useCourseQuestions";
 import { ArrowLeft, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { useQuizData } from "@/hooks/useQuizData";
+import { InlineMath, BlockMath } from "react-katex";
+import "katex/dist/katex.min.css";
 
 export default function AnswerView() {
   const { id, questionId } = useParams<{ id: string; questionId: string }>();
@@ -24,6 +26,8 @@ export default function AnswerView() {
   const { hasQuizData } = useQuizData(id);
   const [paperMode, setPaperMode] = useState(false);
   const [showHint, setShowHint] = useState(() => !localStorage.getItem('lcu_paper_hint_seen'));
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   const dismissHint = () => {
     setShowHint(false);
@@ -44,6 +48,40 @@ export default function AnswerView() {
       navigate(`/course/${id}`);
     }
   }, [isLoading, questionsLoading, user, course, isOwned, isFreePreview, id, navigate]);
+
+  // Tap edges + swipe gestures to navigate
+  const goPrev = () => {
+    if (questionIndex > 0) navigate(`/course/${id}/answer/${questionIndex - 1}`);
+  };
+  const goNext = () => {
+    if (!isOwned) return; // guard preview
+    if (questionIndex < questions.length - 1) navigate(`/course/${id}/answer/${questionIndex + 1}`);
+  };
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") goPrev();
+      if (e.key === "ArrowRight") goNext();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [questionIndex, questions.length, isOwned, id]);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current == null || touchStartY.current == null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    touchStartX.current = null;
+    touchStartY.current = null;
+    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx)) return; // require horizontal swipe
+    if (dx < 0) goNext();
+    else goPrev();
+  };
 
   if (isLoading || coursesLoading || questionsLoading) {
     return (
@@ -114,12 +152,12 @@ export default function AnswerView() {
                 {title}
               </span>
               <div className="text-muted-foreground leading-relaxed font-serif text-lg whitespace-pre-wrap">
-                {body.join('\n').trim()}
+                {renderWithMath(body.join('\n').trim())}
               </div>
             </div>
           );
         }
-        return <div key={`${segIdx}-${i}`} className="text-muted-foreground leading-relaxed font-serif text-lg mb-6 whitespace-pre-wrap">{trimmed}</div>;
+        return <div key={`${segIdx}-${i}`} className="text-muted-foreground leading-relaxed font-serif text-lg mb-6 whitespace-pre-wrap">{renderWithMath(trimmed)}</div>;
       });
     });
   };
@@ -144,7 +182,11 @@ export default function AnswerView() {
       
       <Header isLoggedIn userName={profile?.full_name || ''} />
       
-      <main className="container py-8 px-4 max-w-3xl relative z-10">
+      <main
+        className="container py-8 px-4 max-w-3xl relative z-10"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
         <Link to={`/course/${id}`} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 font-medium text-sm transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to {course.code}
         </Link>
@@ -198,13 +240,27 @@ export default function AnswerView() {
           <h1 className={`text-xl md:text-2xl font-display font-bold leading-snug mb-8 transition-colors duration-500 ${
             paperMode ? 'text-[#1C1917]' : 'text-foreground'
           }`}>
-            {question.question_text}
+            {renderWithMath(question.question_text)}
           </h1>
 
           <div className={`prose-content relative transition-colors duration-500 ${paperMode ? 'paper-mode' : ''}`}>
             {renderAnswer(question.answer_text)}
           </div>
         </div>
+
+        {/* Tap edges to navigate (mobile-friendly invisible zones) */}
+        <button
+          aria-label="Previous question"
+          onClick={goPrev}
+          disabled={questionIndex === 0}
+          className="fixed left-0 top-24 bottom-24 w-10 z-20 md:hidden disabled:opacity-0"
+        />
+        <button
+          aria-label="Next question"
+          onClick={goNext}
+          disabled={!isOwned || questionIndex >= questions.length - 1}
+          className="fixed right-0 top-24 bottom-24 w-10 z-20 md:hidden disabled:opacity-0"
+        />
 
         {/* Navigation Buttons */}
         <div className="flex items-center justify-between pb-20">
@@ -226,6 +282,27 @@ export default function AnswerView() {
       </main>
     </div>
   );
+}
+
+// Render text with inline $...$ and block $$...$$ math via KaTeX.
+function renderWithMath(text: string): React.ReactNode {
+  if (!text) return text;
+  // Split on $$...$$ first, then $...$
+  const blockParts = text.split(/(\$\$[\s\S]+?\$\$)/g);
+  return blockParts.map((bp, bi) => {
+    if (bp.startsWith("$$") && bp.endsWith("$$")) {
+      const tex = bp.slice(2, -2).trim();
+      try { return <BlockMath key={`b${bi}`} math={tex} />; } catch { return bp; }
+    }
+    const inlineParts = bp.split(/(\$[^$\n]+?\$)/g);
+    return inlineParts.map((ip, ii) => {
+      if (ip.startsWith("$") && ip.endsWith("$") && ip.length > 2) {
+        const tex = ip.slice(1, -1);
+        try { return <InlineMath key={`b${bi}-i${ii}`} math={tex} />; } catch { return ip; }
+      }
+      return <span key={`b${bi}-t${ii}`}>{ip}</span>;
+    });
+  });
 }
 
 // Helper to clean up render logic
