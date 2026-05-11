@@ -11,16 +11,26 @@ export interface Course {
   price: number;
 }
 
+// Module-level cache so revisits show data instantly (stale-while-revalidate).
+let coursesCache: Course[] | null = null;
+const SS_KEY = 'lcu_courses_cache_v1';
+if (coursesCache === null && typeof sessionStorage !== 'undefined') {
+  try {
+    const raw = sessionStorage.getItem(SS_KEY);
+    if (raw) coursesCache = JSON.parse(raw);
+  } catch {}
+}
+
 export function useCourses() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [courses, setCourses] = useState<Course[]>(coursesCache ?? []);
+  const [isLoading, setIsLoading] = useState(coursesCache === null);
 
   useEffect(() => {
     fetchCourses();
   }, []);
 
   const fetchCourses = async () => {
-    setIsLoading(true);
+    if (coursesCache === null) setIsLoading(true);
     const { data, error } = await supabase
       .from('courses')
       .select('id, code, title, faculty, level, price')
@@ -28,13 +38,19 @@ export function useCourses() {
 
     if (error) {
       console.error('Failed to load courses:', error);
-      toast({
-        title: "Couldn't load courses",
-        description: "Check your connection and try again.",
-        variant: "destructive",
-      });
+      // Only complain if we have nothing cached to show.
+      if (!coursesCache) {
+        toast({
+          title: "Couldn't load courses",
+          description: "Check your connection and try again.",
+          variant: "destructive",
+        });
+      }
     } else {
-      setCourses(data ?? []);
+      const next = data ?? [];
+      coursesCache = next;
+      try { sessionStorage.setItem(SS_KEY, JSON.stringify(next)); } catch {}
+      setCourses(next);
     }
     setIsLoading(false);
   };
