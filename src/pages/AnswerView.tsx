@@ -26,12 +26,18 @@ export default function AnswerView() {
   const { hasQuizData } = useQuizData(id);
   const [paperMode, setPaperMode] = useState(false);
   const [showHint, setShowHint] = useState(() => !localStorage.getItem('lcu_paper_hint_seen'));
+  const [showTapHint, setShowTapHint] = useState(() => !localStorage.getItem('lcu_tap_hint_seen'));
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
 
   const dismissHint = () => {
     setShowHint(false);
     localStorage.setItem('lcu_paper_hint_seen', '1');
+  };
+
+  const dismissTapHint = () => {
+    setShowTapHint(false);
+    localStorage.setItem('lcu_tap_hint_seen', '1');
   };
 
   const handleToggle = () => {
@@ -254,14 +260,34 @@ export default function AnswerView() {
           aria-label="Previous question"
           onClick={goPrev}
           disabled={questionIndex === 0}
-          className="fixed left-0 bottom-0 h-[55vh] w-[28vw] z-10 md:hidden disabled:opacity-0 active:bg-foreground/5 transition-colors"
+          className="fixed left-0 top-0 h-full w-[28vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
         />
         <button
           aria-label="Next question"
           onClick={goNext}
           disabled={!isOwned || questionIndex >= questions.length - 1}
-          className="fixed right-0 bottom-0 h-[55vh] w-[28vw] z-10 md:hidden disabled:opacity-0 active:bg-foreground/5 transition-colors"
+          className="fixed right-0 top-0 h-full w-[28vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
         />
+
+        {/* First-time tap hint overlay */}
+        {showTapHint && (
+          <div
+            className="fixed inset-0 z-40 md:hidden bg-foreground/60 backdrop-blur-sm flex items-center justify-between px-6 animate-fade-in"
+            onClick={dismissTapHint}
+          >
+            <div className="flex flex-col items-center gap-2 text-background">
+              <ChevronLeft className="w-10 h-10" />
+              <span className="text-xs font-display font-bold uppercase tracking-wider">Tap to go back</span>
+            </div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-background text-center px-4">
+              <p className="text-sm font-medium opacity-90">Tap anywhere to dismiss</p>
+            </div>
+            <div className="flex flex-col items-center gap-2 text-background">
+              <ChevronRight className="w-10 h-10" />
+              <span className="text-xs font-display font-bold uppercase tracking-wider">Tap for next</span>
+            </div>
+          </div>
+        )}
 
         {/* Navigation Buttons */}
         <div className="flex items-center justify-between pb-20">
