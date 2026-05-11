@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 export interface QuizOption {
-
-export interface QuizOption {
   text: string;
   is_correct: boolean;
 }
@@ -137,7 +135,6 @@ export function useQuizData(courseId: string | undefined) {
 
       if (error) {
         console.error('Failed to load quiz data:', error);
-        toast({ title: "Couldn't load quiz", description: "Check your connection.", variant: "destructive" });
       }
 
       if (!error && data) {
@@ -273,7 +270,6 @@ export function useSemesterReadiness(userId: string | undefined, courseIds: stri
 
       if (error) {
         console.error('Failed to load readiness data:', error);
-        toast({ title: "Couldn't load readiness", description: "Your progress may be outdated.", variant: "destructive" });
       }
       if (!error && data) {
         const bestPerCourse = new Map<string, number>();

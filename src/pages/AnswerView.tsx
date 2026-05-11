@@ -254,19 +254,19 @@ export default function AnswerView() {
           </div>
         </div>
 
-        {/* WhatsApp-story style tap zones — left 25% = previous, right 25% = next.
-            Positioned at bottom-0 below the card so they don't block text selection. */}
+        {/* WhatsApp-story style tap zones — left edge = previous, right edge = next.
+            Start below the card header (Aa button row) so the toggle stays clickable. */}
         <button
           aria-label="Previous question"
           onClick={goPrev}
           disabled={questionIndex === 0}
-          className="fixed left-0 bottom-0 h-[55vh] w-[22vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
+          className="fixed left-0 top-44 bottom-0 w-[22vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
         />
         <button
           aria-label="Next question"
           onClick={goNext}
           disabled={!isOwned || questionIndex >= questions.length - 1}
-          className="fixed right-0 bottom-0 h-[55vh] w-[22vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
+          className="fixed right-0 top-44 bottom-0 w-[22vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
         />
 
         {/* First-time tap hint overlay — Linear/Arc inspired */}
