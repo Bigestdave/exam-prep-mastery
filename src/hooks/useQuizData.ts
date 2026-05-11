@@ -23,52 +23,6 @@ export interface QuizAttempt {
   percentage: number;
 }
 
-// --- Stale-while-revalidate caches (memory + sessionStorage) ---
-const quizCache: Record<string, { questions: QuizQuestion[]; hasQuizData: boolean }> = {};
-const QUIZ_SS = 'lcu_quiz_v1_';
-function readQuizCache(courseId: string) {
-  if (quizCache[courseId]) return quizCache[courseId];
-  try {
-    const raw = sessionStorage.getItem(QUIZ_SS + courseId);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      quizCache[courseId] = parsed;
-      return parsed;
-    }
-  } catch {}
-  return null;
-}
-
-const bestAttemptCache: Record<string, QuizAttempt | null> = {};
-const BEST_SS = 'lcu_best_v1_';
-function readBestCache(key: string): QuizAttempt | null | undefined {
-  if (key in bestAttemptCache) return bestAttemptCache[key];
-  try {
-    const raw = sessionStorage.getItem(BEST_SS + key);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      bestAttemptCache[key] = parsed;
-      return parsed;
-    }
-  } catch {}
-  return undefined;
-}
-
-const readinessCache: Record<string, Record<string, number>> = {};
-const READY_SS = 'lcu_ready_v1_';
-function readReadinessCache(key: string): Map<string, number> | null {
-  if (readinessCache[key]) return new Map(Object.entries(readinessCache[key]));
-  try {
-    const raw = sessionStorage.getItem(READY_SS + key);
-    if (raw) {
-      const obj = JSON.parse(raw);
-      readinessCache[key] = obj;
-      return new Map(Object.entries(obj));
-    }
-  } catch {}
-  return null;
-}
-
 /**
  * Parses quiz data from content/structured_content JSONB.
  * Supports two formats:
@@ -161,23 +115,15 @@ function parseSingleQuiz(quiz: any): { question: string; options: QuizOption[]; 
 }
 
 export function useQuizData(courseId: string | undefined) {
-  const initial = courseId ? readQuizCache(courseId) : null;
-  const [questions, setQuestions] = useState<QuizQuestion[]>(initial?.questions ?? []);
-  const [isLoading, setIsLoading] = useState(initial == null);
-  const [hasQuizData, setHasQuizData] = useState(initial?.hasQuizData ?? false);
+  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasQuizData, setHasQuizData] = useState(false);
 
   useEffect(() => {
     const fetchQuizQuestions = async () => {
       if (!courseId) {
         setIsLoading(false);
         return;
-      }
-
-      const cached = readQuizCache(courseId);
-      if (cached) {
-        setQuestions(cached.questions);
-        setHasQuizData(cached.hasQuizData);
-        setIsLoading(false);
       }
 
       // Fetch questions that have EITHER quiz_options OR structured_content with quiz
@@ -248,9 +194,6 @@ export function useQuizData(courseId: string | undefined) {
         }
 
         console.log(`[useQuizData] Parsed ${parsed.length} quiz questions total`);
-        const next = { questions: parsed, hasQuizData: parsed.length > 0 };
-        quizCache[courseId] = next;
-        try { sessionStorage.setItem(QUIZ_SS + courseId, JSON.stringify(next)); } catch {}
         setQuestions(parsed);
         setHasQuizData(parsed.length > 0);
       }
@@ -264,22 +207,14 @@ export function useQuizData(courseId: string | undefined) {
 }
 
 export function useBestQuizAttempt(courseId: string | undefined, userId: string | undefined) {
-  const cacheKey = courseId && userId ? `${userId}:${courseId}` : '';
-  const initial = cacheKey ? readBestCache(cacheKey) : undefined;
-  const [best, setBest] = useState<QuizAttempt | null>(initial ?? null);
-  const [isLoading, setIsLoading] = useState(initial === undefined);
+  const [best, setBest] = useState<QuizAttempt | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetch = async () => {
       if (!courseId || !userId) {
         setIsLoading(false);
         return;
-      }
-      const key = `${userId}:${courseId}`;
-      const cached = readBestCache(key);
-      if (cached !== undefined) {
-        setBest(cached);
-        setIsLoading(false);
       }
 
       const { data, error } = await supabase
@@ -294,18 +229,13 @@ export function useBestQuizAttempt(courseId: string | undefined, userId: string 
       if (error) {
         console.error('Failed to load quiz attempt:', error);
       }
-      if (!error) {
-        const next: QuizAttempt | null = data
-          ? {
-              course_id: data.course_id,
-              score: data.score,
-              total_questions: data.total_questions,
-              percentage: data.percentage ?? 0,
-            }
-          : null;
-        bestAttemptCache[key] = next;
-        try { sessionStorage.setItem(BEST_SS + key, JSON.stringify(next)); } catch {}
-        setBest(next);
+      if (!error && data) {
+        setBest({
+          course_id: data.course_id,
+          score: data.score,
+          total_questions: data.total_questions,
+          percentage: data.percentage ?? 0,
+        });
       }
       setIsLoading(false);
     };
@@ -317,10 +247,8 @@ export function useBestQuizAttempt(courseId: string | undefined, userId: string 
 }
 
 export function useSemesterReadiness(userId: string | undefined, courseIds: string[]) {
-  const sortedKey = userId ? `${userId}:${[...courseIds].sort().join(',')}` : '';
-  const initial = sortedKey ? readReadinessCache(sortedKey) : null;
-  const [readiness, setReadiness] = useState<Map<string, number>>(initial ?? new Map());
-  const [isLoading, setIsLoading] = useState(initial == null);
+  const [readiness, setReadiness] = useState<Map<string, number>>(new Map());
+  const [isLoading, setIsLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const refetch = () => setRefreshKey(k => k + 1);
@@ -331,14 +259,8 @@ export function useSemesterReadiness(userId: string | undefined, courseIds: stri
         setIsLoading(false);
         return;
       }
-      const key = `${userId}:${[...courseIds].sort().join(',')}`;
-      const cached = readReadinessCache(key);
-      if (cached) {
-        setReadiness(cached);
-        setIsLoading(false);
-      } else {
-        setIsLoading(true);
-      }
+
+      setIsLoading(true);
       const { data, error } = await supabase
         .from('quiz_attempts')
         .select('course_id, percentage')
@@ -357,9 +279,6 @@ export function useSemesterReadiness(userId: string | undefined, courseIds: stri
             bestPerCourse.set(row.course_id, row.percentage ?? 0);
           }
         });
-        const obj = Object.fromEntries(bestPerCourse);
-        readinessCache[key] = obj;
-        try { sessionStorage.setItem(READY_SS + key, JSON.stringify(obj)); } catch {}
         setReadiness(bestPerCourse);
       }
       setIsLoading(false);
