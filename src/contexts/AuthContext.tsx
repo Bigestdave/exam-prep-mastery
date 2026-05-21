@@ -233,31 +233,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setPurchases([]);
   };
 
+  // Purchases are inserted server-side by verify-payment / paystack-webhook (service role).
+  // These helpers only perform optimistic local state updates + re-sync from the DB.
   const addPurchase = async (courseId: string) => {
     if (!user) return;
-    
-    const { error } = await supabase
-      .from('purchases')
-      .insert({
-        user_id: user.id,
-        course_id: courseId,
-      });
-
-    if (!error) {
-      setPurchases(prev => [...prev, courseId]);
-    }
+    setPurchases(prev => (prev.includes(courseId) ? prev : [...prev, courseId]));
+    // Re-sync from server (webhook may not have written yet; retry once shortly after)
+    fetchPurchases(user.id);
+    setTimeout(() => user && fetchPurchases(user.id), 3000);
   };
 
   const addPurchases = async (courseIds: string[]) => {
     if (!user || courseIds.length === 0) return;
-    const records = courseIds.map(courseId => ({
-      user_id: user.id,
-      course_id: courseId,
-    }));
-    const { error } = await supabase.from('purchases').insert(records);
-    if (!error) {
-      setPurchases(prev => [...new Set([...prev, ...courseIds])]);
-    }
+    setPurchases(prev => [...new Set([...prev, ...courseIds])]);
+    fetchPurchases(user.id);
+    setTimeout(() => user && fetchPurchases(user.id), 3000);
   };
 
   return (
