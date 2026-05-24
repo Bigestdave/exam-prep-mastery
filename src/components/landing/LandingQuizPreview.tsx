@@ -8,10 +8,14 @@ export function LandingQuizPreview() {
         <div className="max-w-4xl mx-auto">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
-              <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-2">See It In Action</p>
-              <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-4">
+              <div className="chapter-mark">
+                <span className="roman">V.</span>
+                <span className="label">See It In Action</span>
+                <span className="rule" />
+              </div>
+              <h2 className="text-[28px] md:text-[40px] font-display font-bold text-foreground mb-4 leading-[1.05] tracking-[-0.02em]">
                 Know your readiness<br/>
-                <span className="font-serif italic text-accent">before</span> the exam hall
+                <span className="font-serif italic text-accent">before</span> the exam hall.
               </h2>
               <p className="text-base text-muted-foreground leading-relaxed mb-6">
                 After studying, take our quiz and get an instant readiness score. No more guessing if you're prepared. You'll see exactly where you stand.

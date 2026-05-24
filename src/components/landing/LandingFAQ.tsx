@@ -5,8 +5,15 @@ export function LandingFAQ() {
     <section className="py-14 md:py-20 border-t border-border">
       <div className="container px-4">
         <div className="max-w-2xl mx-auto">
-          <p className="text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground mb-2">Questions</p>
-          <h2 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-6">We anticipated<br/>your questions</h2>
+          <div className="chapter-mark">
+            <span className="roman">VIII.</span>
+            <span className="label">Questions</span>
+            <span className="rule" />
+          </div>
+          <h2 className="text-[28px] md:text-[40px] font-display font-bold text-foreground mb-8 leading-[1.05] tracking-[-0.02em]">
+            We anticipated{" "}
+            <span className="font-serif italic text-accent">your questions.</span>
+          </h2>
           <Accordion type="single" collapsible className="w-full">
             {[
               { q: 'How do I know this will actually help me pass?', a: 'Your exams are set from tutorial questions. We solve every single one to first-class standard, then give you a quiz to make sure you actually retained the material. Students who use LCU Prep consistently report walking into exams feeling confident, not anxious.' },
