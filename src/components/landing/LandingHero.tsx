@@ -17,24 +17,35 @@ const MotionButton = motion.create(Button);
 export function LandingHero() {
   return (
     <section className="relative">
-      <div className="container pt-8 pb-16 md:pt-12 md:pb-24 px-4">
+      <div className="container pt-8 pb-16 md:pt-16 md:pb-28 px-4">
         <div className="max-w-3xl mx-auto text-left md:text-center">
+
+          <motion.div
+            className="flex items-center justify-start md:justify-center gap-3 mb-8"
+            {...fadeUp(0.05)}
+          >
+            <span className="text-serif text-base text-accent leading-none">I.</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+              The Lead City Dossier
+            </span>
+            <span className="hidden md:inline-block w-12 h-px bg-border" />
+          </motion.div>
           
           <h1 className="text-foreground leading-[1.1] mb-6">
             <motion.span
-              className="block text-[36px] md:text-5xl lg:text-6xl font-display font-bold leading-[1.1]"
+              className="block text-[34px] md:text-[52px] lg:text-[64px] font-display font-bold leading-[0.98] tracking-[-0.02em]"
               {...fadeUp(0.1)}
             >
               You've read your notes.
             </motion.span>
             <motion.span
-              className="block text-[36px] md:text-5xl lg:text-6xl font-display font-bold leading-[1.1] mt-1"
+              className="block text-[34px] md:text-[52px] lg:text-[64px] font-display font-bold leading-[0.98] tracking-[-0.02em] mt-1"
               {...fadeUp(0.2)}
             >
               Now prove you're
             </motion.span>
             <motion.span
-              className="block text-[36px] md:text-5xl lg:text-6xl font-serif italic text-accent mt-1"
+              className="block text-[40px] md:text-[60px] lg:text-[72px] font-serif italic text-accent mt-2 leading-[0.95]"
               {...fadeUp(0.3)}
             >
               ready for the exam.
