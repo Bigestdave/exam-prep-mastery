@@ -238,4 +238,54 @@
   .paper-mode .bg-primary\/5 {
     background-color: rgba(146, 64, 14, 0.06) !important;
   }
+
+  /* === Editorial system — CORTEX Phase 1 === */
+
+  /* Chapter mark: roman numeral + label + thin rule. The spine of the page. */
+  .chapter-mark {
+    @apply flex items-center gap-3 mb-6;
+  }
+  .chapter-mark .roman {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-style: italic;
+    font-size: 1.125rem;
+    line-height: 1;
+    color: hsl(var(--accent));
+  }
+  .chapter-mark .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+  }
+  .chapter-mark .rule {
+    flex: 1;
+    height: 1px;
+    background: hsl(var(--border));
+  }
+
+  /* Oversized ghost numeral — the calculated disruption */
+  .ghost-numeral {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-weight: 400;
+    line-height: 0.85;
+    color: hsl(var(--foreground));
+    opacity: 0.06;
+    letter-spacing: -0.05em;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  /* Editorial horizontal rule with center marker */
+  .editorial-rule {
+    @apply flex items-center gap-4 my-2;
+  }
+  .editorial-rule::before,
+  .editorial-rule::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: hsl(var(--border));
+  }
 }
