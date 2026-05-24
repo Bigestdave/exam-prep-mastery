@@ -5,7 +5,7 @@ export function LandingPricing() {
         <div className="max-w-5xl mx-auto">
           <div className="max-w-2xl mb-12">
             <div className="chapter-mark">
-              <span className="roman">VI.</span>
+              <span className="roman">VII.</span>
               <span className="label">The Price</span>
               <span className="rule" />
             </div>

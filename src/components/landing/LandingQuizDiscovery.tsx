@@ -4,7 +4,7 @@ export function LandingQuizDiscovery() {
       <div className="container px-4">
         <div className="max-w-2xl mx-auto">
           <div className="chapter-mark">
-            <span className="roman">V.</span>
+            <span className="roman">VI.</span>
             <span className="label">After Taking The Quiz</span>
             <span className="rule" />
           </div>
