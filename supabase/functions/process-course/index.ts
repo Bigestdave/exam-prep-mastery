@@ -9,8 +9,10 @@ const corsHeaders = {
 
 // TokenRouter API details
 const TOKENROUTER_GATEWAY = "https://api.tokenrouter.com/v1/chat/completions";
-const MODEL_GPT4O_MINI = "openai/gpt-4o-mini";
+const MODEL_GPT_4O_MINI = "openai/gpt-4o-mini";
 const MODEL_CLAUDE_SONNET = "anthropic/claude-sonnet-4.6";
+const MAX_QUESTION_EXTRACT_CHARS = 30000;
+const MAX_GUIDE_CONTEXT_CHARS = 20000;
 
 interface ProcessPayload {
   course_code: string;
@@ -90,9 +92,9 @@ Ignore headers, footers, administrative text, and syllabus information.
 Return ONLY a JSON object in this exact format: {"questions": ["full question 1 with all sub-parts", "full question 2 with all sub-parts"]}
 If no questions are found, return: {"questions": []}`;
 
-  const userPrompt = `Extract all study questions from this course material:\n\n${pdfText.slice(0, 30000)}`;
+  const userPrompt = `Extract all study questions from this course material:\n\n${pdfText.slice(0, MAX_QUESTION_EXTRACT_CHARS)}`;
 
-  const result = await callTokenRouter(apiKey, MODEL_GPT4O_MINI, systemPrompt, userPrompt, 8192);
+  const result = await callTokenRouter(apiKey, MODEL_GPT_4O_MINI, systemPrompt, userPrompt, 8192);
 
   try {
     const jsonMatch = result.match(/\{[\s\S]*"questions"[\s\S]*\}/);
@@ -224,7 +226,7 @@ Rules:
 3. Include a mix of MCQ, True/False, Fill-in-the-gap, Short answer, and Application-based quiz types.
 4. MCQs must have exactly 4 options when MCQ is selected.`;
 
-  const userPrompt = `Course: ${courseTitle}\n\n[Specific Question]: ${question}\n\n[Course Notes Context]:\n${context.slice(0, 20000)}`;
+  const userPrompt = `Course: ${courseTitle}\n\n[Specific Question]: ${question}\n\n[Course Notes Context]:\n${context.slice(0, MAX_GUIDE_CONTEXT_CHARS)}`;
 
   const result = await callTokenRouter(apiKey, MODEL_CLAUDE_SONNET, systemPrompt, userPrompt);
 
@@ -245,9 +247,11 @@ async function processCourse(payload: ProcessPayload) {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
 
-  // Fetch TokenRouter API key with fallback to Lovable API key
+  // Support legacy env naming while still using TokenRouter gateway.
   const apiKey = Deno.env.get("TOKENROUTER_API_KEY") || Deno.env.get("LOVABLE_API_KEY");
-  if (!apiKey) throw new Error("TOKENROUTER_API_KEY or LOVABLE_API_KEY not configured");
+  if (!apiKey) {
+    throw new Error("Missing API key: set TOKENROUTER_API_KEY (or legacy LOVABLE_API_KEY)");
+  }
 
   const { course_code, course_title, department, level, pdf_urls, raw_text, upload_id } = payload;
 
