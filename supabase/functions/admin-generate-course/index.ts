@@ -173,8 +173,25 @@ async function extractTextFromPdf(pdfUrl: string): Promise<string> {
   if (!response.ok) throw new Error(`Failed to download PDF: ${response.status}`);
 
   const pdfBuffer = await response.arrayBuffer();
-  const pdfParse = (await import("npm:pdf-parse@1.1.1")).default;
-  const result = await pdfParse(new Uint8Array(pdfBuffer));
+  let pdfParse: (dataBuffer: Uint8Array) => Promise<{ text?: string }>;
+
+  try {
+    pdfParse = (await import("npm:pdf-parse@1.1.1")).default;
+  } catch (error) {
+    throw new Error(
+      `Failed to load pdf parser for ${pdfUrl}: ${error instanceof Error ? error.message : "Unknown import error"}`,
+    );
+  }
+
+  let result: { text?: string };
+  try {
+    result = await pdfParse(new Uint8Array(pdfBuffer));
+  } catch (error) {
+    throw new Error(
+      `Failed to parse PDF content from ${pdfUrl}: ${error instanceof Error ? error.message : "Unknown parse error"}`,
+    );
+  }
+
   return result.text || "";
 }
 
