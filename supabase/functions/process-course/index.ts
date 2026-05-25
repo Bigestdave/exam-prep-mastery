@@ -141,7 +141,9 @@ function normalizeQuiz(quiz: PremiumQuiz): Record<string, unknown> | null {
 
   let options: string[] = [];
   if (Array.isArray(quiz.options)) {
-    options = quiz.options.map((o) => String(o));
+    options = quiz.options
+      .map((o) => String(o).trim())
+      .filter((o) => o.length > 0);
   } else {
     const fromFields = [quiz.option_a, quiz.option_b, quiz.option_c, quiz.option_d]
       .filter((o): o is string => Boolean(o && String(o).trim()))
@@ -158,16 +160,25 @@ function normalizeQuiz(quiz: PremiumQuiz): Record<string, unknown> | null {
   if (options.length < 2) return null;
 
   let correctIndex = 0;
+  let matchedCorrectAnswer = false;
   const correct = String(quiz.correct_answer || "").trim();
   if (correct) {
     const upper = correct.toUpperCase();
     const asLetter = ["A", "B", "C", "D"].indexOf(upper);
     if (asLetter >= 0 && asLetter < options.length) {
       correctIndex = asLetter;
+      matchedCorrectAnswer = true;
     } else {
       const byText = options.findIndex((o) => o.trim().toLowerCase() === correct.toLowerCase());
-      if (byText >= 0) correctIndex = byText;
+      if (byText >= 0) {
+        correctIndex = byText;
+        matchedCorrectAnswer = true;
+      }
     }
+  }
+  if (correct && !matchedCorrectAnswer) {
+    console.warn("Skipping quiz with unmatched correct_answer:", { question, correct_answer: correct });
+    return null;
   }
 
   return {
@@ -247,7 +258,7 @@ async function processCourse(payload: ProcessPayload) {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
 
-  // Support legacy env naming while still using TokenRouter gateway.
+  // Prefer TOKENROUTER_API_KEY; LOVABLE_API_KEY is legacy compatibility for existing deployments.
   const apiKey = Deno.env.get("TOKENROUTER_API_KEY") || Deno.env.get("LOVABLE_API_KEY");
   if (!apiKey) {
     throw new Error("Missing API key: set TOKENROUTER_API_KEY (or legacy LOVABLE_API_KEY)");
@@ -313,7 +324,7 @@ async function processCourse(payload: ProcessPayload) {
       courseId = newCourse.id;
     }
 
-    // Clear existing content to prevent duplicates and ensure a clean slate
+    // Destructive reset by design: this keeps one clean generated dataset per run and prevents duplicates.
     const { error: deleteErr } = await serviceClient
       .from("course_questions")
       .delete()
