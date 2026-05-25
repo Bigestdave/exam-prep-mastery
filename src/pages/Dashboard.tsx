@@ -129,12 +129,15 @@ export default function Dashboard() {
       
       <main className="container py-8 px-4 md:px-6">
         {/* Greeting + Stats */}
-        <div className="mb-8">
-          <p className="text-xs text-muted-foreground font-mono tracking-wider uppercase mb-1">
-            {profile?.faculty} · {profile?.level}
-          </p>
-          <h1>
-            {profile?.full_name?.split(' ')[0] || 'Student'}
+        <div className="mb-10">
+          <div className="chapter-mark">
+            <span className="roman">§</span>
+            <span className="label">{profile?.faculty} · {profile?.level}</span>
+            <span className="rule" />
+          </div>
+          <h1 className="text-[34px] md:text-[44px] font-display font-bold text-foreground leading-[0.95] tracking-[-0.02em]">
+            <span className="text-muted-foreground font-normal">Welcome,</span>{" "}
+            <span className="font-serif italic text-accent">{profile?.full_name?.split(' ')[0] || 'Student'}.</span>
           </h1>
         </div>
 
@@ -143,10 +146,15 @@ export default function Dashboard() {
             {/* Semester Readiness */}
             <SemesterReadiness courses={displayCourses.map(c => ({ id: c.id, code: c.code, title: c.title }))} />
 
-            <div className="flex items-center justify-between mb-4">
-              <h2>Your Courses</h2>
-              <span className="text-sm text-muted-foreground">
-                <span className="font-bold text-foreground">{ownedCount}</span>/{displayCourses.length} unlocked
+            <div className="flex items-end justify-between mb-5 mt-10 pb-3 border-b border-border">
+              <div>
+                <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-muted-foreground mb-1.5">The Catalog</p>
+                <h2 className="text-xl font-display font-bold tracking-[-0.02em]">Your Courses</h2>
+              </div>
+              <span className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground tabular-nums">
+                <span className="font-bold text-foreground text-base">{ownedCount}</span>
+                <span className="mx-1">/</span>
+                {displayCourses.length} unlocked
               </span>
             </div>
 
@@ -169,26 +177,31 @@ export default function Dashboard() {
             </div>
           </>
         ) : (
-          <div className="text-center py-20 bg-card rounded-3xl card-float border border-border">
-            <div className="w-20 h-20 rounded-3xl bg-accent/10 flex items-center justify-center mx-auto mb-5">
-              <BookOpen className="w-10 h-10 text-accent" />
+          <div className="py-16 md:py-24 border-y border-border">
+            <div className="max-w-md">
+              <div className="chapter-mark">
+                <span className="roman">∅</span>
+                <span className="label">No Catalog Yet</span>
+                <span className="rule" />
+              </div>
+              <h3 className="text-[28px] md:text-[36px] font-display font-bold text-foreground leading-[1.05] tracking-[-0.02em] mb-4">
+                {departmentHasCoursesInDb
+                  ? <>No <span className="font-serif italic text-accent">{profile?.level}</span> courses yet.</>
+                  : <>Your department is <span className="font-serif italic text-accent">on the way.</span></>}
+              </h3>
+              <p className="text-muted-foreground leading-relaxed mb-8 max-w-sm">
+                {departmentHasCoursesInDb
+                  ? `We don't have ${profile?.level} courses for your department this semester. Request the ones you need and we'll prioritise them.`
+                  : `Courses for ${profile?.faculty || "your department"} are being prepared. Request the ones you need first.`}
+              </p>
+              <button
+                onClick={() => navigate("/request-course")}
+                className="inline-flex items-center gap-3 px-6 py-3.5 bg-foreground text-background font-display font-bold text-sm tracking-[-0.01em] rounded-none border border-foreground hover:bg-background hover:text-foreground transition-colors"
+              >
+                Request a Course
+                <span className="font-serif italic">→</span>
+              </button>
             </div>
-            <h3 className="font-display font-bold text-xl text-foreground mb-2" style={{ letterSpacing: '-0.05em' }}>
-              {departmentHasCoursesInDb ? "No courses for this level" : "Coming Soon"}
-            </h3>
-            <p className="text-muted-foreground text-sm max-w-xs mx-auto leading-relaxed mb-6">
-              {departmentHasCoursesInDb 
-                ? `We don't have ${profile?.level} courses for your department yet. They're on the way.`
-                : `Courses for ${profile?.faculty || "your department"} are being prepared. You'll be the first to know.`
-              }
-            </p>
-            <button
-              onClick={() => navigate("/request-course")}
-              className="px-6 py-3 rounded-2xl bg-foreground text-background font-display font-bold text-sm"
-              style={{ letterSpacing: '-0.05em' }}
-            >
-              Request a Course
-            </button>
           </div>
         )}
       </main>
