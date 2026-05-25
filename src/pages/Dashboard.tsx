@@ -7,7 +7,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCourses } from "@/hooks/useCourses";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { BookOpen } from "lucide-react";
 import { SemesterReadiness } from "@/components/quiz/SemesterReadiness";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 
