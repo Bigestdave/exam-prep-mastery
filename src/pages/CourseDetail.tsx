@@ -227,29 +227,22 @@ export default function CourseDetail() {
         </Link>
 
         <div className="mb-8">
-          <div className="chapter-mark">
-            <span className="roman font-mono not-italic text-foreground text-xs tracking-[0.18em]">{course.code}</span>
-            <span className="label">
-              {isOwned ? (
-                <span className="text-accent inline-flex items-center gap-1.5">
-                  <CheckCircle className="w-3 h-3" />
-                  Full Access
-                </span>
-              ) : (
-                'Tutorial Questions'
-              )}
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-sm font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-lg">
+              {course.code}
             </span>
-            <span className="rule" />
+            {isOwned && (
+              <span className="text-sm font-medium text-success bg-success-light px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                <CheckCircle className="w-4 h-4" />
+                Full Access
+              </span>
+            )}
           </div>
-          <h1 className="text-[28px] md:text-[40px] font-display font-bold text-foreground leading-[1.05] tracking-[-0.02em] mb-3">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
             {course.title}
           </h1>
-          <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-muted-foreground">
-            <span className="tabular-nums text-foreground font-semibold">{displayCount}</span> Questions
-            <span className="mx-2 opacity-40">·</span>
-            {course.faculty}
-            <span className="mx-2 opacity-40">·</span>
-            {course.level}
+          <p className="text-muted-foreground">
+            {displayCount} Tutorial Questions • {course.faculty} • {course.level}
           </p>
         </div>
 

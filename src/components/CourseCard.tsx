@@ -1,3 +1,4 @@
+import { Lock, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -20,24 +21,22 @@ export function CourseCard({ id, code, title, isOwned = false, questionsCount = 
         to={`/course/${id}`}
         className="flex flex-col bg-card border border-border rounded-2xl p-5 card-float transition-all duration-200 group h-full"
       >
-        <div className="flex items-baseline justify-between mb-3 pb-2.5 border-b border-border/70">
-          <span className="text-[11px] font-mono font-semibold text-foreground tracking-[0.15em] uppercase">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-mono font-semibold text-muted-foreground tracking-wider uppercase">
             {code}
           </span>
-          <span className={`text-[9px] font-mono tracking-[0.22em] uppercase ${
-            isOwned ? 'text-accent' : 'text-muted-foreground/70'
-          }`}>
-            {isOwned ? 'Owned' : 'Locked'}
-          </span>
+          {isOwned ? (
+            <CheckCircle className="w-4 h-4 text-accent" />
+          ) : (
+            <Lock className="w-3.5 h-3.5 text-muted-foreground/50" />
+          )}
         </div>
-
-        <h3 className="leading-snug line-clamp-2 flex-1 text-[15px]">
+        
+        <h3 className="leading-snug line-clamp-2 flex-1">
           {title}
         </h3>
-
-        <span className="text-[10px] font-mono uppercase tracking-[0.22em] text-muted-foreground mt-3 tabular-nums">
-          {questionsCount} Questions
-        </span>
+        
+        <span className="text-xs font-mono text-muted-foreground mt-3">{questionsCount} Questions</span>
       </Link>
     </motion.div>
   );
