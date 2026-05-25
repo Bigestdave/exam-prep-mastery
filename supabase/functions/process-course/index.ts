@@ -105,7 +105,7 @@ If no questions are found, return: {"questions": []}`;
       }
     }
   } catch (e) {
-    console.error("Failed to parse questions JSON:", e, "Raw:", result.slice(0, 500));
+    console.error("Failed to parse questions JSON:", e);
   }
   return [];
 }
@@ -177,7 +177,7 @@ function normalizeQuiz(quiz: PremiumQuiz): Record<string, unknown> | null {
     }
   }
   if (correct && !matchedCorrectAnswer) {
-    console.warn("Skipping quiz with unmatched correct_answer:", { question, correct_answer: correct });
+    console.warn("Skipping quiz with unmatched correct_answer");
     return null;
   }
 
@@ -247,7 +247,7 @@ Rules:
       return JSON.parse(jsonMatch[0]) as PremiumContent;
     }
   } catch (e) {
-    console.error("Failed to parse premium guide JSON:", e, "Raw:", result.slice(0, 500));
+    console.error("Failed to parse premium guide JSON:", e);
   }
   return null;
 }
@@ -349,6 +349,7 @@ async function processCourse(payload: ProcessPayload) {
     // Generate study guides and quizzes
     await updateUploadStatus(serviceClient, upload_id, "generating");
 
+    // Smaller batch to reduce upstream model/API rate-limit pressure during generation.
     const BATCH_SIZE = 2;
     const rowsToInsert: Array<{
       course_id: string;
