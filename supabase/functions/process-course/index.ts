@@ -314,7 +314,13 @@ async function processCourse(payload: ProcessPayload) {
     }
 
     // Clear existing content to prevent duplicates and ensure a clean slate
-    await serviceClient.from("course_questions").delete().eq("course_id", courseId);
+    const { error: deleteErr } = await serviceClient
+      .from("course_questions")
+      .delete()
+      .eq("course_id", courseId);
+    if (deleteErr) {
+      throw new Error(`Failed to clear existing course questions: ${deleteErr.message}`);
+    }
 
     // Extract questions
     await updateUploadStatus(serviceClient, upload_id, "extracting");
