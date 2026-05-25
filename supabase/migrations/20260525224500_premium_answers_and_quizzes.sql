@@ -4,6 +4,9 @@ ADD COLUMN IF NOT EXISTS key_points jsonb,
 ADD COLUMN IF NOT EXISTS exam_tip text,
 ADD COLUMN IF NOT EXISTS answer_confidence double precision;
 
+ALTER TABLE public.course_questions
+ALTER COLUMN answer_confidence SET DEFAULT 0.65;
+
 CREATE TABLE IF NOT EXISTS public.question_quizzes (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   question_id uuid NOT NULL REFERENCES public.course_questions(id) ON DELETE CASCADE,

@@ -81,7 +81,7 @@ export function FrictionlessBuilderTab({ onGenerated }: FrictionlessBuilderTabPr
 
       toast({
         title: "Admin premium course generated",
-        description: `${data.questions_count} tutorial questions were regenerated and published for ${courseCode.trim()}.`,
+        description: `${data.questions_count} tutorial questions were generated and published for ${courseCode.trim()}.`,
       });
 
       resetForm();

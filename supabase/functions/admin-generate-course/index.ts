@@ -10,7 +10,9 @@ const corsHeaders = {
 const TOKENROUTER_GATEWAY = "https://api.tokenrouter.com/v1/chat/completions";
 const MODEL_GPT4O_MINI = "openai/gpt-4o-mini";
 const MODEL_CLAUDE_SONNET = "anthropic/claude-sonnet-4.6";
-const QUESTION_BATCH_SIZE = 2;
+const ANSWER_GENERATION_BATCH_SIZE = 2;
+const MIN_QUIZ_OPTIONS = 2;
+const DEFAULT_COURSE_PRICE = 1000;
 
 interface GeneratePayload {
   course_code: string;
@@ -76,7 +78,7 @@ function extractJsonString(text: string, anchor: string): string | null {
 }
 
 function parseJsonObject<T>(text: string, anchor: string): T | null {
-  const cleaned = text.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+  const cleaned = text.replace(/```(?:json)?\s*/gi, "").trim();
   const jsonString = extractJsonString(cleaned, anchor);
   if (!jsonString) return null;
 
@@ -109,7 +111,7 @@ function normalizeQuiz(quiz: unknown): GeneratedQuiz | null {
     : [];
   const correctIndex = Number(candidate.correct_index);
 
-  if (!String(candidate.question ?? "").trim() || options.length < 2 || !Number.isInteger(correctIndex)) {
+  if (!String(candidate.question ?? "").trim() || options.length < MIN_QUIZ_OPTIONS || !Number.isInteger(correctIndex)) {
     return null;
   }
 
@@ -297,10 +299,12 @@ serve(async (req) => {
   }
 
   try {
-    const serviceClient = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!supabaseUrl) throw new Error("SUPABASE_URL environment variable is required");
+    if (!serviceRoleKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY environment variable is required");
+
+    const serviceClient = createClient(supabaseUrl, serviceRoleKey);
 
     await ensureAdmin(req.headers.get("Authorization"), serviceClient);
 
@@ -380,7 +384,7 @@ serve(async (req) => {
           title: payload.course_title,
           faculty: payload.department,
           level: payload.level,
-          price: 1000,
+          price: DEFAULT_COURSE_PRICE,
         })
         .select("id")
         .single();
@@ -400,8 +404,8 @@ serve(async (req) => {
     await serviceClient.from("course_questions").delete().eq("course_id", courseId);
 
     const generatedQuestions: GeneratedAnswer[] = [];
-    for (let index = 0; index < questions.length; index += QUESTION_BATCH_SIZE) {
-      const batch = questions.slice(index, index + QUESTION_BATCH_SIZE);
+    for (let index = 0; index < questions.length; index += ANSWER_GENERATION_BATCH_SIZE) {
+      const batch = questions.slice(index, index + ANSWER_GENERATION_BATCH_SIZE);
       const batchResults = await Promise.all(
         batch.map((question) => generatePremiumAnswer(tokenRouterKey, payload.course_title, question, materials)),
       );
