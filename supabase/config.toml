@@ -18,6 +18,9 @@ verify_jwt = false
 [functions.process-course]
 verify_jwt = false
 
+[functions.admin-generate-course]
+verify_jwt = false
+
 [functions.generate-quiz-options]
 verify_jwt = false
 

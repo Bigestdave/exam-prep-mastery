@@ -16,6 +16,21 @@ export interface QuizQuestion {
   hint?: string;
 }
 
+function parseRelationalOptions(options: unknown, correctIndex: number): QuizOption[] {
+  if (!Array.isArray(options)) return [];
+
+  return options
+    .map((option, index) => ({
+      text: typeof option === 'string'
+        ? option
+        : typeof option === 'object' && option !== null && 'text' in option
+          ? String((option as { text?: unknown }).text ?? '')
+          : String(option ?? ''),
+      is_correct: index === correctIndex,
+    }))
+    .filter(option => option.text.trim().length > 0);
+}
+
 export interface QuizAttempt {
   course_id: string;
   score: number;
@@ -139,6 +154,35 @@ export function useQuizData(courseId: string | undefined) {
 
       if (!error && data) {
         console.log(`[useQuizData] Fetched ${data.length} questions for course ${courseId}`);
+        const questionIds = data.map(q => q.id);
+        const relationalQuizMap = new Map<string, Array<{ id: string; question: string; options: QuizOption[]; hint?: string }>>();
+
+        if (questionIds.length > 0) {
+          const { data: relationalQuizzes, error: relationalError } = await supabase
+            .from('question_quizzes')
+            .select('id, question_id, question_text, options, correct_index, explanation_text, hint_text, quiz_index')
+            .in('question_id', questionIds)
+            .order('quiz_index', { ascending: true });
+
+          if (relationalError) {
+            console.error('Failed to load relational quiz data:', relationalError);
+          }
+
+          relationalQuizzes?.forEach((quiz) => {
+            const parsedOptions = parseRelationalOptions(quiz.options, quiz.correct_index);
+            if (parsedOptions.length === 0) return;
+
+            const existing = relationalQuizMap.get(quiz.question_id) ?? [];
+            existing.push({
+              id: quiz.id,
+              question: quiz.question_text,
+              options: shuffleArray(parsedOptions),
+              hint: quiz.explanation_text || quiz.hint_text || undefined,
+            });
+            relationalQuizMap.set(quiz.question_id, existing);
+          });
+        }
+
         const parsed: QuizQuestion[] = [];
 
         for (const q of data) {
@@ -153,7 +197,24 @@ export function useQuizData(courseId: string | undefined) {
             console.log(`[useQuizData] Q${q.question_index} content keys:`, Object.keys(contentObj || {}), 'quizzes count:', (contentObj as any)?.quizzes?.length ?? 0);
           }
 
-          // Priority 1: Multi-quiz from content/structured_content
+          const relationalQuizzes = relationalQuizMap.get(q.id) ?? [];
+          if (relationalQuizzes.length > 0) {
+            for (const relationalQuiz of relationalQuizzes) {
+              parsed.push({
+                id: relationalQuiz.id,
+                course_id: q.course_id,
+                question_index: q.question_index,
+                question_text: q.question_text,
+                quiz_question_text: relationalQuiz.question,
+                answer_text: q.answer_text,
+                quiz_options: relationalQuiz.options,
+                hint: relationalQuiz.hint,
+              });
+            }
+            continue;
+          }
+
+          // Priority 2: Multi-quiz from content/structured_content
           const contentQuizzes = parseQuiz(q.content);
           const quizzes = contentQuizzes.length > 0 
             ? contentQuizzes 
@@ -178,7 +239,7 @@ export function useQuizData(courseId: string | undefined) {
             continue;
           }
 
-          // Priority 2: Legacy quiz_options column
+          // Priority 3: Legacy quiz_options column
           const legacyOptions = q.quiz_options as unknown as QuizOption[] | null;
           if (legacyOptions && Array.isArray(legacyOptions) && legacyOptions.length >= 2) {
             parsed.push({

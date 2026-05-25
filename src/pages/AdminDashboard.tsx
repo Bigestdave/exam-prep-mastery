@@ -19,8 +19,9 @@ import { AmbassadorApplicationsTab } from "@/components/admin/AmbassadorApplicat
 import { UploadsTab } from "@/components/admin/UploadsTab";
 import { ContentReviewTab } from "@/components/admin/ContentReviewTab";
 import { ContentQueueTab } from "@/components/admin/ContentQueueTab";
+import { FrictionlessBuilderTab } from "@/components/admin/FrictionlessBuilderTab";
 import { Badge } from "@/components/ui/badge";
-import { facultyCategories, allDepartments } from "@/data/departments";
+import { facultyCategories } from "@/data/departments";
 
 interface Question {
   q: string;
@@ -787,6 +788,7 @@ export default function AdminDashboard() {
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="courses">
           <TabsList className="mb-6 flex-wrap">
+            <TabsTrigger value="generator" className="gap-2"><Zap className="w-4 h-4" />Generator</TabsTrigger>
             <TabsTrigger value="courses" className="gap-2"><BookOpen className="w-4 h-4" />Courses</TabsTrigger>
             <TabsTrigger value="queue" className="gap-2"><ClipboardList className="w-4 h-4" />Content Queue</TabsTrigger>
             <TabsTrigger value="review" className="gap-2"><Eye className="w-4 h-4" />Review</TabsTrigger>
@@ -797,6 +799,10 @@ export default function AdminDashboard() {
             <TabsTrigger value="applications" className="gap-2"><Mail className="w-4 h-4" />Applications</TabsTrigger>
             <TabsTrigger value="survey" className="gap-2"><ClipboardList className="w-4 h-4" />Survey</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="generator">
+            <FrictionlessBuilderTab onGenerated={fetchCourses} />
+          </TabsContent>
 
           <TabsContent value="courses">
             <Card>
