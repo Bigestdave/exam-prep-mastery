@@ -403,7 +403,15 @@ serve(async (req) => {
         exam_tip: generated.exam_tip || null,
         status: "published",
         answer_confidence: generated.answer_confidence,
-        content: generated.quizzes.length > 0 ? { quizzes: generated.quizzes } : null,
+        content: generated.quizzes.length > 0 ? {
+          quizzes: generated.quizzes.map((quiz) => ({
+            question: quiz.question,
+            options: quiz.options,
+            correct_index: quiz.correct_index,
+            explanation: quiz.explanation_text,
+            hint: quiz.hint_text,
+          })),
+        } : null,
       };
     });
 
