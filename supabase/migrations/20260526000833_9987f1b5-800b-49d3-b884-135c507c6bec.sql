@@ -21,22 +21,12 @@ BEGIN
     FROM pg_policies
     WHERE schemaname = 'public'
       AND tablename = 'question_quizzes'
-      AND policyname = 'Users can view accessible question quizzes'
+      AND policyname = 'Anyone can read quizzes'
   ) THEN
-    CREATE POLICY "Users can view accessible question quizzes"
+    CREATE POLICY "Anyone can read quizzes"
       ON public.question_quizzes
       FOR SELECT
-      USING (
-        EXISTS (
-          SELECT 1
-          FROM public.course_questions cq
-          WHERE cq.id = question_id
-            AND (
-              public.has_purchased_course(cq.course_id)
-              OR cq.question_index = 0
-            )
-        )
-      );
+      USING (true);
   END IF;
 END $$;
 
