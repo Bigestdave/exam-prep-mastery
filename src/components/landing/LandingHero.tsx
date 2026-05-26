@@ -89,8 +89,7 @@ export function LandingHero() {
             <img
               src={sovereignKey}
               alt="Sovereign key logo"
-              className="w-10 h-10 object-contain"
-              style={{ filter: "brightness(0)" }}
+              className="w-10 h-10 object-contain brightness-0"
             />
           </motion.div>
           <motion.p
