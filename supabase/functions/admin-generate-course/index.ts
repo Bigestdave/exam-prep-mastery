@@ -14,7 +14,7 @@ const MODEL_ANSWER = "google/gemini-2.5-pro";
 const ANSWER_GENERATION_BATCH_SIZE = 2;
 const MIN_QUIZ_OPTIONS = 2;
 const DEFAULT_COURSE_PRICE = 1000;
-const LOVABLE_KEY_NAMES = ["LOVABLE_API_KEY", "LOVABLE_API_KEY", "LOVABLE_AI_KEY"] as const;
+const LOVABLE_KEY_NAMES = ["LOVABLE_API_KEY", "LOVABLE_AI_KEY"] as const;
 
 interface GeneratePayload {
   course_code: string;
@@ -312,8 +312,10 @@ function logPostgrestError(context: string, error: unknown) {
 function isMissingQuestionQuizzesTableError(error: unknown): boolean {
   const parsed = parsePostgrestError(error);
   const combined = [parsed?.message, parsed?.details, parsed?.hint].filter(Boolean).join(" ").toLowerCase();
-  return parsed?.code === "42P01" || parsed?.code === "PGRST205" ||
-    (combined.includes("question_quizzes") && (combined.includes("does not exist") || combined.includes("schema cache")));
+  const isTableNotFoundError = parsed?.code === "42P01" || parsed?.code === "PGRST205";
+  const mentionsQuestionQuizzes = combined.includes("question_quizzes");
+  const isSchemaMessage = combined.includes("does not exist") || combined.includes("schema cache");
+  return isTableNotFoundError || (mentionsQuestionQuizzes && isSchemaMessage);
 }
 
 async function extractQuestions(gateway: AiGatewayConfig, courseTitle: string, materials: string): Promise<string[]> {
