@@ -312,8 +312,8 @@ function logPostgrestError(context: string, error: unknown) {
 function isMissingQuestionQuizzesTableError(error: unknown): boolean {
   const parsed = parsePostgrestError(error);
   const combined = [parsed?.message, parsed?.details, parsed?.hint].filter(Boolean).join(" ").toLowerCase();
-  const isTableNotFoundError = parsed?.code === "42P01" || parsed?.code === "PGRST205";
   const mentionsQuestionQuizzes = combined.includes("question_quizzes");
+  const isTableNotFoundError = (parsed?.code === "42P01" || parsed?.code === "PGRST205") && mentionsQuestionQuizzes;
   const isSchemaMessage = combined.includes("does not exist") || combined.includes("schema cache");
   return isTableNotFoundError || (mentionsQuestionQuizzes && isSchemaMessage);
 }
@@ -580,7 +580,7 @@ serve(async (req) => {
       if (insertQuizzesError) {
         if (isMissingQuestionQuizzesTableError(insertQuizzesError)) {
           console.error(
-            "[admin-generate-course] question_quizzes table missing; skipping relational quiz rows because quizzes are already stored in course_questions.content.quizzes",
+            "[admin-generate-course] question_quizzes table not found; quiz data preserved in course_questions",
             parsePostgrestError(insertQuizzesError) ?? insertQuizzesError,
           );
         } else {
