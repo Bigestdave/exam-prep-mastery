@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import lcuLogo from "@/assets/lcu-logo.png";
 
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
 const fadeUp = (delay: number) => ({
@@ -79,7 +80,7 @@ export function LandingHero() {
             {...fadeUp(1)}
           >
             <img
-              src="/lcu-logo.png"
+              src={lcuLogo}
               alt="Lead City University"
               className="w-10 h-10 object-contain opacity-80"
             />
