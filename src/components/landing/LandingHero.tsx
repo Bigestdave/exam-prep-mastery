@@ -72,6 +72,27 @@ export function LandingHero() {
               </MotionButton>
             </Link>
           </motion.div>
+
+          <motion.div
+            className="flex items-center justify-center gap-4 mt-10"
+            {...fadeUp(1)}
+          >
+            <img
+              src="/lcu-logo.png"
+              alt="Lead City University"
+              className="w-10 h-10 object-contain opacity-80"
+            />
+            <span className="text-xl text-muted-foreground">×</span>
+            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-display text-lg font-bold">
+              LP
+            </div>
+          </motion.div>
+          <motion.p
+            className="text-center font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground mt-3"
+            {...fadeUp(0.6)}
+          >
+            Built for Lead City University students.
+          </motion.p>
         </div>
       </div>
     </section>
