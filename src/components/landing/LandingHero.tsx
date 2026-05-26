@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import lcuLogo from "@/assets/lcu-logo.png";
+import sovereignKey from "@/assets/sovereign-key.png";
 
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
 const fadeUp = (delay: number) => ({
@@ -85,9 +86,12 @@ export function LandingHero() {
               className="w-10 h-10 object-contain opacity-80"
             />
             <span className="text-xl text-muted-foreground">×</span>
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-display text-lg font-bold">
-              LP
-            </div>
+            <img
+              src={sovereignKey}
+              alt="LCU Prep"
+              className="w-10 h-10 object-contain"
+              style={{ filter: "brightness(0)" }}
+            />
           </motion.div>
           <motion.p
             className="text-center font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground mt-3"
