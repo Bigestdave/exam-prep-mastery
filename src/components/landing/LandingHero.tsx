@@ -18,16 +18,7 @@ export function LandingHero() {
       <div className="container pt-8 pb-16 md:pt-16 md:pb-28 px-4">
         <div className="max-w-3xl mx-auto text-left md:text-center">
 
-          <motion.div
-            className="flex items-center justify-start md:justify-center gap-3 mb-8"
-            {...fadeUp(0.05)}
-          >
-            <span className="text-serif text-base text-accent leading-none">I.</span>
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-              For Lead City Students
-            </span>
-            <span className="hidden md:inline-block w-12 h-px bg-border" />
-          </motion.div>
+          
           
           <h1 className="text-foreground leading-[1.1] mb-6">
             <motion.span
