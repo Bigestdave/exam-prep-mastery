@@ -26,7 +26,7 @@ export function LandingHero() {
           >
             <span className="text-serif text-base text-accent leading-none">I.</span>
             <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-              For Lead City Students
+              For Lead City Students.
             </span>
             <span className="hidden md:inline-block w-12 h-px bg-border" />
           </motion.div>
