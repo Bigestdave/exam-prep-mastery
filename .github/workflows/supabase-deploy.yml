@@ -31,7 +31,7 @@ jobs:
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
-          supabase db push --project-ref ykkspgvhveaeeaisprqz
+          supabase db push --linked
 
       - name: Deploy Edge Functions
         env:
@@ -42,7 +42,7 @@ jobs:
               if [ -d "$fn" ]; then
                 name=$(basename "$fn")
                 echo "Deploying function: $name"
-                supabase functions deploy "$name" --project-ref ykkspgvhveaeeaisprqz
+                supabase functions deploy "$name" --linked
               fi
             done
           else
