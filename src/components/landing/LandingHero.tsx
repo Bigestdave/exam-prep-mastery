@@ -2,8 +2,6 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import sovereignKey from "@/assets/sovereign-key.png";
-import lcuLogo from "@/assets/lcu-logo.png";
 
 const ease = [0.25, 0.46, 0.45, 0.94] as const;
 const fadeUp = (delay: number) => ({
@@ -82,25 +80,6 @@ export function LandingHero() {
                 I have an account
               </MotionButton>
             </Link>
-          </motion.div>
-
-
-          {/* Partnership badge */}
-          <motion.div 
-            className="flex flex-col items-center gap-2 mt-10"
-            {...fadeUp(0.7)}
-          >
-            <div className="flex items-center gap-3">
-              <img src={lcuLogo} alt="Lead City University" className="w-8 h-8 object-contain" />
-              <span className="text-muted-foreground/40 font-light text-xl select-none">×</span>
-              <div className="flex items-center gap-1.5">
-                <img src={sovereignKey} alt="LCU Prep" className="w-5 h-5 object-contain" style={{ filter: 'brightness(0)' }} />
-                <span className="font-display font-semibold text-foreground">LCU Prep</span>
-              </div>
-            </div>
-            <p className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground">
-              Built for Lead City University students
-            </p>
           </motion.div>
         </div>
       </div>
