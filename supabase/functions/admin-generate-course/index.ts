@@ -7,12 +7,14 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const TOKENROUTER_GATEWAY = "https://api.tokenrouter.com/v1/chat/completions";
 const LOVABLE_AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL_EXTRACT = "google/gemini-2.5-flash";
 const MODEL_ANSWER = "google/gemini-2.5-pro";
 const ANSWER_GENERATION_BATCH_SIZE = 2;
 const MIN_QUIZ_OPTIONS = 2;
 const DEFAULT_COURSE_PRICE = 1000;
+const LOVABLE_KEY_NAMES = ["LOVABLE_API_KEY", "LOVABLE_API_KEY", "LOVABLE_AI_KEY"] as const;
 
 interface GeneratePayload {
   course_code: string;
@@ -42,6 +44,21 @@ interface GeneratedAnswer {
   exam_tip: string;
   answer_confidence: number;
   quizzes: GeneratedQuiz[];
+}
+
+type GatewayProvider = "tokenrouter" | "lovable";
+
+interface AiGatewayConfig {
+  provider: GatewayProvider;
+  endpoint: string;
+  apiKey: string;
+}
+
+interface PostgrestErrorLike {
+  code?: string;
+  message?: string;
+  details?: string;
+  hint?: string;
 }
 
 function getUserIdFromToken(authHeader: string): string | null {
@@ -197,17 +214,17 @@ async function extractTextFromPdf(pdfUrl: string): Promise<string> {
   return result.text || "";
 }
 
-async function callLovableAI(
-  apiKey: string,
+async function callAiGateway(
+  gateway: AiGatewayConfig,
   model: string,
   systemPrompt: string,
   userPrompt: string,
   maxTokens = 4096,
 ) {
-  const response = await fetch(LOVABLE_AI_GATEWAY, {
+  const response = await fetch(gateway.endpoint, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${gateway.apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -222,14 +239,84 @@ async function callLovableAI(
   });
 
   if (!response.ok) {
-    throw new Error(`Lovable AI error ${response.status}: ${await response.text()}`);
+    throw new Error(`${gateway.provider} AI error ${response.status}: ${await response.text()}`);
   }
 
   const data = await response.json();
   return String(data.choices?.[0]?.message?.content || "").trim();
 }
 
-async function extractQuestions(apiKey: string, courseTitle: string, materials: string): Promise<string[]> {
+function firstDefinedEnv(names: readonly string[]): string | null {
+  for (const name of names) {
+    const value = Deno.env.get(name)?.trim();
+    if (value) return value;
+  }
+  return null;
+}
+
+function resolveAiGateway(): AiGatewayConfig | null {
+  const tokenRouterKey = Deno.env.get("TOKENROUTER_API_KEY")?.trim();
+  if (tokenRouterKey) {
+    return {
+      provider: "tokenrouter",
+      endpoint: TOKENROUTER_GATEWAY,
+      apiKey: tokenRouterKey,
+    };
+  }
+
+  const lovableKey = firstDefinedEnv(LOVABLE_KEY_NAMES);
+  if (lovableKey) {
+    return {
+      provider: "lovable",
+      endpoint: LOVABLE_AI_GATEWAY,
+      apiKey: lovableKey,
+    };
+  }
+
+  return null;
+}
+
+function parsePostgrestError(error: unknown): PostgrestErrorLike | null {
+  if (!error || typeof error !== "object") return null;
+  const candidate = error as Record<string, unknown>;
+  if (
+    typeof candidate.message === "string" ||
+    typeof candidate.code === "string" ||
+    typeof candidate.details === "string"
+  ) {
+    return {
+      code: typeof candidate.code === "string" ? candidate.code : undefined,
+      message: typeof candidate.message === "string" ? candidate.message : undefined,
+      details: typeof candidate.details === "string" ? candidate.details : undefined,
+      hint: typeof candidate.hint === "string" ? candidate.hint : undefined,
+    };
+  }
+  return null;
+}
+
+function describePostgrestError(error: unknown): string {
+  const parsed = parsePostgrestError(error);
+  if (!parsed) return "Unknown PostgREST error";
+  return [parsed.code, parsed.message, parsed.details, parsed.hint].filter(Boolean).join(" | ");
+}
+
+function logPostgrestError(context: string, error: unknown) {
+  const parsed = parsePostgrestError(error);
+  if (parsed) {
+    console.error(`[admin-generate-course] ${context} PostgREST error`, parsed);
+    return;
+  }
+  console.error(`[admin-generate-course] ${context} non-PostgREST error`, error);
+}
+
+function isMissingQuestionQuizzesTableError(error: unknown): boolean {
+  const parsed = parsePostgrestError(error);
+  const combined = [parsed?.message, parsed?.details, parsed?.hint].filter(Boolean).join(" ").toLowerCase();
+  return parsed?.code === "42P01" || parsed?.code === "PGRST205" ||
+    (combined.includes("question_quizzes") && (combined.includes("does not exist") || combined.includes("schema cache")));
+}
+
+async function extractQuestions(gateway: AiGatewayConfig, courseTitle: string, materials: string): Promise<string[]> {
   const systemPrompt = `You extract tutorial and exam-prep questions from university course materials.
 Return only valid JSON in this exact format:
 {"questions":["Question 1","Question 2"]}
@@ -245,13 +332,13 @@ Rules:
 Materials:
 ${materials.slice(0, 50000)}`;
 
-  const response = await callLovableAI(apiKey, MODEL_EXTRACT, systemPrompt, userPrompt, 8192);
+  const response = await callAiGateway(gateway, MODEL_EXTRACT, systemPrompt, userPrompt, 8192);
   const parsed = parseJsonObject<ExtractedQuestions>(response, "{");
   return normalizeQuestions(parsed?.questions);
 }
 
 async function generatePremiumAnswer(
-  apiKey: string,
+  gateway: AiGatewayConfig,
   courseTitle: string,
   question: string,
   materials: string,
@@ -288,7 +375,7 @@ Tutorial question: ${question}
 Course materials:
 ${materials.slice(0, 32000)}`;
 
-  const response = await callLovableAI(apiKey, MODEL_ANSWER, systemPrompt, userPrompt, 8192);
+  const response = await callAiGateway(gateway, MODEL_ANSWER, systemPrompt, userPrompt, 8192);
   const parsed = parseJsonObject<GeneratedAnswer>(response, "{");
   return normalizeAnswerResponse(parsed, response);
 }
@@ -308,9 +395,15 @@ serve(async (req) => {
 
     await ensureAdmin(req.headers.get("Authorization"), serviceClient);
 
-    const aiKey = Deno.env.get("LOVABLE_API_KEY");
-    if (!aiKey) {
-      throw new Error("LOVABLE_API_KEY not configured");
+    const aiGateway = resolveAiGateway();
+    if (!aiGateway) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: "AI gateway not configured. Set TOKENROUTER_API_KEY or LOVABLE_API_KEY (legacy aliases also supported).",
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const payload = (await req.json()) as GeneratePayload;
@@ -360,7 +453,8 @@ serve(async (req) => {
       .maybeSingle();
 
     if (courseLookupError) {
-      throw courseLookupError;
+      logPostgrestError("course lookup", courseLookupError);
+      throw new Error(`Database error while reading course: ${describePostgrestError(courseLookupError)}`);
     }
 
     let courseId = existingCourse?.id;
@@ -375,7 +469,10 @@ serve(async (req) => {
         })
         .eq("id", courseId);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        logPostgrestError("course update", updateError);
+        throw new Error(`Database error while updating course: ${describePostgrestError(updateError)}`);
+      }
     } else {
       const { data: newCourse, error: insertCourseError } = await serviceClient
         .from("courses")
@@ -390,24 +487,32 @@ serve(async (req) => {
         .single();
 
       if (insertCourseError || !newCourse) {
-        throw insertCourseError || new Error("Failed to create course");
+        if (insertCourseError) {
+          logPostgrestError("course insert", insertCourseError);
+          throw new Error(`Database error while creating course: ${describePostgrestError(insertCourseError)}`);
+        }
+        throw new Error("Failed to create course");
       }
 
       courseId = newCourse.id;
     }
 
-    const questions = await extractQuestions(aiKey, payload.course_title, materials);
+    const questions = await extractQuestions(aiGateway, payload.course_title, materials);
     if (questions.length === 0) {
       throw new Error("No tutorial questions could be extracted from the provided materials");
     }
 
-    await serviceClient.from("course_questions").delete().eq("course_id", courseId);
+    const { error: deleteQuestionsError } = await serviceClient.from("course_questions").delete().eq("course_id", courseId);
+    if (deleteQuestionsError) {
+      logPostgrestError("course_questions cleanup", deleteQuestionsError);
+      throw new Error(`Database error while resetting questions: ${describePostgrestError(deleteQuestionsError)}`);
+    }
 
     const generatedQuestions: GeneratedAnswer[] = [];
     for (let index = 0; index < questions.length; index += ANSWER_GENERATION_BATCH_SIZE) {
       const batch = questions.slice(index, index + ANSWER_GENERATION_BATCH_SIZE);
       const batchResults = await Promise.all(
-        batch.map((question) => generatePremiumAnswer(aiKey, payload.course_title, question, materials)),
+        batch.map((question) => generatePremiumAnswer(aiGateway, payload.course_title, question, materials)),
       );
       generatedQuestions.push(...batchResults);
     }
@@ -442,7 +547,11 @@ serve(async (req) => {
       .select("id, question_index");
 
     if (insertQuestionsError || !insertedQuestions) {
-      throw insertQuestionsError || new Error("Failed to save course questions");
+      if (insertQuestionsError) {
+        logPostgrestError("course_questions insert", insertQuestionsError);
+        throw new Error(`Database error while saving questions: ${describePostgrestError(insertQuestionsError)}`);
+      }
+      throw new Error("Failed to save course questions");
     }
 
     const questionIdByIndex = new Map(insertedQuestions.map((row) => [row.question_index, row.id]));
@@ -467,7 +576,15 @@ serve(async (req) => {
         .insert(quizRows);
 
       if (insertQuizzesError) {
-        throw insertQuizzesError;
+        if (isMissingQuestionQuizzesTableError(insertQuizzesError)) {
+          console.error(
+            "[admin-generate-course] question_quizzes table missing; continuing with content.quizzes fallback",
+            parsePostgrestError(insertQuizzesError) ?? insertQuizzesError,
+          );
+        } else {
+          logPostgrestError("question_quizzes insert", insertQuizzesError);
+          throw new Error(`Database error while saving quizzes: ${describePostgrestError(insertQuizzesError)}`);
+        }
       }
     }
 
