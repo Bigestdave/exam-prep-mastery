@@ -80,14 +80,10 @@ export type Database = {
       course_questions: {
         Row: {
           answer_text: string
-          answer_confidence: number | null
           content: Json | null
           course_id: string
           created_at: string | null
-          exam_tip: string | null
-          explanation_text: string | null
           id: string
-          key_points: Json | null
           question_index: number
           question_text: string
           quiz_options: Json | null
@@ -97,14 +93,10 @@ export type Database = {
         }
         Insert: {
           answer_text: string
-          answer_confidence?: number | null
           content?: Json | null
           course_id: string
           created_at?: string | null
-          exam_tip?: string | null
-          explanation_text?: string | null
           id?: string
-          key_points?: Json | null
           question_index: number
           question_text: string
           quiz_options?: Json | null
@@ -114,14 +106,10 @@ export type Database = {
         }
         Update: {
           answer_text?: string
-          answer_confidence?: number | null
           content?: Json | null
           course_id?: string
           created_at?: string | null
-          exam_tip?: string | null
-          explanation_text?: string | null
           id?: string
-          key_points?: Json | null
           question_index?: number
           question_text?: string
           quiz_options?: Json | null
@@ -349,54 +337,7 @@ export type Database = {
           id?: string
           user_id?: string
         }
-        Relationships: [        ]
-      }
-      question_quizzes: {
-        Row: {
-          correct_index: number
-          created_at: string
-          explanation_text: string | null
-          hint_text: string | null
-          id: string
-          options: Json
-          question_id: string
-          question_text: string
-          quiz_index: number
-          updated_at: string
-        }
-        Insert: {
-          correct_index: number
-          created_at?: string
-          explanation_text?: string | null
-          hint_text?: string | null
-          id?: string
-          options: Json
-          question_id: string
-          question_text: string
-          quiz_index: number
-          updated_at?: string
-        }
-        Update: {
-          correct_index?: number
-          created_at?: string
-          explanation_text?: string | null
-          hint_text?: string | null
-          id?: string
-          options?: Json
-          question_id?: string
-          question_text?: string
-          quiz_index?: number
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "question_quizzes_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: false
-            referencedRelation: "course_questions"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       quiz_attempts: {
         Row: {
