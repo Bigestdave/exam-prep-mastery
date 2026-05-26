@@ -17,17 +17,9 @@ export function LandingHero() {
     <section className="relative">
       <div className="container pt-8 pb-16 md:pt-16 md:pb-28 px-4">
         <div className="max-w-3xl mx-auto text-left md:text-center">
+          
 
-          <motion.div
-            className="flex items-center justify-start md:justify-center gap-3 mb-8"
-            {...fadeUp(0.05)}
-          >
-            <span className="text-serif text-base text-accent leading-none">I.</span>
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-              For Lead City Students
-            </span>
-            <span className="hidden md:inline-block w-12 h-px bg-border" />
-          </motion.div>
+          
           
           <h1 className="text-foreground leading-[1.1] mb-6">
             <motion.span
@@ -81,6 +73,27 @@ export function LandingHero() {
               </MotionButton>
             </Link>
           </motion.div>
+
+          <motion.div
+            className="flex items-center justify-center gap-4 mt-10"
+            {...fadeUp(1)}
+          >
+            <img
+              src="/lcu-logo.png"
+              alt="Lead City University"
+              className="w-10 h-10 object-contain opacity-80"
+            />
+            <span className="text-xl text-muted-foreground">×</span>
+            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-display text-lg font-bold">
+              LP
+            </div>
+          </motion.div>
+          <motion.p
+            className="text-center font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground mt-3"
+            {...fadeUp(0.6)}
+          >
+            Built for Lead City University students.
+          </motion.p>
         </div>
       </div>
     </section>
