@@ -401,7 +401,7 @@ serve(async (req) => {
     if (!aiGateway) {
       return new Response(JSON.stringify({
         success: false,
-        error: "AI gateway not configured. Set TOKENROUTER_API_KEY or LOVABLE_API_KEY (legacy aliases also supported).",
+        error: "AI gateway not configured. Set TOKENROUTER_API_KEY or LOVABLE_API_KEY (legacy: LOVABLE_AI_KEY).",
       }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -580,7 +580,7 @@ serve(async (req) => {
       if (insertQuizzesError) {
         if (isMissingQuestionQuizzesTableError(insertQuizzesError)) {
           console.error(
-            "[admin-generate-course] question_quizzes table missing; continuing with content.quizzes fallback",
+            "[admin-generate-course] question_quizzes table missing; skipping relational quiz rows because quizzes are already stored in course_questions.content.quizzes",
             parsePostgrestError(insertQuizzesError) ?? insertQuizzesError,
           );
         } else {
