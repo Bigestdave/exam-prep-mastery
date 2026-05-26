@@ -88,7 +88,7 @@ export function LandingHero() {
             <span className="text-xl text-muted-foreground">×</span>
             <img
               src={sovereignKey}
-              alt="LCU Prep"
+              alt="LCU Prep logo"
               className="w-10 h-10 object-contain"
               style={{ filter: "brightness(0)" }}
             />
