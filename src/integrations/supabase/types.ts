@@ -339,6 +339,50 @@ export type Database = {
         }
         Relationships: []
       }
+      question_quizzes: {
+        Row: {
+          correct_index: number
+          created_at: string
+          explanation_text: string | null
+          hint_text: string | null
+          id: string
+          options: Json
+          question_id: string
+          question_text: string
+          quiz_index: number
+        }
+        Insert: {
+          correct_index: number
+          created_at?: string
+          explanation_text?: string | null
+          hint_text?: string | null
+          id?: string
+          options: Json
+          question_id: string
+          question_text: string
+          quiz_index: number
+        }
+        Update: {
+          correct_index?: number
+          created_at?: string
+          explanation_text?: string | null
+          hint_text?: string | null
+          id?: string
+          options?: Json
+          question_id?: string
+          question_text?: string
+          quiz_index?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_quizzes_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "course_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quiz_attempts: {
         Row: {
           completed_at: string

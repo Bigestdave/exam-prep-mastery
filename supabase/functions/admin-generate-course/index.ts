@@ -7,9 +7,9 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const TOKENROUTER_GATEWAY = "https://api.tokenrouter.com/v1/chat/completions";
-const MODEL_GPT4O_MINI = "openai/gpt-4o-mini";
-const MODEL_CLAUDE_SONNET = "anthropic/claude-sonnet-4.6";
+const LOVABLE_AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const MODEL_EXTRACT = "google/gemini-2.5-flash";
+const MODEL_ANSWER = "google/gemini-2.5-pro";
 const ANSWER_GENERATION_BATCH_SIZE = 2;
 const MIN_QUIZ_OPTIONS = 2;
 const DEFAULT_COURSE_PRICE = 1000;
@@ -197,14 +197,14 @@ async function extractTextFromPdf(pdfUrl: string): Promise<string> {
   return result.text || "";
 }
 
-async function callTokenRouter(
+async function callLovableAI(
   apiKey: string,
   model: string,
   systemPrompt: string,
   userPrompt: string,
   maxTokens = 4096,
 ) {
-  const response = await fetch(TOKENROUTER_GATEWAY, {
+  const response = await fetch(LOVABLE_AI_GATEWAY, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -222,7 +222,7 @@ async function callTokenRouter(
   });
 
   if (!response.ok) {
-    throw new Error(`TokenRouter error ${response.status}: ${await response.text()}`);
+    throw new Error(`Lovable AI error ${response.status}: ${await response.text()}`);
   }
 
   const data = await response.json();
@@ -245,7 +245,7 @@ Rules:
 Materials:
 ${materials.slice(0, 50000)}`;
 
-  const response = await callTokenRouter(apiKey, MODEL_GPT4O_MINI, systemPrompt, userPrompt, 8192);
+  const response = await callLovableAI(apiKey, MODEL_EXTRACT, systemPrompt, userPrompt, 8192);
   const parsed = parseJsonObject<ExtractedQuestions>(response, "{");
   return normalizeQuestions(parsed?.questions);
 }
@@ -288,7 +288,7 @@ Tutorial question: ${question}
 Course materials:
 ${materials.slice(0, 32000)}`;
 
-  const response = await callTokenRouter(apiKey, MODEL_CLAUDE_SONNET, systemPrompt, userPrompt, 8192);
+  const response = await callLovableAI(apiKey, MODEL_ANSWER, systemPrompt, userPrompt, 8192);
   const parsed = parseJsonObject<GeneratedAnswer>(response, "{");
   return normalizeAnswerResponse(parsed, response);
 }
@@ -308,9 +308,9 @@ serve(async (req) => {
 
     await ensureAdmin(req.headers.get("Authorization"), serviceClient);
 
-    const tokenRouterKey = Deno.env.get("TOKENROUTER_API_KEY");
-    if (!tokenRouterKey) {
-      throw new Error("TOKENROUTER_API_KEY not configured");
+    const aiKey = Deno.env.get("LOVABLE_API_KEY");
+    if (!aiKey) {
+      throw new Error("LOVABLE_API_KEY not configured");
     }
 
     const payload = (await req.json()) as GeneratePayload;
@@ -396,7 +396,7 @@ serve(async (req) => {
       courseId = newCourse.id;
     }
 
-    const questions = await extractQuestions(tokenRouterKey, payload.course_title, materials);
+    const questions = await extractQuestions(aiKey, payload.course_title, materials);
     if (questions.length === 0) {
       throw new Error("No tutorial questions could be extracted from the provided materials");
     }
@@ -407,7 +407,7 @@ serve(async (req) => {
     for (let index = 0; index < questions.length; index += ANSWER_GENERATION_BATCH_SIZE) {
       const batch = questions.slice(index, index + ANSWER_GENERATION_BATCH_SIZE);
       const batchResults = await Promise.all(
-        batch.map((question) => generatePremiumAnswer(tokenRouterKey, payload.course_title, question, materials)),
+        batch.map((question) => generatePremiumAnswer(aiKey, payload.course_title, question, materials)),
       );
       generatedQuestions.push(...batchResults);
     }
@@ -419,12 +419,12 @@ serve(async (req) => {
         question_index: index,
         question_text: question,
         answer_text: generated.answer_text,
-        explanation_text: generated.explanation_text || null,
-        key_points: generated.key_points,
-        exam_tip: generated.exam_tip || null,
         status: "published",
-        answer_confidence: generated.answer_confidence,
-        content: generated.quizzes.length > 0 ? {
+        content: {
+          explanation_text: generated.explanation_text || null,
+          key_points: generated.key_points,
+          exam_tip: generated.exam_tip || null,
+          answer_confidence: generated.answer_confidence,
           quizzes: generated.quizzes.map((quiz) => ({
             question: quiz.question,
             options: quiz.options,
@@ -432,7 +432,7 @@ serve(async (req) => {
             explanation: quiz.explanation_text,
             hint: quiz.hint_text,
           })),
-        } : null,
+        },
       };
     });
 

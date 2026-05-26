@@ -158,7 +158,7 @@ export function useQuizData(courseId: string | undefined) {
         const relationalQuizMap = new Map<string, Array<{ id: string; question: string; options: QuizOption[]; hint?: string }>>();
 
         if (questionIds.length > 0) {
-          const { data: relationalQuizzes, error: relationalError } = await supabase
+          const { data: relationalQuizzes, error: relationalError } = await (supabase as any)
             .from('question_quizzes')
             .select('id, question_id, question_text, options, correct_index, explanation_text, hint_text, quiz_index')
             .in('question_id', questionIds)
@@ -168,7 +168,7 @@ export function useQuizData(courseId: string | undefined) {
             console.error('Failed to load relational quiz data:', relationalError);
           }
 
-          relationalQuizzes?.forEach((quiz) => {
+          relationalQuizzes?.forEach((quiz: any) => {
             const parsedOptions = parseRelationalOptions(quiz.options, quiz.correct_index);
             if (parsedOptions.length === 0) return;
 
