@@ -369,22 +369,28 @@ export default function AnswerView() {
           disabled={!isOwned || questionIndex >= questions.length - 1}
           className="fixed right-0 top-44 bottom-0 w-[22vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
         />
-            >
-              <ChevronLeft className="w-4 h-4" /> <span className="hidden sm:inline">Previous</span>
-            </Button>
+        {/* Footer Navigation Group */}
+        <div className="flex items-center justify-between pb-20 mt-8 pt-8 border-t border-border/40 px-1">
+          <Button
+            variant="outline"
+            onClick={goPrev}
+            disabled={questionIndex === 0}
+            className="gap-2 rounded-xl font-display font-bold border-border hover:bg-secondary/40 transition-all h-10 px-4"
+          >
+            <ChevronLeft className="w-4 h-4" /> <span className="hidden sm:inline">Previous</span>
+          </Button>
 
-            <div className="text-xs font-display font-bold text-muted-foreground uppercase tracking-widest select-none bg-secondary/50 px-3 py-1.5 rounded-full border border-border/20">
-              {questionIndex + 1} / {questions.length}
-            </div>
-
-            <NextButton 
-              hasNext={hasNext(questionIndex, questions.length)} 
-              isOwned={isOwned} 
-              id={id!}
-              hasQuiz={hasQuizData}
-              onClick={goNext}
-            />
+          <div className="text-xs font-display font-bold text-muted-foreground uppercase tracking-widest select-none bg-secondary/50 px-3 py-1.5 rounded-full border border-border/20">
+            {questionIndex + 1} / {questions.length}
           </div>
+
+          <NextButton 
+            hasNext={hasNext(questionIndex, questions.length)} 
+            isOwned={isOwned} 
+            id={id!}
+            hasQuiz={hasQuizData}
+            onClick={goNext}
+          />
         </div>
       </main>
     </div>
