@@ -1,3 +1,9 @@
+import result1 from "@/assets/results/result-1.png";
+import result2 from "@/assets/results/result-2.png";
+import result3 from "@/assets/results/result-3.png";
+import result4 from "@/assets/results/result-4.png";
+import result5 from "@/assets/results/result-5.png";
+import result6 from "@/assets/results/result-6.png";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, ShieldCheck } from "lucide-react";
@@ -26,7 +32,7 @@ interface ResultData {
 const RESULTS_LEDGER: ResultData[] = [
   {
     id: 1,
-    image: null, // Replace with your image import, e.g., result1
+    image: result1, // Replace with your image import, e.g., result1
     level: "300 Level",
     gpa: "5.00 / 5.00",
     standing: "First Class",
@@ -34,7 +40,7 @@ const RESULTS_LEDGER: ResultData[] = [
   },
   {
     id: 2,
-    image: null,
+    image: result2,
     level: "400 Level",
     gpa: "4.83 / 5.00",
     standing: "First Class",
@@ -42,31 +48,31 @@ const RESULTS_LEDGER: ResultData[] = [
   },
   {
     id: 3,
-    image: null,
+    image: result3,
     level: "200 Level",
     gpa: "4.67 / 5.00",
     standing: "First Class",
-    quote: "When the results were pasted in the department, the difference was clear. I scored A's in courses people usually struggle with.",
+    quote: "When the results were pasted in my department, the difference was clear. I scored A's in courses people usually struggle with.",
   },
   {
     id: 4,
-    image: null,
+    image: result4,
     level: "100 Level",
     gpa: "4.50 / 5.00",
     standing: "Second Class Upper",
-    quote: "I focused on what mattered instead of reading the entire course material the night before. LCU Prep was exactly what I just needed.",
+    quote: "I focused on what mattered instead of reading my entire course material the night before. LCU Prep was exactly what I just needed.",
   },
   {
     id: 5,
-    image: null,
+    image: result5,
     level: "300 Level",
     gpa: "4.75 / 5.00",
     standing: "First Class",
-    quote: "The answers from the tutorial questions, gave me the confidence to walk into the exam hall knowing exactly how to answer the questions.",
+    quote: "The answers from the tutorial questions, gave me confidence to enter the exam hall knowing exactly how to answer the questions.",
   },
   {
     id: 6,
-    image: null,
+    image: result6,
     level: "200 Level",
     gpa: "5.00 / 5.00",
     standing: "First Class",
