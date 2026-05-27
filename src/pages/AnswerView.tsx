@@ -251,7 +251,39 @@ export default function AnswerView() {
   );
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden page-enter">
+    <div className={`min-h-screen bg-background relative overflow-hidden page-enter transition-all duration-500 ${
+      paperMode ? 'paper-mode-active' : ''
+    }`}>
+      <style>{`
+        .paper-mode-active {
+          background-color: #F8F5EE !important;
+          color: #2E251B !important;
+        }
+        .paper-mode-active .bg-card {
+          background-color: #FFFDF9 !important;
+          border-color: #E8E0D0 !important;
+          color: #2E251B !important;
+        }
+        .paper-mode-active .text-foreground\\/80,
+        .paper-mode-active .text-foreground\\/90 {
+          color: #3D3327 !important;
+        }
+        .paper-mode-active .label {
+          color: #8C7861 !important;
+        }
+        .paper-mode-active .rule {
+          background-color: #E8E0D0 !important;
+        }
+        .paper-mode-active .border-border\\/40,
+        .paper-mode-active .border-border\\/50 {
+          border-color: #E8E0D0 !important;
+        }
+        .paper-mode-active h1,
+        .paper-mode-active h2,
+        .paper-mode-active h3 {
+          color: #2E251B !important;
+        }
+      `}</style>
       
       {user && <WatermarkOverlay />}
       
@@ -268,31 +300,31 @@ export default function AnswerView() {
             <ArrowLeft className="w-4 h-4" /> Back to {course.code}
           </Link>
 
-          <div className="flex items-center gap-4 bg-secondary/40 border border-border/40 px-3 py-1.5 rounded-full shadow-sm">
+          <div className="flex items-center gap-3 bg-secondary/40 border border-border/40 px-3 py-1.5 rounded-full shadow-sm">
             {questionIndex > 0 ? (
               <button
                 onClick={goPrev}
                 className="flex items-center gap-0.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
+                title="Previous Question"
               >
-                <ChevronLeft className="w-3.5 h-3.5" /> Q{questionIndex}
+                <ChevronLeft className="w-4 h-4" />
               </button>
             ) : (
-              <span className="w-8" />
+              <span className="w-4" />
             )}
 
-            <span className="text-[10px] font-display font-black uppercase tracking-widest text-muted-foreground select-none">
-              Q{questionIndex + 1} OF {questions.length}
-            </span>
+            <div className="h-4 w-px bg-border/40" />
 
             {hasNext(questionIndex, questions.length) && isOwned ? (
               <button
                 onClick={goNext}
                 className="flex items-center gap-0.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
+                title="Next Question"
               >
-                Q{questionIndex + 2} <ChevronRight className="w-3.5 h-3.5" />
+                <ChevronRight className="w-4 h-4" />
               </button>
             ) : (
-              <span className="w-8" />
+              <span className="w-4" />
             )}
           </div>
         </div>
@@ -336,22 +368,14 @@ export default function AnswerView() {
               </button>
             </div>
           </div>
-
-          {/* Visually Boxed Question */}
-          <div className={`mb-8 p-6 rounded-xl border-l-4 transition-colors duration-500 ${
-            paperMode
-              ? 'bg-[#FDF6E3] border-[#1a1a2e] text-[#1C1917]'
-              : 'bg-[#FFF8F0] border-[#1a1a2e] text-[#1D1B18]'
-          }`}>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2 block font-display">
-              THE QUESTION
-            </span>
-            <h1 className="text-lg md:text-xl font-display font-bold leading-snug">
+          {/* Clean Editorial Question */}
+          <div className="mb-10 px-1 border-b border-border/30 pb-6">
+            <h1 className="text-xl md:text-2xl font-display font-bold leading-snug text-foreground">
               {renderWithMath(question.question_text)}
             </h1>
           </div>
 
-          <div className={`prose-content relative transition-colors duration-500 ${paperMode ? 'paper-mode' : ''}`}>
+          <div className="prose-content relative">
             {renderAnswer(question.answer_text)}
           </div>
         </div>
@@ -379,10 +403,6 @@ export default function AnswerView() {
           >
             <ChevronLeft className="w-4 h-4" /> <span className="hidden sm:inline">Previous</span>
           </Button>
-
-          <div className="text-xs font-display font-bold text-muted-foreground uppercase tracking-widest select-none bg-secondary/50 px-3 py-1.5 rounded-full border border-border/20">
-            {questionIndex + 1} / {questions.length}
-          </div>
 
           <NextButton 
             hasNext={hasNext(questionIndex, questions.length)} 
