@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+
 export interface QuizOption {
   text: string;
   is_correct: boolean;
@@ -23,12 +24,6 @@ export interface QuizAttempt {
   percentage: number;
 }
 
-/**
- * Parses quiz data from content/structured_content JSONB.
- * Supports two formats:
- * 1. Edge Function format: { question, options: ["A","B","C","D"], correct_index: 0, explanation }
- * 2. Legacy n8n format: { question, options: {A:"...",B:"...",C:"...",D:"..."}, correct_answer: "B", hint }
- */
 function shuffleArray<T>(arr: T[]): T[] {
   const shuffled = [...arr];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -53,8 +48,15 @@ function parseQuiz(structured: any): { question: string; options: QuizOption[]; 
 
     // Format 2: Single quiz field (legacy)
     if (results.length === 0 && content?.quiz) {
-      const parsed = parseSingleQuiz(content.quiz);
-      if (parsed) results.push(parsed);
+      if (Array.isArray(content.quiz)) {
+        for (const quiz of content.quiz) {
+          const parsed = parseSingleQuiz(quiz);
+          if (parsed) results.push(parsed);
+        }
+      } else {
+        const parsed = parseSingleQuiz(content.quiz);
+        if (parsed) results.push(parsed);
+      }
     }
 
     return results;
@@ -74,7 +76,6 @@ function parseSingleQuiz(quiz: any): { question: string; options: QuizOption[]; 
         text: String(text),
         is_correct: i === correctIdx,
       }));
-      // Skip validation — show everything raw
       return {
         question: quiz.question || '(no question text)',
         options: options.length > 0 ? shuffleArray(options) : [{ text: 'No options', is_correct: true }],
@@ -98,19 +99,16 @@ function parseSingleQuiz(quiz: any): { question: string; options: QuizOption[]; 
       };
     }
 
-    // Catch-all: if quiz has a question field, try to show it anyway
     if (quiz.question) {
-      console.warn('[parseSingleQuiz] Unknown format, showing raw:', JSON.stringify(quiz).slice(0, 200));
       const rawOptions = Array.isArray(quiz.options) 
         ? quiz.options.map((t: any, i: number) => ({ text: String(t), is_correct: i === 0 }))
         : [{ text: 'No options available', is_correct: true }];
       return { question: quiz.question, options: rawOptions, hint: quiz.hint };
     }
   } catch (e) {
-    console.error('[parseSingleQuiz] Error parsing quiz:', e, JSON.stringify(quiz).slice(0, 300));
+    console.error('[parseSingleQuiz] Error parsing quiz:', e);
   }
 
-  console.warn('[parseSingleQuiz] Could not parse quiz:', JSON.stringify(quiz).slice(0, 200));
   return null;
 }
 
@@ -126,40 +124,25 @@ export function useQuizData(courseId: string | undefined) {
         return;
       }
 
-      // Fetch questions that have EITHER quiz_options OR structured_content with quiz
-      const { data, error } = await supabase
+      // 1. Fetch course questions
+      const { data: questionsData, error: qErr } = await supabase
         .from('course_questions')
         .select('id, course_id, question_index, question_text, answer_text, quiz_options, structured_content, content')
         .eq('course_id', courseId)
         .order('question_index', { ascending: true });
 
-      if (error) {
-        console.error('Failed to load quiz data:', error);
+      if (qErr) {
+        console.error('Failed to load course questions for quiz:', qErr);
       }
 
-      if (!error && data) {
-        console.log(`[useQuizData] Fetched ${data.length} questions for course ${courseId}`);
+      if (!qErr && questionsData) {
         const parsed: QuizQuestion[] = [];
 
-        for (const q of data) {
-          // Debug: log what each question has
-          const hasContent = q.content !== null && q.content !== undefined;
-          const hasStructured = q.structured_content !== null && q.structured_content !== undefined;
-          const hasLegacy = q.quiz_options !== null && q.quiz_options !== undefined;
-          console.log(`[useQuizData] Q${q.question_index}: content=${hasContent}, structured=${hasStructured}, legacy=${hasLegacy}`);
-          
-          if (hasContent) {
-            const contentObj = typeof q.content === 'string' ? JSON.parse(q.content as string) : q.content;
-            console.log(`[useQuizData] Q${q.question_index} content keys:`, Object.keys(contentObj || {}), 'quizzes count:', (contentObj as any)?.quizzes?.length ?? 0);
-          }
-
-          // Priority 1: Multi-quiz from content/structured_content
+        console.log(`[useQuizData] Parsing quizzes from JSON fields.`);
+        for (const q of questionsData) {
+          // Edge Function format
           const contentQuizzes = parseQuiz(q.content);
-          const quizzes = contentQuizzes.length > 0 
-            ? contentQuizzes 
-            : parseQuiz(q.structured_content);
-          
-          console.log(`[useQuizData] Q${q.question_index}: parsed ${quizzes.length} quizzes`);
+          const quizzes = contentQuizzes.length > 0 ? contentQuizzes : parseQuiz(q.structured_content);
 
           if (quizzes.length > 0) {
             for (let qi = 0; qi < quizzes.length; qi++) {
@@ -178,7 +161,7 @@ export function useQuizData(courseId: string | undefined) {
             continue;
           }
 
-          // Priority 2: Legacy quiz_options column
+          // Legacy raw quiz_options
           const legacyOptions = q.quiz_options as unknown as QuizOption[] | null;
           if (legacyOptions && Array.isArray(legacyOptions) && legacyOptions.length >= 2) {
             parsed.push({
