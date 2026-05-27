@@ -25,24 +25,11 @@ export default function AnswerView() {
   const question = getQuestionByIndex(questionIndex);
   const { hasQuizData } = useQuizData(id);
   const [paperMode, setPaperMode] = useState(false);
-  const [showHint, setShowHint] = useState(() => !localStorage.getItem('lcu_paper_hint_seen'));
-  const [showTapHint, setShowTapHint] = useState(() => !localStorage.getItem('lcu_tap_hint_seen'));
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
 
-  const dismissHint = () => {
-    setShowHint(false);
-    localStorage.setItem('lcu_paper_hint_seen', '1');
-  };
-
-  const dismissTapHint = () => {
-    setShowTapHint(false);
-    localStorage.setItem('lcu_tap_hint_seen', '1');
-  };
-
   const handleToggle = () => {
     setPaperMode(!paperMode);
-    if (showHint) dismissHint();
   };
 
   useEffect(() => {
@@ -142,15 +129,13 @@ export default function AnswerView() {
           return (
             <div
               key={index}
-              className="mb-8 p-6 bg-[#F0F4FF] border-l-4 border-[#4A90D9] rounded-r-2xl shadow-sm transition-all duration-300 hover:shadow-md"
+              className="mb-12 relative"
             >
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-lg">💡</span>
-                <span className="text-xs font-bold text-[#4A90D9] uppercase tracking-widest font-display">
-                  EXPLANATION
-                </span>
+              <div className="chapter-mark mb-5">
+                <span className="label">EXPLANATION</span>
+                <div className="rule"></div>
               </div>
-              <div className="text-foreground/80 leading-relaxed font-serif text-base md:text-lg whitespace-pre-wrap">
+              <div className="prose-content text-foreground/80 leading-relaxed font-serif text-base md:text-lg whitespace-pre-wrap">
                 {renderWithMath(bodyText)}
               </div>
             </div>
@@ -159,15 +144,13 @@ export default function AnswerView() {
           return (
             <div
               key={index}
-              className="mb-8 p-6 bg-[#F0FFF4] border-l-4 border-[#38A169] rounded-r-2xl shadow-sm transition-all duration-300 hover:shadow-md"
+              className="mb-12 relative"
             >
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-lg">🔑</span>
-                <span className="text-xs font-bold text-[#38A169] uppercase tracking-widest font-display">
-                  KEY POINTS TO REMEMBER
-                </span>
+              <div className="chapter-mark mb-5">
+                <span className="label">KEY POINTS TO REMEMBER</span>
+                <div className="rule"></div>
               </div>
-              <div className="text-foreground/80 leading-relaxed font-serif text-base md:text-lg whitespace-pre-wrap">
+              <div className="prose-content text-foreground/80 leading-relaxed font-serif text-base md:text-lg whitespace-pre-wrap">
                 {renderWithMath(bodyText)}
               </div>
             </div>
@@ -176,15 +159,13 @@ export default function AnswerView() {
           return (
             <div
               key={index}
-              className="mb-8 p-6 bg-[#FFFBF0] border-l-4 border-[#DD6B20] rounded-r-2xl shadow-sm transition-all duration-300 hover:shadow-md"
+              className="mb-12 relative"
             >
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-lg">📝</span>
-                <span className="text-xs font-bold text-[#DD6B20] uppercase tracking-widest font-display">
-                  EXAM WRITING TIP
-                </span>
+              <div className="chapter-mark mb-5">
+                <span className="label">EXAM WRITING TIP</span>
+                <div className="rule"></div>
               </div>
-              <div className="text-foreground/80 leading-relaxed font-serif text-base md:text-lg whitespace-pre-wrap">
+              <div className="prose-content text-foreground/80 leading-relaxed font-serif text-base md:text-lg whitespace-pre-wrap">
                 {renderWithMath(bodyText)}
               </div>
             </div>
@@ -200,19 +181,19 @@ export default function AnswerView() {
           return (
             <div
               key={index}
-              className="mb-8 p-6 bg-card border border-border/60 border-l-4 border-l-[#6C63FF] rounded-r-2xl shadow-sm transition-all duration-300 hover:shadow-md relative overflow-hidden"
+              className="mb-12 p-8 bg-card/40 border border-border/50 rounded-2xl shadow-sm transition-all duration-300 relative overflow-hidden"
             >
-              <div className="flex items-center justify-between mb-3 border-b border-border/40 pb-2">
-                <span className="text-xs font-bold text-[#6C63FF] uppercase tracking-widest font-display">
+              <div className="flex items-center justify-between mb-5 border-b border-border/40 pb-3">
+                <span className="text-xs font-bold uppercase tracking-widest font-display text-muted-foreground">
                   {headerLine}
                 </span>
                 {partLabel && (
-                  <span className="bg-[#6C63FF]/10 text-[#6C63FF] text-[10px] font-bold px-2 py-0.5 rounded-full font-display">
+                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-mono bg-secondary/50 px-2 py-0.5 rounded-sm">
                     PART {partLabel}
                   </span>
                 )}
               </div>
-              <div className="text-foreground/80 leading-relaxed font-serif text-base md:text-lg whitespace-pre-wrap">
+              <div className="text-foreground/90 leading-relaxed font-serif text-base md:text-lg whitespace-pre-wrap">
                 {renderWithMath(bodyText)}
               </div>
             </div>
@@ -231,17 +212,15 @@ export default function AnswerView() {
           return (
             <div
               key={`exp-${index}-${pIdx}`}
-              className="mb-8 p-6 bg-[#F0F4FF] border-l-4 border-[#4A90D9] rounded-r-2xl shadow-sm"
+              className="mb-12 relative"
             >
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-lg">💡</span>
-                <span className="text-xs font-bold text-[#4A90D9] uppercase tracking-widest font-display">
-                  EXPLANATION
-                </span>
+              <div className="chapter-mark mb-5">
+                <span className="label">EXPLANATION</span>
+                <div className="rule"></div>
               </div>
-              <p className="text-foreground/80 leading-relaxed font-serif text-base md:text-lg whitespace-pre-wrap">
-                {expText}
-              </p>
+              <div className="prose-content text-foreground/80 leading-relaxed font-serif text-base md:text-lg whitespace-pre-wrap">
+                {renderWithMath(expText)}
+              </div>
             </div>
           );
         }
@@ -273,23 +252,6 @@ export default function AnswerView() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden page-enter">
-      <style>{`
-        @keyframes swipeHint {
-          0% { transform: translateX(-30px); opacity: 0; }
-          50% { opacity: 1; }
-          100% { transform: translateX(30px); opacity: 0; }
-        }
-        @keyframes pulseIndicator {
-          0%, 100% { opacity: 0.4; transform: scale(0.95); }
-          50% { opacity: 1; transform: scale(1.05); }
-        }
-        .animate-swipe {
-          animation: swipeHint 2s ease-in-out infinite;
-        }
-        .animate-pulse-indicator {
-          animation: pulseIndicator 1.5s ease-in-out infinite;
-        }
-      `}</style>
       
       {user && <WatermarkOverlay />}
       
@@ -367,35 +329,21 @@ export default function AnswerView() {
                   paperMode
                     ? 'bg-foreground text-background shadow-md'
                     : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80'
-                } ${showHint ? 'ring-2 ring-primary/50 ring-offset-2 ring-offset-card' : ''}`}
+                }`}
                 title={paperMode ? 'Switch to Default Mode' : 'Switch to Paper Mode'}
               >
                 Aa
               </button>
-
-              {/* One-time hint tooltip */}
-              {showHint && (
-                <div className="absolute right-0 top-full mt-2.5 z-20 w-56 animate-fade-in">
-                  <div className="bg-foreground text-background rounded-xl px-4 py-3 text-xs leading-relaxed shadow-elevated relative">
-                    <div className="absolute -top-1.5 right-4 w-3 h-3 bg-foreground rotate-45 rounded-sm" />
-                    <p className="font-medium mb-1">👀 Easy on your eyes</p>
-                    <p className="opacity-80">Tap to switch to Paper Mode — a warm, book-like reading experience.</p>
-                    <button onClick={dismissHint} className="absolute top-2 right-2 opacity-60 hover:opacity-100 transition-opacity">
-                      <X className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
           {/* Visually Boxed Question */}
-          <div className={`mb-8 p-6 rounded-2xl border-l-4 shadow-sm transition-colors duration-500 ${
+          <div className={`mb-8 p-6 rounded-xl border-l-4 transition-colors duration-500 ${
             paperMode
               ? 'bg-[#FDF6E3] border-[#1a1a2e] text-[#1C1917]'
               : 'bg-[#FFF8F0] border-[#1a1a2e] text-[#1D1B18]'
           }`}>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2.5 block font-display">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2 block font-display">
               THE QUESTION
             </span>
             <h1 className="text-lg md:text-xl font-display font-bold leading-snug">
@@ -421,79 +369,6 @@ export default function AnswerView() {
           disabled={!isOwned || questionIndex >= questions.length - 1}
           className="fixed right-0 top-44 bottom-0 w-[22vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
         />
-
-        {/* Immersive Full-Screen Onboarding Overlay */}
-        {showTapHint && (
-          <div
-            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col justify-between p-6 animate-fade-in text-white"
-            onClick={dismissTapHint}
-          >
-            {/* Top Info */}
-            <div className="text-center pt-8">
-              <span className="text-[10px] font-display font-bold uppercase tracking-widest text-white/40">
-                Onboarding Guide
-              </span>
-            </div>
-
-            {/* Tap Gestures Visualizer */}
-            <div className="flex flex-col items-center justify-center gap-6 my-auto">
-              <div className="relative w-72 h-44 border-2 border-dashed border-white/20 rounded-3xl flex flex-col items-center justify-center bg-white/5 p-4 shadow-xl">
-                {/* Left Tap Indicator */}
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 flex flex-col items-center animate-pulse-indicator">
-                  <span className="text-3xl filter drop-shadow">👈</span>
-                  <span className="text-[9px] uppercase font-black tracking-widest text-white/50 mt-1">Tap Left</span>
-                  <span className="text-[8px] text-white/30 font-serif">Previous</span>
-                </div>
-
-                {/* Right Tap Indicator */}
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex flex-col items-center animate-pulse-indicator" style={{ animationDelay: '0.75s' }}>
-                  <span className="text-3xl filter drop-shadow">👉</span>
-                  <span className="text-[9px] uppercase font-black tracking-widest text-white/50 mt-1">Tap Right</span>
-                  <span className="text-[8px] text-white/30 font-serif">Next</span>
-                </div>
-
-                {/* Swipe center */}
-                <div className="text-center text-xs font-serif italic text-white/90">
-                  Swipe Left / Right
-                  <div className="w-20 h-1 bg-white/25 rounded-full mx-auto mt-3.5 overflow-hidden relative border border-white/5">
-                    <div className="absolute h-full w-5 bg-[#6C63FF] rounded-full animate-swipe" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="text-center max-w-sm px-4">
-                <h3 className="text-lg font-display font-bold tracking-tight mb-2">
-                  Glide through questions
-                </h3>
-                <p className="text-xs text-white/70 font-serif leading-relaxed">
-                  Tap the left or right edges of the screen, or swipe horizontally, to move seamlessly between questions.
-                </p>
-              </div>
-            </div>
-
-            {/* Got It Button */}
-            <div className="pb-8 w-full max-w-xs mx-auto">
-              <button
-                onClick={dismissTapHint}
-                className="w-full py-4 rounded-2xl bg-white text-black text-sm font-display font-bold tracking-tight hover:bg-white/90 active:scale-[0.98] transition-all shadow-xl"
-              >
-                Got it ✓
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Spacer for bottom navigation */}
-        <div className="h-28" />
-
-        {/* Sticky Fixed Bottom Navigation Bar */}
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl border-t border-border/40 py-4 px-4 shadow-[0_-8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_-8px_30px_rgb(0,0,0,0.2)] md:px-8">
-          <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
-            <Button
-              variant="outline"
-              onClick={goPrev}
-              disabled={questionIndex === 0}
-              className="flex items-center gap-2 rounded-xl text-muted-foreground hover:text-foreground border-border/60 hover:bg-secondary/50 transition-all h-10 px-4"
             >
               <ChevronLeft className="w-4 h-4" /> <span className="hidden sm:inline">Previous</span>
             </Button>
