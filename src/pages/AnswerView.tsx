@@ -33,6 +33,17 @@ export default function AnswerView() {
   };
 
   useEffect(() => {
+    if (paperMode) {
+      document.documentElement.classList.add("paper-mode-active");
+    } else {
+      document.documentElement.classList.remove("paper-mode-active");
+    }
+    return () => {
+      document.documentElement.classList.remove("paper-mode-active");
+    };
+  }, [paperMode]);
+
+  useEffect(() => {
     if (!isLoading && !user) navigate("/login");
   }, [user, isLoading, navigate]);
 
@@ -257,12 +268,18 @@ export default function AnswerView() {
       <style>{`
         .paper-mode-active {
           background-color: #F8F5EE !important;
+          background-image: none !important;
+        }
+        .paper-mode-active body {
+          background-color: #F8F5EE !important;
+          background-image: none !important;
           color: #2E251B !important;
         }
         .paper-mode-active .bg-card {
           background-color: #FFFDF9 !important;
           border-color: #E8E0D0 !important;
           color: #2E251B !important;
+          box-shadow: none !important;
         }
         .paper-mode-active .text-foreground\\/80,
         .paper-mode-active .text-foreground\\/90 {
@@ -299,34 +316,6 @@ export default function AnswerView() {
           <Link to={`/course/${id}`} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground font-medium text-sm transition-colors">
             <ArrowLeft className="w-4 h-4" /> Back to {course.code}
           </Link>
-
-          <div className="flex items-center gap-3 bg-secondary/40 border border-border/40 px-3 py-1.5 rounded-full shadow-sm">
-            {questionIndex > 0 ? (
-              <button
-                onClick={goPrev}
-                className="flex items-center gap-0.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
-                title="Previous Question"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-            ) : (
-              <span className="w-4" />
-            )}
-
-            <div className="h-4 w-px bg-border/40" />
-
-            {hasNext(questionIndex, questions.length) && isOwned ? (
-              <button
-                onClick={goNext}
-                className="flex items-center gap-0.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
-                title="Next Question"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            ) : (
-              <span className="w-4" />
-            )}
-          </div>
         </div>
 
         {/* Progress Bar */}
