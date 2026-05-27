@@ -39,7 +39,7 @@ const RESULTS_LEDGER: ResultData[] = [
     level: "200 Level",
     gpa: "4.83 / 5.00",
     standing: "First Class",
-    quote: "David. O.",
+    quote: "Daniel. O.",
   },
   {
     id: 3,
@@ -47,7 +47,7 @@ const RESULTS_LEDGER: ResultData[] = [
     level: "200 Level",
     gpa: "4.67 / 5.00",
     standing: "First Class",
-    quote: "Mimi. C",
+    quote: "Chris. E",
   },
   {
     id: 4,
@@ -55,7 +55,7 @@ const RESULTS_LEDGER: ResultData[] = [
     level: "100 Level",
     gpa: "4.50 / 5.00",
     standing: "Second Class Upper",
-    quote: "Anjola. L",
+    quote: "Anjola. O",
   },
   {
     id: 5,
@@ -63,7 +63,7 @@ const RESULTS_LEDGER: ResultData[] = [
     level: "300 Level",
     gpa: "4.75 / 5.00",
     standing: "First Class",
-    quote: "Aliyah. A",
+    quote: "Zainab. A",
   },
   {
     id: 6,
@@ -71,7 +71,7 @@ const RESULTS_LEDGER: ResultData[] = [
     level: "200 Level",
     gpa: "5.00 / 5.00",
     standing: "First Class",
-    quote: "Steph. O",
+    quote: "Ella. C",
   }
 ];
 
