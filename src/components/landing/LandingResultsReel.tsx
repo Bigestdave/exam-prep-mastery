@@ -36,7 +36,7 @@ const RESULTS_LEDGER: ResultData[] = [
   {
     id: 2,
     image: result2,
-    level: "400 Level",
+    level: "200 Level",
     gpa: "4.83 / 5.00",
     standing: "First Class",
     quote: "David. O.",
