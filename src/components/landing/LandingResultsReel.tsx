@@ -30,7 +30,7 @@ const RESULTS_LEDGER: ResultData[] = [
     level: "300 Level",
     gpa: "5.00 / 5.00",
     standing: "First Class",
-    quote: "I just studied the past questions on LCU Prep and saw the exact same concepts in my exams. It made studying so much more straightforward.",
+    quote: "I just studied the tutorial questions on LCU Prep and saw the exact same concepts in my exams. It made studying so much more straightforward.",
   },
   {
     id: 2,
@@ -38,7 +38,7 @@ const RESULTS_LEDGER: ResultData[] = [
     level: "400 Level",
     gpa: "4.83 / 5.00",
     standing: "First Class",
-    quote: "Having verified, step-by-step solutions instead of guessing answers online saved me hours of reading.",
+    quote: "Seriously, having a verified step-by-step solutions, instead of guessing answers online saved me hours of reading.",
   },
   {
     id: 3,
@@ -54,7 +54,7 @@ const RESULTS_LEDGER: ResultData[] = [
     level: "100 Level",
     gpa: "4.50 / 5.00",
     standing: "Second Class Upper",
-    quote: "I focused on what mattered instead of reading the entire textbook the night before. LCU Prep was exactly what I needed.",
+    quote: "I focused on what mattered instead of reading the entire course material the night before. LCU Prep was exactly what I just needed.",
   },
   {
     id: 5,
@@ -62,7 +62,7 @@ const RESULTS_LEDGER: ResultData[] = [
     level: "300 Level",
     gpa: "4.75 / 5.00",
     standing: "First Class",
-    quote: "The solutions from previous years gave me the confidence to walk into the exam hall knowing exactly how to answer the questions.",
+    quote: "The answers from the tutorial questions, gave me the confidence to walk into the exam hall knowing exactly how to answer the questions.",
   },
   {
     id: 6,
@@ -159,7 +159,10 @@ export function LandingResultsReel() {
           </div>
 
           <h2 className="mt-5 text-[28px] md:text-[40px] font-display font-bold text-foreground leading-[1.1] tracking-[-0.02em]">
-            Students reading with LCU Prep are already outperforming in their departments.
+            Students reading with LCU Prep are already{" "}
+            <span className="font-serif italic text-accent block sm:inline">
+              outperforming in their departments.
+            </span>
           </h2>
           <p className="mt-4 text-sm md:text-base text-muted-foreground leading-relaxed max-w-md mx-auto">
             When the broadsheets are pasted, the difference is clear.
