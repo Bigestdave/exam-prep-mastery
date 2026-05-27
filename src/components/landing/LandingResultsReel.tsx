@@ -1,23 +1,18 @@
+import { useState, useEffect, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
 import result1 from "@/assets/results/result-1.png";
 import result2 from "@/assets/results/result-2.png";
 import result3 from "@/assets/results/result-3.png";
 import result4 from "@/assets/results/result-4.png";
 import result5 from "@/assets/results/result-5.png";
 import result6 from "@/assets/results/result-6.png";
-import { useState, useEffect, useRef, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, ShieldCheck } from "lucide-react";
 
 /**
  * PREMIUM GRADE LEDGER SLIDER
  * Features world-class custom spring easing and a tactile luxury editorial aesthetic.
- * Displays actual screenshot images of results.
- * 
- * HOW TO ADD YOUR OWN SCREENSHOTS:
- * 1. Save your result screenshots in src/assets/results/
- * 2. Import them at the top of this file:
- *    import result1 from "@/assets/results/result-1.png";
- * 3. Replace the `image: null` in the RESULTS_LEDGER array with the imported variable.
+ * Displays actual screenshot images of results inside a clean, modern browser-style casing.
  */
 
 interface ResultData {
@@ -32,7 +27,7 @@ interface ResultData {
 const RESULTS_LEDGER: ResultData[] = [
   {
     id: 1,
-    image: result1, // Replace with your image import, e.g., result1
+    image: result1,
     level: "300 Level",
     gpa: "5.00 / 5.00",
     standing: "First Class",
@@ -191,23 +186,28 @@ export function LandingResultsReel() {
               exit="exit"
               className="w-full flex flex-col items-center gap-8 md:gap-12"
             >
-              {/* 1. ACTUAL SCREENSHOT CARD */}
-              <div className="w-full max-w-4xl bg-card border border-border/60 rounded-2xl shadow-card p-4 md:p-6 relative overflow-hidden group select-none">
+              {/* 1. MINIMALIST DOCUMENT/BROWSER SCREENSHOT CARD */}
+              <div className="w-full max-w-4xl bg-card border border-border/60 rounded-2xl shadow-card p-4 md:p-6 relative overflow-hidden select-none">
                 
-                {/* Stamped Header */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-border/40 text-neutral-500 font-mono uppercase text-[9px] tracking-[0.2em]">
+                {/* Minimalist Document Tab Header */}
+                <div className="flex items-center justify-between gap-3 mb-5 pb-4 border-b border-border/40 text-[10px] text-muted-foreground font-mono tracking-wider">
                   <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>LCU PREP · AUTHENTIC RECORD EXCERPT</span>
+                    {/* 3 mini elegant macOS-style window control dots */}
+                    <div className="flex gap-1.5 mr-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-neutral-200/80" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-neutral-200/80" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-neutral-200/80" />
+                    </div>
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>OFFICIAL GRADE SHEET EXCERPT</span>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-[#F0EDEA] px-2 py-0.5 rounded text-neutral-600 font-medium">
-                    <ShieldCheck className="w-3 h-3 text-accent" />
-                    <span>CONFIDENTIAL IDENTITY PROTECTED</span>
+                  <div className="hidden sm:block text-[9px] uppercase bg-neutral-100 px-2 py-0.5 rounded text-neutral-600 font-mono tracking-[0.1em]">
+                    Verified Proof
                   </div>
                 </div>
 
                 {/* Screenshot Image Container */}
-                <div className="w-full overflow-hidden bg-[#FAF8F3] rounded-lg flex items-center justify-center min-h-[200px]">
+                <div className="w-full overflow-hidden bg-[#FAF8F3] rounded-lg flex items-center justify-center min-h-[160px] md:min-h-[200px]">
                   {activeResult.image ? (
                     <img
                       src={activeResult.image}
@@ -227,11 +227,6 @@ export function LandingResultsReel() {
                       </div>
                     </div>
                   )}
-                </div>
-
-                {/* Stamped Certification Seal */}
-                <div className="absolute top-12 right-6 md:right-10 rotate-[-12deg] border-2 border-dashed border-emerald-600/60 rounded px-3 py-1 text-[10px] font-black text-emerald-600/90 font-mono tracking-[0.2em] bg-emerald-50/70 uppercase select-none pointer-events-none shadow-sm">
-                  VERIFIED LEDGER
                 </div>
               </div>
 
@@ -319,3 +314,4 @@ export function LandingResultsReel() {
     </section>
   );
 }
+
