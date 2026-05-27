@@ -31,7 +31,7 @@ const RESULTS_LEDGER: ResultData[] = [
     level: "300 Level",
     gpa: "5.00 / 5.00",
     standing: "First Class",
-    quote: "I just studied the tutorial questions on LCU Prep and saw the exact same concepts in my exams. It made studying so much more straightforward.",
+    quote: "Kachi. C",
   },
   {
     id: 2,
@@ -39,7 +39,7 @@ const RESULTS_LEDGER: ResultData[] = [
     level: "400 Level",
     gpa: "4.83 / 5.00",
     standing: "First Class",
-    quote: "Seriously, having a verified step-by-step solutions, instead of guessing answers online saved me hours of reading.",
+    quote: "David. O",
   },
   {
     id: 3,
@@ -47,7 +47,7 @@ const RESULTS_LEDGER: ResultData[] = [
     level: "200 Level",
     gpa: "4.67 / 5.00",
     standing: "First Class",
-    quote: "When the results were pasted in my department, the difference was clear. I scored A's in courses people usually struggle with.",
+    quote: "Mimi. C",
   },
   {
     id: 4,
@@ -55,7 +55,7 @@ const RESULTS_LEDGER: ResultData[] = [
     level: "100 Level",
     gpa: "4.50 / 5.00",
     standing: "Second Class Upper",
-    quote: "I focused on what mattered instead of reading my entire course material the night before. LCU Prep was exactly what I just needed.",
+    quote: "Anjola. L",
   },
   {
     id: 5,
@@ -63,7 +63,7 @@ const RESULTS_LEDGER: ResultData[] = [
     level: "300 Level",
     gpa: "4.75 / 5.00",
     standing: "First Class",
-    quote: "The answers from the tutorial questions, gave me confidence to enter the exam hall knowing exactly how to answer the questions.",
+    quote: "Aliyah. A",
   },
   {
     id: 6,
@@ -71,7 +71,7 @@ const RESULTS_LEDGER: ResultData[] = [
     level: "200 Level",
     gpa: "5.00 / 5.00",
     standing: "First Class",
-    quote: "It's a very straightforward tool. You study the actual questions that come out, you understand the steps, and you get your A.",
+    quote: "Steph. O",
   }
 ];
 
