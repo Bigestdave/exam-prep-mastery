@@ -442,7 +442,7 @@ function NextButton({ hasNext, isOwned, id, hasQuiz, onClick }: { hasNext: boole
   } else if (hasNext && !isOwned) {
     return (
        <Link to={`/course/${id}`}>
-         <Button variant="outline" className="gap-2 rounded-xl font-display font-bold border-accent text-accent hover:bg-accent/10 transition-all h-10 px-4">
+         <Button className="gap-2 rounded-xl font-display font-bold bg-foreground text-background hover:bg-foreground/90 transition-all h-10 px-5 shadow-sm">
            Unlock Full Course <ChevronRight className="w-4 h-4" />
          </Button>
        </Link>
