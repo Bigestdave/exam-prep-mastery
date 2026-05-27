@@ -165,7 +165,7 @@ export function LandingResultsReel() {
             </span>
           </h2>
           <p className="mt-4 text-sm md:text-base text-muted-foreground leading-relaxed max-w-md mx-auto">
-            When the broadsheets are pasted, the difference is clear.
+            When the results are pasted, the difference is clear.
           </p>
         </div>
 
