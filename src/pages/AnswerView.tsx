@@ -300,7 +300,7 @@ export default function AnswerView() {
         {/* Progress Bar */}
         <div className="w-full h-1 bg-secondary rounded-full overflow-hidden mb-6">
           <div
-            className="h-full bg-[#6C63FF] transition-all duration-500 ease-out"
+            className="h-full bg-accent transition-all duration-500 ease-out"
             style={{ width: `${((questionIndex + 1) / questions.length) * 100}%` }}
           />
         </div>
@@ -318,7 +318,7 @@ export default function AnswerView() {
               <span className={`text-xs font-display font-bold uppercase tracking-wider transition-colors duration-500 ${paperMode ? 'text-[#1C1917]/50' : 'text-muted-foreground'}`}>
                 Question {questionIndex + 1}
               </span>
-              {isFreePreview && !isOwned && <span className="text-[10px] font-bold text-[#6C63FF] bg-[#6C63FF]/10 px-2.5 py-0.5 rounded-full font-display">FREE PREVIEW</span>}
+              {isFreePreview && !isOwned && <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded bg-badge-free-bg text-badge-free-text font-display">FREE PREVIEW</span>}
             </div>
 
             {/* Paper Mode Toggle */}
@@ -426,14 +426,14 @@ function hasNext(current: number, total: number) {
 function NextButton({ hasNext, isOwned, id, hasQuiz, onClick }: { hasNext: boolean, isOwned: boolean, id: string, hasQuiz?: boolean, onClick?: () => void }) {
   if (hasNext && isOwned) {
     return (
-      <Button onClick={onClick} className="gap-2 rounded-xl shadow-glow font-display font-bold bg-[#6C63FF] hover:bg-[#5b52e6] text-white transition-all h-10 px-4">
+      <Button onClick={onClick} className="gap-2 rounded-xl shadow-glow font-display font-bold bg-accent hover:bg-accent/90 text-accent-foreground transition-all h-10 px-4">
         Next Question <ChevronRight className="w-4 h-4" />
       </Button>
     );
   } else if (hasNext && !isOwned) {
     return (
        <Link to={`/course/${id}`}>
-         <Button variant="outline" className="gap-2 rounded-xl font-display font-bold border-[#6C63FF] text-[#6C63FF] hover:bg-[#6C63FF]/10 transition-all h-10 px-4">
+         <Button variant="outline" className="gap-2 rounded-xl font-display font-bold border-accent text-accent hover:bg-accent/10 transition-all h-10 px-4">
            Unlock Full Course <ChevronRight className="w-4 h-4" />
          </Button>
        </Link>
