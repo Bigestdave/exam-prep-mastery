@@ -13,6 +13,7 @@ import { LandingProblem } from "@/components/landing/LandingProblem";
 import { LandingValueProps } from "@/components/landing/LandingValueProps";
 import { LandingHowItWorks } from "@/components/landing/LandingHowItWorks";
 import { LandingSocialProof } from "@/components/landing/LandingSocialProof";
+import { LandingResultsReel } from "@/components/landing/LandingResultsReel";
 import { LandingQuizPreview } from "@/components/landing/LandingQuizPreview";
 import { LandingQuizDiscovery } from "@/components/landing/LandingQuizDiscovery";
 import { LandingPricing } from "@/components/landing/LandingPricing";
@@ -40,6 +41,7 @@ export default function Landing() {
       <Header isLoggedIn={!!user} userName={profile?.full_name || ''} />
       <LandingHero />
       <LandingTrustBar />
+      <LandingResultsReel />
       <LandingProblem />
       <LandingValueProps />
       <LandingHowItWorks />
@@ -53,3 +55,4 @@ export default function Landing() {
     </div>
   );
 }
+
