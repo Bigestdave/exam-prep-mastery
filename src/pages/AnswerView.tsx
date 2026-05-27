@@ -122,48 +122,138 @@ export default function AnswerView() {
 
   // --- RENDER ANSWER TEXT ---
   const renderAnswer = (text: string) => {
-    // First, split out %%% explanation %%% blocks
-    const segments = text.split(/(%%%[\s\S]*?%%%)/g);
+    if (!text) return null;
 
-    return segments.map((segment, segIdx) => {
-      const trimmedSeg = segment.trim();
-      if (!trimmedSeg) return null;
+    // Split the text into segments by ### headers
+    const segments = text.split(/(?=### )/g);
 
-      // Check if this is a %%% explanation %%% block
-      if (trimmedSeg.startsWith('%%%') && trimmedSeg.endsWith('%%%')) {
-        const explanationText = trimmedSeg.slice(3, -3).trim();
-        return (
-          <div key={`exp-${segIdx}`} className="mb-6 pl-4 border-l-2 border-primary/30 bg-primary/[0.03] rounded-r-xl py-3 pr-4">
-            <span className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5 inline-block">
-              Why This Is Correct
-            </span>
-            <p className="text-muted-foreground leading-relaxed font-serif text-base whitespace-pre-wrap">
-              {explanationText}
-            </p>
-          </div>
-        );
-      }
+    return segments.map((segment, index) => {
+      const trimmed = segment.trim();
+      if (!trimmed) return null;
 
-      // Then handle ### headers within normal text segments
-      const parts = trimmedSeg.split(/(?=### )/g);
-      return parts.map((part, i) => {
-        const trimmed = part.trim();
-        if (!trimmed) return null;
+      if (trimmed.startsWith('### ')) {
+        const lines = trimmed.split('\n');
+        const headerLine = lines[0].replace('### ', '').trim();
+        const bodyText = lines.slice(1).join('\n').trim();
 
-        if (trimmed.startsWith('### ')) {
-          const [title, ...body] = trimmed.replace('### ', '').split('\n');
+        const headerUpper = headerLine.toUpperCase();
+
+        if (headerUpper.includes('EXPLANATION') || headerUpper.includes('WHY THIS IS CORRECT')) {
           return (
-            <div key={`${segIdx}-${i}`} className="mb-8 pl-4 border-l-2 border-primary/20 relative">
-              <span className="text-[10px] font-bold text-primary uppercase tracking-widest bg-primary/5 px-2 py-1 rounded mb-2 inline-block">
-                {title}
-              </span>
-              <div className="text-muted-foreground leading-relaxed font-serif text-lg whitespace-pre-wrap">
-                {renderWithMath(body.join('\n').trim())}
+            <div
+              key={index}
+              className="mb-8 p-6 bg-[#F0F4FF] border-l-4 border-[#4A90D9] rounded-r-2xl shadow-sm transition-all duration-300 hover:shadow-md"
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">💡</span>
+                <span className="text-xs font-bold text-[#4A90D9] uppercase tracking-widest font-display">
+                  EXPLANATION
+                </span>
+              </div>
+              <div className="text-foreground/80 leading-relaxed font-serif text-base md:text-lg whitespace-pre-wrap">
+                {renderWithMath(bodyText)}
+              </div>
+            </div>
+          );
+        } else if (headerUpper.includes('KEY POINTS') || headerUpper.includes('POINTS TO REMEMBER')) {
+          return (
+            <div
+              key={index}
+              className="mb-8 p-6 bg-[#F0FFF4] border-l-4 border-[#38A169] rounded-r-2xl shadow-sm transition-all duration-300 hover:shadow-md"
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">🔑</span>
+                <span className="text-xs font-bold text-[#38A169] uppercase tracking-widest font-display">
+                  KEY POINTS TO REMEMBER
+                </span>
+              </div>
+              <div className="text-foreground/80 leading-relaxed font-serif text-base md:text-lg whitespace-pre-wrap">
+                {renderWithMath(bodyText)}
+              </div>
+            </div>
+          );
+        } else if (headerUpper.includes('EXAM WRITING TIP') || headerUpper.includes('EXAM TIP')) {
+          return (
+            <div
+              key={index}
+              className="mb-8 p-6 bg-[#FFFBF0] border-l-4 border-[#DD6B20] rounded-r-2xl shadow-sm transition-all duration-300 hover:shadow-md"
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">📝</span>
+                <span className="text-xs font-bold text-[#DD6B20] uppercase tracking-widest font-display">
+                  EXAM WRITING TIP
+                </span>
+              </div>
+              <div className="text-foreground/80 leading-relaxed font-serif text-base md:text-lg whitespace-pre-wrap">
+                {renderWithMath(bodyText)}
+              </div>
+            </div>
+          );
+        } else {
+          // Sub-answer style
+          let partLabel = "";
+          const matchPart = headerLine.match(/\b(part\s+)?(\d+[a-z]|[a-z])\b/i);
+          if (matchPart) {
+            partLabel = matchPart[2].toUpperCase();
+          }
+
+          return (
+            <div
+              key={index}
+              className="mb-8 p-6 bg-card border border-border/60 border-l-4 border-l-[#6C63FF] rounded-r-2xl shadow-sm transition-all duration-300 hover:shadow-md relative overflow-hidden"
+            >
+              <div className="flex items-center justify-between mb-3 border-b border-border/40 pb-2">
+                <span className="text-xs font-bold text-[#6C63FF] uppercase tracking-widest font-display">
+                  {headerLine}
+                </span>
+                {partLabel && (
+                  <span className="bg-[#6C63FF]/10 text-[#6C63FF] text-[10px] font-bold px-2 py-0.5 rounded-full font-display">
+                    PART {partLabel}
+                  </span>
+                )}
+              </div>
+              <div className="text-foreground/80 leading-relaxed font-serif text-base md:text-lg whitespace-pre-wrap">
+                {renderWithMath(bodyText)}
               </div>
             </div>
           );
         }
-        return <div key={`${segIdx}-${i}`} className="text-muted-foreground leading-relaxed font-serif text-lg mb-6 whitespace-pre-wrap">{renderWithMath(trimmed)}</div>;
+      }
+
+      // Default segment (direct answer before any headers, or legacy text)
+      const percentParts = trimmed.split(/(%%%[\s\S]*?%%%)/g);
+      return percentParts.map((part, pIdx) => {
+        const trimmedPart = part.trim();
+        if (!trimmedPart) return null;
+
+        if (trimmedPart.startsWith('%%%') && trimmedPart.endsWith('%%%')) {
+          const expText = trimmedPart.slice(3, -3).trim();
+          return (
+            <div
+              key={`exp-${index}-${pIdx}`}
+              className="mb-8 p-6 bg-[#F0F4FF] border-l-4 border-[#4A90D9] rounded-r-2xl shadow-sm"
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">💡</span>
+                <span className="text-xs font-bold text-[#4A90D9] uppercase tracking-widest font-display">
+                  EXPLANATION
+                </span>
+              </div>
+              <p className="text-foreground/80 leading-relaxed font-serif text-base md:text-lg whitespace-pre-wrap">
+                {expText}
+              </p>
+            </div>
+          );
+        }
+
+        return (
+          <div
+            key={`text-${index}-${pIdx}`}
+            className="text-foreground/90 leading-relaxed font-serif text-base md:text-lg mb-8 whitespace-pre-wrap px-1"
+          >
+            {renderWithMath(trimmedPart)}
+          </div>
+        );
       });
     });
   };
@@ -183,6 +273,23 @@ export default function AnswerView() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden page-enter">
+      <style>{`
+        @keyframes swipeHint {
+          0% { transform: translateX(-30px); opacity: 0; }
+          50% { opacity: 1; }
+          100% { transform: translateX(30px); opacity: 0; }
+        }
+        @keyframes pulseIndicator {
+          0%, 100% { opacity: 0.4; transform: scale(0.95); }
+          50% { opacity: 1; transform: scale(1.05); }
+        }
+        .animate-swipe {
+          animation: swipeHint 2s ease-in-out infinite;
+        }
+        .animate-pulse-indicator {
+          animation: pulseIndicator 1.5s ease-in-out infinite;
+        }
+      `}</style>
       
       {user && <WatermarkOverlay />}
       
@@ -193,9 +300,48 @@ export default function AnswerView() {
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
-        <Link to={`/course/${id}`} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 font-medium text-sm transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to {course.code}
-        </Link>
+        {/* Persistent Header Navigation */}
+        <div className="flex items-center justify-between mb-4 px-1">
+          <Link to={`/course/${id}`} className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground font-medium text-sm transition-colors">
+            <ArrowLeft className="w-4 h-4" /> Back to {course.code}
+          </Link>
+
+          <div className="flex items-center gap-4 bg-secondary/40 border border-border/40 px-3 py-1.5 rounded-full shadow-sm">
+            {questionIndex > 0 ? (
+              <button
+                onClick={goPrev}
+                className="flex items-center gap-0.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" /> Q{questionIndex}
+              </button>
+            ) : (
+              <span className="w-8" />
+            )}
+
+            <span className="text-[10px] font-display font-black uppercase tracking-widest text-muted-foreground select-none">
+              Q{questionIndex + 1} OF {questions.length}
+            </span>
+
+            {hasNext(questionIndex, questions.length) && isOwned ? (
+              <button
+                onClick={goNext}
+                className="flex items-center gap-0.5 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Q{questionIndex + 2} <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            ) : (
+              <span className="w-8" />
+            )}
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="w-full h-1 bg-secondary rounded-full overflow-hidden mb-6">
+          <div
+            className="h-full bg-[#6C63FF] transition-all duration-500 ease-out"
+            style={{ width: `${((questionIndex + 1) / questions.length) * 100}%` }}
+          />
+        </div>
 
         {/* Question Card */}
         <div
@@ -210,7 +356,7 @@ export default function AnswerView() {
               <span className={`text-xs font-display font-bold uppercase tracking-wider transition-colors duration-500 ${paperMode ? 'text-[#1C1917]/50' : 'text-muted-foreground'}`}>
                 Question {questionIndex + 1}
               </span>
-              {isFreePreview && !isOwned && <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">FREE PREVIEW</span>}
+              {isFreePreview && !isOwned && <span className="text-[10px] font-bold text-[#6C63FF] bg-[#6C63FF]/10 px-2.5 py-0.5 rounded-full font-display">FREE PREVIEW</span>}
             </div>
 
             {/* Paper Mode Toggle */}
@@ -243,19 +389,26 @@ export default function AnswerView() {
             </div>
           </div>
 
-          <h1 className={`text-xl md:text-2xl font-display font-bold leading-snug mb-8 transition-colors duration-500 ${
-            paperMode ? 'text-[#1C1917]' : 'text-foreground'
+          {/* Visually Boxed Question */}
+          <div className={`mb-8 p-6 rounded-2xl border-l-4 shadow-sm transition-colors duration-500 ${
+            paperMode
+              ? 'bg-[#FDF6E3] border-[#1a1a2e] text-[#1C1917]'
+              : 'bg-[#FFF8F0] border-[#1a1a2e] text-[#1D1B18]'
           }`}>
-            {renderWithMath(question.question_text)}
-          </h1>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2.5 block font-display">
+              THE QUESTION
+            </span>
+            <h1 className="text-lg md:text-xl font-display font-bold leading-snug">
+              {renderWithMath(question.question_text)}
+            </h1>
+          </div>
 
           <div className={`prose-content relative transition-colors duration-500 ${paperMode ? 'paper-mode' : ''}`}>
             {renderAnswer(question.answer_text)}
           </div>
         </div>
 
-        {/* WhatsApp-story style tap zones — left edge = previous, right edge = next.
-            Start below the card header (Aa button row) so the toggle stays clickable. */}
+        {/* WhatsApp-story style tap zones */}
         <button
           aria-label="Previous question"
           onClick={goPrev}
@@ -269,59 +422,94 @@ export default function AnswerView() {
           className="fixed right-0 top-44 bottom-0 w-[22vw] z-10 md:hidden disabled:opacity-0 bg-transparent"
         />
 
-        {/* First-time tap hint overlay — Linear/Arc inspired */}
+        {/* Immersive Full-Screen Onboarding Overlay */}
         {showTapHint && (
           <div
-            className="fixed inset-0 z-50 md:hidden bg-foreground/40 backdrop-blur-md flex items-center justify-center px-8 animate-fade-in"
+            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col justify-between p-6 animate-fade-in text-white"
             onClick={dismissTapHint}
           >
-            <div
-              className="bg-card/95 backdrop-blur-xl border border-border/60 rounded-2xl shadow-elevated max-w-xs w-full p-6 text-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-center gap-3 mb-5">
-                <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary border border-border/60">
-                  <ChevronLeft className="w-4 h-4 text-foreground" />
-                  <span className="text-[10px] font-display font-bold uppercase tracking-widest text-muted-foreground">Prev</span>
+            {/* Top Info */}
+            <div className="text-center pt-8">
+              <span className="text-[10px] font-display font-bold uppercase tracking-widest text-white/40">
+                Onboarding Guide
+              </span>
+            </div>
+
+            {/* Tap Gestures Visualizer */}
+            <div className="flex flex-col items-center justify-center gap-6 my-auto">
+              <div className="relative w-72 h-44 border-2 border-dashed border-white/20 rounded-3xl flex flex-col items-center justify-center bg-white/5 p-4 shadow-xl">
+                {/* Left Tap Indicator */}
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 flex flex-col items-center animate-pulse-indicator">
+                  <span className="text-3xl filter drop-shadow">👈</span>
+                  <span className="text-[9px] uppercase font-black tracking-widest text-white/50 mt-1">Tap Left</span>
+                  <span className="text-[8px] text-white/30 font-serif">Previous</span>
                 </div>
-                <div className="h-px w-4 bg-border" />
-                <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-foreground text-background">
-                  <span className="text-[10px] font-display font-bold uppercase tracking-widest">Next</span>
-                  <ChevronRight className="w-4 h-4" />
+
+                {/* Right Tap Indicator */}
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex flex-col items-center animate-pulse-indicator" style={{ animationDelay: '0.75s' }}>
+                  <span className="text-3xl filter drop-shadow">👉</span>
+                  <span className="text-[9px] uppercase font-black tracking-widest text-white/50 mt-1">Tap Right</span>
+                  <span className="text-[8px] text-white/30 font-serif">Next</span>
+                </div>
+
+                {/* Swipe center */}
+                <div className="text-center text-xs font-serif italic text-white/90">
+                  Swipe Left / Right
+                  <div className="w-20 h-1 bg-white/25 rounded-full mx-auto mt-3.5 overflow-hidden relative border border-white/5">
+                    <div className="absolute h-full w-5 bg-[#6C63FF] rounded-full animate-swipe" />
+                  </div>
                 </div>
               </div>
-              <h3 className="text-base font-display font-bold text-foreground mb-1.5 tracking-tight">
-                Move at your pace
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed font-serif mb-5">
-                Tap the left or right edge of the screen to glide between questions.
-              </p>
+
+              <div className="text-center max-w-sm px-4">
+                <h3 className="text-lg font-display font-bold tracking-tight mb-2">
+                  Glide through questions
+                </h3>
+                <p className="text-xs text-white/70 font-serif leading-relaxed">
+                  Tap the left or right edges of the screen, or swipe horizontally, to move seamlessly between questions.
+                </p>
+              </div>
+            </div>
+
+            {/* Got It Button */}
+            <div className="pb-8 w-full max-w-xs mx-auto">
               <button
                 onClick={dismissTapHint}
-                className="w-full py-2.5 rounded-xl bg-foreground text-background text-sm font-display font-bold tracking-tight hover:opacity-90 transition-opacity"
+                className="w-full py-4 rounded-2xl bg-white text-black text-sm font-display font-bold tracking-tight hover:bg-white/90 active:scale-[0.98] transition-all shadow-xl"
               >
-                Got it
+                Got it ✓
               </button>
             </div>
           </div>
         )}
 
-        {/* Navigation Buttons */}
-        <div className="flex items-center justify-between pb-20">
-          <Link to={questionIndex > 0 ? `/course/${id}/answer/${questionIndex - 1}` : '#'}>
-             <Button variant="outline" disabled={questionIndex === 0} className="gap-2 rounded-xl">
-               <ChevronLeft className="w-4 h-4" /> Previous
-             </Button>
-          </Link>
+        {/* Spacer for bottom navigation */}
+        <div className="h-28" />
 
-          <Link to={hasNext(questionIndex, questions.length) ? `/course/${id}/answer/${questionIndex + 1}` : '#'}>
-             <NextButton 
-               hasNext={hasNext(questionIndex, questions.length)} 
-               isOwned={isOwned} 
-               id={id!}
-               hasQuiz={hasQuizData}
-             />
-          </Link>
+        {/* Sticky Fixed Bottom Navigation Bar */}
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-xl border-t border-border/40 py-4 px-4 shadow-[0_-8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_-8px_30px_rgb(0,0,0,0.2)] md:px-8">
+          <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
+            <Button
+              variant="outline"
+              onClick={goPrev}
+              disabled={questionIndex === 0}
+              className="flex items-center gap-2 rounded-xl text-muted-foreground hover:text-foreground border-border/60 hover:bg-secondary/50 transition-all h-10 px-4"
+            >
+              <ChevronLeft className="w-4 h-4" /> <span className="hidden sm:inline">Previous</span>
+            </Button>
+
+            <div className="text-xs font-display font-bold text-muted-foreground uppercase tracking-widest select-none bg-secondary/50 px-3 py-1.5 rounded-full border border-border/20">
+              {questionIndex + 1} / {questions.length}
+            </div>
+
+            <NextButton 
+              hasNext={hasNext(questionIndex, questions.length)} 
+              isOwned={isOwned} 
+              id={id!}
+              hasQuiz={hasQuizData}
+              onClick={goNext}
+            />
+          </div>
         </div>
       </main>
     </div>
@@ -354,17 +542,17 @@ function hasNext(current: number, total: number) {
   return current < total - 1;
 }
 
-function NextButton({ hasNext, isOwned, id, hasQuiz }: { hasNext: boolean, isOwned: boolean, id: string, hasQuiz?: boolean }) {
+function NextButton({ hasNext, isOwned, id, hasQuiz, onClick }: { hasNext: boolean, isOwned: boolean, id: string, hasQuiz?: boolean, onClick?: () => void }) {
   if (hasNext && isOwned) {
     return (
-      <Button className="gap-2 rounded-xl shadow-glow font-display font-bold">
+      <Button onClick={onClick} className="gap-2 rounded-xl shadow-glow font-display font-bold bg-[#6C63FF] hover:bg-[#5b52e6] text-white transition-all h-10 px-4">
         Next Question <ChevronRight className="w-4 h-4" />
       </Button>
     );
   } else if (hasNext && !isOwned) {
     return (
        <Link to={`/course/${id}`}>
-         <Button variant="outline" className="gap-2 rounded-xl font-display font-bold">
+         <Button variant="outline" className="gap-2 rounded-xl font-display font-bold border-[#6C63FF] text-[#6C63FF] hover:bg-[#6C63FF]/10 transition-all h-10 px-4">
            Unlock Full Course <ChevronRight className="w-4 h-4" />
          </Button>
        </Link>
@@ -374,8 +562,8 @@ function NextButton({ hasNext, isOwned, id, hasQuiz }: { hasNext: boolean, isOwn
     return (
       <Link to={`/course/${id}/quiz`}>
         <Button
-          className="gap-2 rounded-xl font-display font-bold bg-accent hover:bg-accent/90 text-accent-foreground animate-pulse"
-          style={{ letterSpacing: '-0.05em' }}
+          className="gap-2 rounded-xl font-display font-bold bg-emerald-600 hover:bg-emerald-500 text-white animate-pulse transition-all h-10 px-4"
+          style={{ letterSpacing: '-0.02em' }}
         >
           Prove You Are Exam Ready <ChevronRight className="w-4 h-4" />
         </Button>
@@ -384,7 +572,7 @@ function NextButton({ hasNext, isOwned, id, hasQuiz }: { hasNext: boolean, isOwn
   } else {
     return (
       <Link to={`/course/${id}`}>
-        <Button variant="outline" className="gap-2 rounded-xl">
+        <Button variant="outline" className="gap-2 rounded-xl h-10 px-4">
           Back to List
         </Button>
       </Link>
