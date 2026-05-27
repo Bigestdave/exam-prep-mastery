@@ -39,7 +39,7 @@ const RESULTS_LEDGER: ResultData[] = [
     level: "400 Level",
     gpa: "4.83 / 5.00",
     standing: "First Class",
-    quote: "David. O",
+    quote: "David. O.",
   },
   {
     id: 3,
