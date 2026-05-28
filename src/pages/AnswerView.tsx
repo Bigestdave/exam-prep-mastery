@@ -8,8 +8,7 @@ import { useCourseQuestions } from "@/hooks/useCourseQuestions";
 import { ArrowLeft, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { useQuizData } from "@/hooks/useQuizData";
-import { InlineMath, BlockMath } from "react-katex";
-import "katex/dist/katex.min.css";
+import { renderWithMath } from "@/lib/renderWithMath";
 
 export default function AnswerView() {
   const { id, questionId } = useParams<{ id: string; questionId: string }>();
@@ -248,7 +247,7 @@ export default function AnswerView() {
     });
   };
 
-  // --- WATERMARK COMPONENT (Inside file for simplicity) ---
+  // --- WATERMARK COMPONENT ---
   const WatermarkOverlay = () => (
     <div className="fixed inset-0 z-50 pointer-events-none overflow-hidden flex items-center justify-center">
       <div className="grid grid-cols-2 gap-20 rotate-[-30deg] scale-150 opacity-[0.025]">
@@ -406,27 +405,6 @@ export default function AnswerView() {
   );
 }
 
-// Render text with inline $...$ and block $$...$$ math via KaTeX.
-function renderWithMath(text: string): React.ReactNode {
-  if (!text) return text;
-  // Split on $$...$$ first, then $...$
-  const blockParts = text.split(/(\$\$[\s\S]+?\$\$)/g);
-  return blockParts.map((bp, bi) => {
-    if (bp.startsWith("$$") && bp.endsWith("$$")) {
-      const tex = bp.slice(2, -2).trim();
-      try { return <BlockMath key={`b${bi}`} math={tex} />; } catch { return bp; }
-    }
-    const inlineParts = bp.split(/(\$[^$\n]+?\$)/g);
-    return inlineParts.map((ip, ii) => {
-      if (ip.startsWith("$") && ip.endsWith("$") && ip.length > 2) {
-        const tex = ip.slice(1, -1);
-        try { return <InlineMath key={`b${bi}-i${ii}`} math={tex} />; } catch { return ip; }
-      }
-      return <span key={`b${bi}-t${ii}`}>{ip}</span>;
-    });
-  });
-}
-
 // Helper to clean up render logic
 function hasNext(current: number, total: number) {
   return current < total - 1;
@@ -448,7 +426,6 @@ function NextButton({ hasNext, isOwned, id, hasQuiz, onClick }: { hasNext: boole
        </Link>
     );
   } else if (!hasNext && isOwned && hasQuiz) {
-    // Last question + owned + has quiz → "Prove You Are Exam Ready" pulsing green CTA
     return (
       <Link to={`/course/${id}/quiz`}>
         <Button
