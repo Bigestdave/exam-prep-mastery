@@ -6,6 +6,7 @@ import { useCourses } from "@/hooks/useCourses";
 import { useQuizData, QuizOption } from "@/hooks/useQuizData";
 import { supabase } from "@/integrations/supabase/client";
 import { X, ChevronLeft } from "lucide-react";
+import { renderWithMath } from "@/lib/renderWithMath";
 import QuizResult from "@/components/quiz/QuizResult";
 
 export default function Quiz() {
@@ -199,7 +200,7 @@ export default function Quiz() {
               className="text-xl md:text-2xl font-display font-bold text-foreground text-center mb-10 leading-snug"
               style={{ letterSpacing: '-0.05em' }}
             >
-              {currentQuestion.quiz_question_text}
+              {renderWithMath(currentQuestion.quiz_question_text)}
             </h2>
 
             {/* Option Cards — NO radio dots, entire card is the button */}
@@ -214,7 +215,7 @@ export default function Quiz() {
                   disabled={isTransitioning}
                 >
                   <span className="text-sm font-medium text-foreground leading-relaxed">
-                    {option.text}
+                    {renderWithMath(option.text)}
                   </span>
                 </motion.button>
               ))}
