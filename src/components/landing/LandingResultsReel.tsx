@@ -139,7 +139,7 @@ export function LandingResultsReel() {
       scale: 0.97,
       rotateY: dir > 0 ? -6 : 6,
       transition: {
-        ease: [0.16, 1, 0.3, 1], // Custom Apple-style decelerating cubic-bezier for exits
+        ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
         duration: 0.45,
       },
     }),
