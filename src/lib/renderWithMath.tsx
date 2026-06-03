@@ -2,6 +2,18 @@ import { InlineMath, BlockMath } from "react-katex";
 import "katex/dist/katex.min.css";
 
 /**
+ * Auto-wrap unmarked math expressions in `$...$` so things like
+ * `2x^2-4x-3=0` written by lecturers (no LaTeX delimiters) still render.
+ * Heuristic: any whitespace-delimited token containing `^` is treated as math.
+ * Skipped if the text already contains `$` (author opted in to manual LaTeX).
+ */
+function autoLatex(text: string): string {
+  if (!text || text.includes("$")) return text;
+  // Match contiguous non-space runs that include a caret (e.g. 2x^2-4x-3=0, X^2+2x-8=0)
+  return text.replace(/\S*\^\S+/g, (m) => `$${m}$`);
+}
+
+/**
  * Renders a string containing optional LaTeX math expressions using KaTeX.
  *
  * Supports two modes:
@@ -13,6 +25,8 @@ import "katex/dist/katex.min.css";
  */
 export function renderWithMath(text: string): React.ReactNode {
   if (!text) return text;
+
+  text = autoLatex(text);
 
   // Split on $$...$$ (block math) first
   const blockParts = text.split(/(\$\$[\s\S]+?\$\$)/g);
