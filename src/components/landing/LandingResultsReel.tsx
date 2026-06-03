@@ -79,7 +79,7 @@ export function LandingResultsReel() {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(0); // -1 for left, 1 for right
   const [isPaused, setIsPaused] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const SLIDE_DURATION = 8000; // 8 seconds per slide for relaxed reading
 
@@ -113,7 +113,7 @@ export function LandingResultsReel() {
 
   // Custom World-Class spring easing config
   const springTransition = {
-    type: "spring",
+    type: "spring" as const,
     stiffness: 240,
     damping: 24,
     mass: 0.8,
@@ -139,7 +139,7 @@ export function LandingResultsReel() {
       scale: 0.97,
       rotateY: dir > 0 ? -6 : 6,
       transition: {
-        ease: [0.16, 1, 0.3, 1], // Custom Apple-style decelerating cubic-bezier for exits
+        ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
         duration: 0.45,
       },
     }),
