@@ -435,8 +435,7 @@ function NextButton({ hasNext, isOwned, id, hasQuiz, onClick }: { hasNext: boole
     return (
       <Link to={`/course/${id}/quiz`}>
         <Button
-          className="gap-2 rounded-2xl font-display font-bold bg-accent hover:bg-accent/90 text-accent-foreground transition-all h-10 px-4 shadow-card text-sm"
-          style={{ letterSpacing: '-0.05em' }}
+          className="gap-2 rounded-xl font-semibold bg-accent hover:bg-accent/90 text-accent-foreground transition-all h-10 px-4 shadow-card text-sm"
         >
           Prove You Are Exam Ready <ChevronRight className="w-4 h-4" />
         </Button>
