@@ -72,6 +72,12 @@ export default function AnswerView() {
   }, [questionIndex, questions.length, isOwned, id]);
 
   const onTouchStart = (e: React.TouchEvent) => {
+    // Don't hijack horizontal scroll inside wide math equations
+    if ((e.target as Element).closest?.('.katex-display')) {
+      touchStartX.current = null;
+      touchStartY.current = null;
+      return;
+    }
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
   };
@@ -429,8 +435,8 @@ function NextButton({ hasNext, isOwned, id, hasQuiz, onClick }: { hasNext: boole
     return (
       <Link to={`/course/${id}/quiz`}>
         <Button
-          className="gap-2 rounded-xl font-display font-bold bg-emerald-600 hover:bg-emerald-500 text-white animate-pulse transition-all h-10 px-4"
-          style={{ letterSpacing: '-0.02em' }}
+          className="gap-2 rounded-2xl font-display font-bold bg-accent hover:bg-accent/90 text-accent-foreground transition-all h-10 px-4 shadow-card text-sm"
+          style={{ letterSpacing: '-0.05em' }}
         >
           Prove You Are Exam Ready <ChevronRight className="w-4 h-4" />
         </Button>
