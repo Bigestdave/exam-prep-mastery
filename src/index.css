@@ -4,6 +4,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* KaTeX: allow wide equations to scroll horizontally instead of overflowing the card */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  padding: 0.25rem 0;
+}
+.katex-display > .katex {
+  white-space: nowrap;
+}
+.katex {
+  max-width: 100%;
+}
+
 @layer base {
   :root {
     /* THE LEAD CITY DOSSIER — "Old Money" Editorial */
