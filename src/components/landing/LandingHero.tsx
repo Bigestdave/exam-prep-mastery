@@ -36,19 +36,19 @@ export function LandingHero() {
               className="block text-[34px] md:text-[52px] lg:text-[64px] font-display font-bold leading-[0.98] tracking-[-0.02em]"
               {...fadeUp(0.1)}
             >
-              You've read your notes.
+              Every question on your exam
             </motion.span>
             <motion.span
               className="block text-[34px] md:text-[52px] lg:text-[64px] font-display font-bold leading-[0.98] tracking-[-0.02em] mt-1"
               {...fadeUp(0.2)}
             >
-              Now prove you're
+              is already in your tutorial.
             </motion.span>
             <motion.span
               className="block text-[40px] md:text-[60px] lg:text-[72px] font-serif italic text-accent mt-2 leading-[0.95]"
               {...fadeUp(0.3)}
             >
-              ready for the exam.
+              We solved them all.
             </motion.span>
           </h1>
           
