@@ -33,19 +33,19 @@ export function LandingHero() {
           
           <h1 className="text-foreground leading-[1.1] mb-6">
             <motion.span
-              className="block text-[28px] md:text-[52px] lg:text-[64px] font-display font-bold leading-[0.98] tracking-[-0.02em]"
+              className="block text-[32px] md:text-[52px] lg:text-[64px] font-display font-bold leading-[0.98] tracking-[-0.02em]"
               {...fadeUp(0.1)}
             >
               Every question on your exam
             </motion.span>
             <motion.span
-              className="block text-[28px] md:text-[52px] lg:text-[64px] font-display font-bold leading-[0.98] tracking-[-0.02em] mt-1"
+              className="block text-[32px] md:text-[52px] lg:text-[64px] font-display font-bold leading-[0.98] tracking-[-0.02em] mt-1"
               {...fadeUp(0.2)}
             >
               is already in your tutorial.
             </motion.span>
             <motion.span
-              className="block text-[34px] md:text-[60px] lg:text-[72px] font-serif italic text-accent mt-2 leading-[0.95]"
+              className="block text-[38px] md:text-[60px] lg:text-[72px] font-serif italic text-accent mt-2 leading-[0.95]"
               {...fadeUp(0.3)}
             >
               We solved them all.
