@@ -159,6 +159,7 @@ export const facultyCategories: FacultyCategory[] = [
       "Chemistry Education",
       "Physics Education",
       "Mathematics Education",
+      "English Language Education",
     ],
   },
   {
